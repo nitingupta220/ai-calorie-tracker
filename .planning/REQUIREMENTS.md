@@ -171,28 +171,96 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
+Which phases cover which requirements. Updated during roadmap creation. Mapped against 5-phase coarse vertical-MVP roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GATE-01 to GATE-04 | Phase 0 | Pending |
-| INFRA-01 to INFRA-08 | Phase 1 | Pending |
-| AUTH-01 to AUTH-05 | Phase 1 / Phase 3 | Pending |
-| TRACK-01 to TRACK-10 | Phase 1 / Phase 3 | Pending |
-| ADVICE-01 to ADVICE-06 | Phase 2 | Pending |
-| ONBOARD-01 to ONBOARD-05 | Phase 3 | Pending |
-| HISTORY-01 to HISTORY-06 | Phase 3 | Pending |
-| RETAIN-01 to RETAIN-05 | Phase 4 | Pending |
-| COMP-01 to COMP-09 | Phase 1 + Phase 7 | Pending |
-| WOZ-01 to WOZ-03 | Phase 3 (Week 6) | Pending |
-| ALPHA-01 to ALPHA-05 | Phase 5 + Phase 6 | Pending |
-| LAUNCH-01 to LAUNCH-04 | Phase 8 | Pending |
+| GATE-01 | Phase 1 | Pending |
+| GATE-02 | Phase 1 | Pending |
+| GATE-03 | Phase 1 | Pending |
+| GATE-04 | Phase 1 | Pending |
+| INFRA-01 | Phase 2 | Pending |
+| INFRA-02 | Phase 2 | Pending |
+| INFRA-03 | Phase 2 | Pending |
+| INFRA-04 | Phase 2 | Pending |
+| INFRA-05 | Phase 2 | Pending |
+| INFRA-06 | Phase 2 | Pending |
+| INFRA-07 | Phase 2 | Pending |
+| INFRA-08 | Phase 2 | Pending |
+| AUTH-01 | Phase 2 | Pending |
+| AUTH-02 | Phase 2 | Pending |
+| AUTH-03 | Phase 3 | Pending |
+| AUTH-04 | Phase 2 | Pending |
+| AUTH-05 | Phase 2 | Pending |
+| ONBOARD-01 | Phase 3 | Pending |
+| ONBOARD-02 | Phase 3 | Pending |
+| ONBOARD-03 | Phase 3 | Pending |
+| ONBOARD-04 | Phase 3 | Pending |
+| ONBOARD-05 | Phase 3 | Pending |
+| TRACK-01 | Phase 3 | Pending |
+| TRACK-02 | Phase 3 | Pending |
+| TRACK-03 | Phase 3 | Pending |
+| TRACK-04 | Phase 2 | Pending |
+| TRACK-05 | Phase 2 | Pending |
+| TRACK-06 | Phase 2 | Pending |
+| TRACK-07 | Phase 2 | Pending |
+| TRACK-08 | Phase 2 | Pending |
+| TRACK-09 | Phase 2 | Pending |
+| TRACK-10 | Phase 2 | Pending |
+| ADVICE-01 | Phase 2 | Pending |
+| ADVICE-02 | Phase 2 | Pending |
+| ADVICE-03 | Phase 2 | Pending |
+| ADVICE-04 | Phase 2 | Pending |
+| ADVICE-05 | Phase 2 | Pending |
+| ADVICE-06 | Phase 2 | Pending |
+| HISTORY-01 | Phase 3 | Pending |
+| HISTORY-02 | Phase 3 | Pending |
+| HISTORY-03 | Phase 2 | Pending |
+| HISTORY-04 | Phase 2 | Pending |
+| HISTORY-05 | Phase 3 | Pending |
+| HISTORY-06 | Phase 3 | Pending |
+| RETAIN-01 | Phase 3 | Pending |
+| RETAIN-02 | Phase 3 | Pending |
+| RETAIN-03 | Phase 3 | Pending |
+| RETAIN-04 | Phase 3 | Pending |
+| RETAIN-05 | Phase 3 | Pending |
+| COMP-01 | Phase 2 | Pending |
+| COMP-02 | Phase 3 | Pending |
+| COMP-03 | Phase 2 | Pending |
+| COMP-04 | Phase 2 | Pending |
+| COMP-05 | Phase 2 | Pending |
+| COMP-06 | Phase 3 | Pending |
+| COMP-07 | Phase 4 | Pending |
+| COMP-08 | Phase 2 | Pending |
+| COMP-09 | Phase 2 | Pending |
+| WOZ-01 | Phase 3 | Pending |
+| WOZ-02 | Phase 3 | Pending |
+| WOZ-03 | Phase 3 | Pending |
+| ALPHA-01 | Phase 4 | Pending |
+| ALPHA-02 | Phase 4 | Pending |
+| ALPHA-03 | Phase 4 | Pending |
+| ALPHA-04 | Phase 4 | Pending |
+| ALPHA-05 | Phase 4 | Pending |
+| LAUNCH-01 | Phase 4 | Pending |
+| LAUNCH-02 | Phase 4 | Pending |
+| LAUNCH-03 | Phase 5 | Pending |
+| LAUNCH-04 | Phase 5 | Pending |
+| V1.1-02 (trigger) | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 67 total (4 gates + 8 infra + 5 auth + 5 onboard + 10 track + 6 advice + 6 history + 5 retain + 9 comp + 3 woz + 5 alpha + 4 launch + 1 V1.1 trigger)
-- Mapped to phases: 67
-- Unmapped: 0 ✓
+- v1 requirements: 67 total (4 gates + 8 infra + 5 auth + 5 onboard + 10 track + 6 advice + 6 history + 5 retain + 9 comp + 3 woz + 5 alpha + 4 launch + 1 V1.1 trigger / V1.1-02 trigger evaluated in Phase 5; V1.1-01 deferred-but-tracked)
+- Mapped to phases: 67 / 67
+- Unmapped: 0
+
+**Per-phase counts:**
+- Phase 1 (Validation Gates + Stack Lock): 4 (GATE-01..04)
+- Phase 2 (Photo → Macros End-to-End): 31 (INFRA-01..08 + AUTH-01,02,04,05 + TRACK-04..10 + ADVICE-01..06 + HISTORY-03,04 + COMP-01,03,04,05,08,09)
+- Phase 3 (Mobile App + Inline Advice + Retention): 22 (AUTH-03 + ONBOARD-01..05 + TRACK-01,02,03 + HISTORY-01,02,05,06 + RETAIN-01..05 + WOZ-01..03 + COMP-02,06)
+- Phase 4 (Alpha Hardening + Launch Submission): 8 (ALPHA-01..05 + COMP-07 + LAUNCH-01,02)
+- Phase 5 (Public Launch + Paid Tier + V1.1): 3 (LAUNCH-03,04 + V1.1-02 trigger)
+
+**Sum check:** 4 + 31 + 22 + 8 + 3 = 68 (= 67 v1 + V1.1-02 trigger evaluated as gate, not deferred)
 
 ---
 *Requirements defined: 2026-05-27 (YOLO mode + auto-synthesis from PROJECT.md + research/SUMMARY.md + design doc iteration 4)*
-*Last updated: 2026-05-27 after initial definition*
+*Last updated: 2026-05-27 — traceability mapped to 5-phase coarse vertical-MVP roadmap*
