@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bhog — V1 Design Spec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Coach Dark — locked palette */
+    --bg: #1A1612;
+    --bg-elevated: #211C18;
+    --bg-card: #2B2520;
+    --bg-card-hover: #332C26;
+    --border: #3A3128;
+    --border-strong: #4A4036;
+
+    --text-primary: #F5EFE6;
+    --text-secondary: #B9AE9F;
+    --text-muted: #7A7165;
+
+    --accent: #C9A26B;
+    --accent-hover: #D4B07A;
+    --accent-dim: rgba(201, 162, 107, 0.12);
+    --sage: #8A9D7F;
+    --sage-dim: rgba(138, 157, 127, 0.14);
+
+    --success: #7DA86E;
+    --warning: #D4A24A;
+    --error: #C26B5C;
+    --info: #6B8DA8;
+
+    /* Type scale (sp/px) */
+    --t-10: 0.625rem;
+    --t-12: 0.75rem;
+    --t-14: 0.875rem;
+    --t-16: 1rem;
+    --t-18: 1.125rem;
+    --t-20: 1.25rem;
+    --t-24: 1.5rem;
+    --t-32: 2rem;
+    --t-40: 2.5rem;
+    --t-56: 3.5rem;
+
+    /* Spacing — 4pt grid */
+    --s-1: 4px;
+    --s-2: 8px;
+    --s-3: 12px;
+    --s-4: 16px;
+    --s-5: 20px;
+    --s-6: 24px;
+    --s-8: 32px;
+    --s-10: 40px;
+    --s-12: 48px;
+    --s-16: 64px;
+    --s-20: 80px;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    --shadow-card: 0 1px 0 rgba(245, 239, 230, 0.04) inset, 0 12px 32px rgba(0, 0, 0, 0.32);
+    --transition: 180ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: var(--t-16);
+    line-height: 1.55;
+    color: var(--text-primary);
+    background: var(--bg);
+    background-image: radial-gradient(ellipse 1200px 600px at 50% -100px, rgba(201, 162, 107, 0.06), transparent 60%);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  /* Numerics use Plex Mono */
+  .num, code, pre, kbd { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; font-feature-settings: "tnum" 1, "lnum" 1; }
+
+  /* Layout */
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 var(--s-6); }
+
+  /* Nav */
+  nav.top {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(26, 22, 18, 0.84);
+    backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav.top .inner { display: flex; align-items: center; gap: var(--s-6); padding: var(--s-4) var(--s-6); max-width: 1100px; margin: 0 auto; }
+  nav.top .brand { display: flex; align-items: center; gap: var(--s-3); font-weight: 800; letter-spacing: -0.02em; font-size: var(--t-20); }
+  nav.top .brand .dot { width: 10px; height: 10px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-dim); }
+  nav.top ul { list-style: none; display: flex; gap: var(--s-5); margin-left: auto; flex-wrap: wrap; }
+  nav.top a { color: var(--text-secondary); text-decoration: none; font-size: var(--t-14); font-weight: 500; transition: color var(--transition); }
+  nav.top a:hover { color: var(--text-primary); }
+
+  /* Hero */
+  .hero { padding: var(--s-20) 0 var(--s-12); text-align: left; }
+  .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); letter-spacing: -0.04em; font-weight: 800; line-height: 1.02; }
+  .hero h1 .accent { color: var(--accent); }
+  .hero p.lead { margin-top: var(--s-6); font-size: var(--t-20); color: var(--text-secondary); max-width: 720px; line-height: 1.5; }
+  .hero .meta { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-8); }
+  .pill {
+    display: inline-flex; align-items: center; gap: var(--s-2);
+    padding: 6px 12px; border-radius: 999px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    font-size: var(--t-12); font-weight: 500; color: var(--text-secondary);
+  }
+  .pill.accent { color: var(--accent); border-color: rgba(201, 162, 107, 0.3); background: var(--accent-dim); }
+  .pill.sage { color: var(--sage); border-color: rgba(138, 157, 127, 0.3); background: var(--sage-dim); }
+
+  /* Sections */
+  section.block { padding: var(--s-16) 0; border-top: 1px solid var(--border); }
+  section.block:first-of-type { border-top: 0; }
+  .section-head { display: flex; align-items: baseline; gap: var(--s-4); margin-bottom: var(--s-8); flex-wrap: wrap; }
+  .section-num { font-family: "IBM Plex Mono", monospace; font-size: var(--t-14); color: var(--accent); letter-spacing: 0.02em; }
+  h2 { font-size: var(--t-40); letter-spacing: -0.03em; font-weight: 700; line-height: 1.1; }
+  h3 { font-size: var(--t-24); letter-spacing: -0.02em; font-weight: 600; margin-top: var(--s-8); margin-bottom: var(--s-4); }
+  h4 { font-size: var(--t-18); font-weight: 600; margin-top: var(--s-6); margin-bottom: var(--s-3); color: var(--text-primary); }
+  p, li { color: var(--text-secondary); }
+  p { margin-top: var(--s-3); max-width: 760px; }
+  ul, ol { padding-left: var(--s-5); }
+  li { margin-top: var(--s-2); }
+  strong { color: var(--text-primary); font-weight: 600; }
+  a.inline { color: var(--accent); text-decoration: underline; text-decoration-color: rgba(201, 162, 107, 0.4); text-underline-offset: 3px; }
+
+  /* Card */
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--s-6);
+    transition: border-color var(--transition), background var(--transition);
+  }
+  .card + .card { margin-top: var(--s-4); }
+  .card:hover { border-color: var(--border-strong); }
+  .card-grid { display: grid; gap: var(--s-4); }
+  @media (min-width: 720px) { .card-grid.cols-2 { grid-template-columns: 1fr 1fr; } .card-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; } }
+
+  /* KPI tile */
+  .kpi { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--s-4) var(--s-5); }
+  .kpi .label { font-size: var(--t-12); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  .kpi .value { font-family: "IBM Plex Mono", monospace; font-size: var(--t-24); margin-top: var(--s-2); color: var(--text-primary); font-feature-settings: "tnum" 1; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin-top: var(--s-4); font-size: var(--t-14); }
+  th, td { text-align: left; padding: var(--s-3) var(--s-3); border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: var(--t-12); letter-spacing: 0.05em; }
+  td { color: var(--text-secondary); }
+  td strong { color: var(--text-primary); }
+  tr:last-child td { border-bottom: 0; }
+  .table-wrap { overflow-x: auto; }
+
+  /* Code / pre */
+  pre {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--s-4) var(--s-5);
+    font-size: var(--t-13, 0.8125rem);
+    overflow-x: auto;
+    margin-top: var(--s-4);
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+  code { font-size: 0.95em; padding: 2px 6px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); }
+  pre code { padding: 0; background: none; border: 0; }
+
+  /* Mascot block */
+  .mascot-row { display: grid; gap: var(--s-8); align-items: center; }
+  @media (min-width: 800px) { .mascot-row { grid-template-columns: 280px 1fr; } }
+  .mascot-frame { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: var(--s-6); display: flex; flex-direction: column; align-items: center; }
+  .mascot-svg { width: 100%; max-width: 220px; }
+  .mascot-caption { font-family: "IBM Plex Mono", monospace; font-size: var(--t-12); color: var(--text-muted); margin-top: var(--s-3); letter-spacing: 0.05em; }
+
+  /* Swatch row */
+  .swatch-grid { display: grid; gap: var(--s-3); grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); margin-top: var(--s-4); }
+  .swatch { border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--s-3); background: var(--bg-card); }
+  .swatch .chip { width: 100%; height: 56px; border-radius: var(--radius-sm); margin-bottom: var(--s-3); border: 1px solid var(--border); }
+  .swatch .name { font-size: var(--t-14); font-weight: 600; color: var(--text-primary); }
+  .swatch .hex { font-family: "IBM Plex Mono", monospace; font-size: var(--t-12); color: var(--text-muted); margin-top: 2px; }
+
+  /* Type sample */
+  .type-row { display: grid; gap: var(--s-2); margin-top: var(--s-4); }
+  .type-row .sample { display: flex; align-items: baseline; gap: var(--s-4); padding: var(--s-3) var(--s-4); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-card); }
+  .type-row .sample .label { font-family: "IBM Plex Mono", monospace; font-size: var(--t-12); color: var(--text-muted); min-width: 110px; }
+  .type-row .sample .text { color: var(--text-primary); }
+
+  /* Status badges */
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: var(--t-12); font-weight: 600; }
+  .badge.locked { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(201, 162, 107, 0.3); }
+  .badge.pending { background: rgba(212, 162, 74, 0.12); color: var(--warning); border: 1px solid rgba(212, 162, 74, 0.3); }
+  .badge.deferred { background: rgba(122, 113, 101, 0.16); color: var(--text-muted); border: 1px solid var(--border); }
+  .badge.risk { background: rgba(194, 107, 92, 0.14); color: var(--error); border: 1px solid rgba(194, 107, 92, 0.3); }
+
+  /* Checklist */
+  .check { display: flex; gap: var(--s-3); align-items: flex-start; padding: var(--s-3) 0; border-bottom: 1px solid var(--border); }
+  .check:last-child { border-bottom: 0; }
+  .check input[type=checkbox] {
+    appearance: none; -webkit-appearance: none;
+    width: 18px; height: 18px; min-width: 18px; margin-top: 3px;
+    border: 1.5px solid var(--border-strong); border-radius: 5px; background: var(--bg-card);
+    cursor: pointer; transition: all var(--transition);
+  }
+  .check input[type=checkbox]:hover { border-color: var(--accent); }
+  .check input[type=checkbox]:checked { background: var(--accent); border-color: var(--accent); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%231A1612' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2.5 6.5l2.5 2.5 4.5-5.5'/%3E%3C/svg%3E"); background-position: center; background-repeat: no-repeat; }
+  .check .body { flex: 1; }
+  .check .body .title { color: var(--text-primary); font-weight: 500; font-size: var(--t-14); }
+  .check .body .meta { color: var(--text-muted); font-size: var(--t-12); margin-top: 2px; font-family: "IBM Plex Mono", monospace; }
+
+  /* Speech bubble */
+  .speech { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--s-4) var(--s-5); position: relative; max-width: 520px; }
+  .speech:before { content: ""; position: absolute; left: -10px; top: 24px; width: 20px; height: 20px; background: var(--bg-card); border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg); }
+  .speech .who { font-family: "IBM Plex Mono", monospace; font-size: var(--t-12); color: var(--accent); letter-spacing: 0.05em; }
+  .speech .says { color: var(--text-primary); margin-top: var(--s-2); }
+
+  /* Footer */
+  footer { padding: var(--s-12) 0 var(--s-16); border-top: 1px solid var(--border); color: var(--text-muted); font-size: var(--t-14); }
+  footer .row { display: flex; flex-wrap: wrap; gap: var(--s-4); justify-content: space-between; align-items: center; }
+  footer .build { font-family: "IBM Plex Mono", monospace; font-size: var(--t-12); }
+
+  /* Phase pills */
+  .phase-row { display: grid; gap: var(--s-3); margin-top: var(--s-4); }
+  .phase {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: var(--s-4) var(--s-5); display: grid; gap: var(--s-2); align-items: start;
+  }
+  @media (min-width: 720px) { .phase { grid-template-columns: 60px 1fr 130px; align-items: center; } }
+  .phase .num { font-family: "IBM Plex Mono", monospace; font-size: var(--t-24); color: var(--accent); font-weight: 600; }
+  .phase .title { color: var(--text-primary); font-weight: 600; font-size: var(--t-16); }
+  .phase .goal { color: var(--text-secondary); font-size: var(--t-14); margin-top: 2px; }
+  .phase .weeks { font-family: "IBM Plex Mono", monospace; font-size: var(--t-12); color: var(--text-muted); }
+
+  /* Decision callouts */
+  .callout { border: 1px solid var(--border); border-left: 3px solid var(--accent); background: var(--bg-elevated); padding: var(--s-4) var(--s-5); border-radius: var(--radius-md); margin-top: var(--s-4); }
+  .callout.sage { border-left-color: var(--sage); }
+  .callout.warn { border-left-color: var(--warning); }
+  .callout.risk { border-left-color: var(--error); }
+  .callout .lbl { font-family: "IBM Plex Mono", monospace; font-size: var(--t-12); color: var(--accent); letter-spacing: 0.05em; }
+  .callout.sage .lbl { color: var(--sage); }
+  .callout.warn .lbl { color: var(--warning); }
+  .callout.risk .lbl { color: var(--error); }
+  .callout .body { margin-top: var(--s-2); color: var(--text-primary); }
+
+  /* TOC list */
+  .toc { columns: 2; column-gap: var(--s-6); }
+  .toc a { color: var(--text-secondary); text-decoration: none; display: block; padding: var(--s-2) 0; border-bottom: 1px solid var(--border); font-size: var(--t-14); }
+  .toc a:hover { color: var(--accent); }
+  .toc a .n { font-family: "IBM Plex Mono", monospace; color: var(--accent); margin-right: var(--s-3); font-size: var(--t-12); }
+
+  /* Sticker palette demo */
+  .demo-card-shell { display: grid; gap: var(--s-4); }
+  @media (min-width: 760px) { .demo-card-shell { grid-template-columns: 1fr 1fr; } }
+  .meal-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: var(--s-5); box-shadow: var(--shadow-card);
+  }
+  .meal-card .dish { font-size: var(--t-20); font-weight: 600; letter-spacing: -0.01em; color: var(--text-primary); }
+  .meal-card .conf { font-family: "IBM Plex Mono", monospace; font-size: var(--t-12); color: var(--sage); margin-top: 2px; }
+  .meal-card .macros { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-3); margin-top: var(--s-4); padding-top: var(--s-4); border-top: 1px solid var(--border); }
+  .meal-card .m { display: flex; flex-direction: column; }
+  .meal-card .m .k { font-family: "IBM Plex Mono", monospace; font-size: var(--t-24); color: var(--text-primary); font-feature-settings: "tnum" 1; }
+  .meal-card .m .l { font-size: var(--t-10); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-top: 2px; }
+  .meal-card .advice { margin-top: var(--s-4); padding-top: var(--s-4); border-top: 1px solid var(--border); display: flex; gap: var(--s-3); align-items: flex-start; }
+  .meal-card .advice .avatar { width: 36px; height: 36px; border-radius: 999px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--bg); font-size: var(--t-16); flex-shrink: 0; }
+  .meal-card .advice .copy { color: var(--text-primary); font-size: var(--t-14); line-height: 1.55; }
+  .meal-card .advice .copy strong { color: var(--accent); }
+  .meal-card .disclaimer { margin-top: var(--s-3); font-size: var(--t-10); color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="inner">
+    <div class="brand"><span class="dot"></span>Bhog</div>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#brand">Brand</a></li>
+      <li><a href="#design">Design</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#ai">AI</a></li>
+      <li><a href="#competitors">Competitors</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="#checklist">Checklist</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero" id="top">
+    <span class="pill accent">V1 Design Spec · 2026-05-28</span>
+    <h1>Bhog &nbsp;<span class="accent">—</span><br>the AI coach that<br>reads your <span class="accent">thali</span>.</h1>
+    <p class="lead">An Indian-context AI Personal Coach for urban youth 18–30. Photo-to-macros is the hook. Inline veg-protein-gap-closing advice grounded in your last-3-day meal log is the moat. Trainer replacement at <span class="num">₹299/mo</span> vs <span class="num">₹3,000/mo</span> gym trainer.</p>
+    <div class="meta">
+      <span class="pill">Android-first · Expo</span>
+      <span class="pill">India · DPDP-compliant</span>
+      <span class="pill">Free-tier multi-provider AI</span>
+      <span class="pill sage">14-week alpha plan</span>
+      <span class="pill">Bootstrap solo</span>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <section class="block" id="overview">
+    <div class="section-head">
+      <span class="section-num">00</span>
+      <h2>Contents</h2>
+    </div>
+    <div class="toc">
+      <a href="#brand"><span class="n">01</span>Brand · Bhog &amp; Bali</a>
+      <a href="#design"><span class="n">02</span>Design System</a>
+      <a href="#typography"><span class="n">03</span>Typography</a>
+      <a href="#palette"><span class="n">04</span>Color &amp; Tokens</a>
+      <a href="#card-demo"><span class="n">05</span>Meal Card · Locked Layout</a>
+      <a href="#stack"><span class="n">06</span>Tech Stack</a>
+      <a href="#deploy"><span class="n">07</span>Deployment</a>
+      <a href="#ai"><span class="n">08</span>AI Decisions</a>
+      <a href="#competitors"><span class="n">09</span>Competitor Landscape</a>
+      <a href="#roadmap"><span class="n">10</span>Roadmap · 5 Phases</a>
+      <a href="#decisions"><span class="n">11</span>Phase 1 Decisions</a>
+      <a href="#checklist"><span class="n">12</span>Week-1 Checklist</a>
+      <a href="#risks"><span class="n">13</span>Open Risks</a>
+      <a href="#refs"><span class="n">14</span>Canonical References</a>
+    </div>
+  </section>
+
+  <!-- BRAND -->
+  <section class="block" id="brand">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2>Brand · Bhog &amp; Bali</h2>
+    </div>
+
+    <div class="mascot-row">
+      <div class="mascot-frame">
+        <svg class="mascot-svg" viewBox="0 0 240 280" xmlns="http://www.w3.org/2000/svg" aria-label="Bali — the Bhog mascot, a langur in coach pose">
+          <!-- background -->
+          <rect x="0" y="0" width="240" height="280" fill="transparent" />
+          <!-- tail (looping behind) -->
+          <path d="M 70 230 Q 20 220 22 170 Q 24 130 60 132" fill="none" stroke="#9C918A" stroke-width="9" stroke-linecap="round" />
+          <!-- body / torso -->
+          <ellipse cx="120" cy="200" rx="55" ry="48" fill="#B8AFA6" />
+          <!-- chest band -->
+          <path d="M 70 190 Q 120 215 170 190 L 168 210 Q 120 234 72 210 Z" fill="#C9A26B" />
+          <text x="120" y="207" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" font-weight="800" fill="#1A1612">B</text>
+          <!-- arms crossed -->
+          <path d="M 78 178 Q 95 195 145 192 Q 130 175 100 168" fill="#1A1612" />
+          <path d="M 160 178 Q 145 195 95 192 Q 110 175 140 168" fill="#1A1612" opacity="0.85" />
+          <!-- head -->
+          <ellipse cx="120" cy="115" rx="48" ry="48" fill="#B8AFA6" />
+          <!-- face (black mask) -->
+          <ellipse cx="120" cy="128" rx="34" ry="32" fill="#1A1612" />
+          <!-- ears -->
+          <circle cx="76" cy="105" r="13" fill="#B8AFA6" />
+          <circle cx="164" cy="105" r="13" fill="#B8AFA6" />
+          <circle cx="76" cy="105" r="6" fill="#1A1612" />
+          <circle cx="164" cy="105" r="6" fill="#1A1612" />
+          <!-- silver crown / fringe -->
+          <path d="M 78 90 Q 90 70 120 70 Q 150 70 162 90 Q 145 96 120 96 Q 95 96 78 90 Z" fill="#D8CFC4" />
+          <!-- eyes (deadpan, confident) -->
+          <ellipse cx="106" cy="124" rx="5.5" ry="4.5" fill="#F5EFE6" />
+          <ellipse cx="134" cy="124" rx="5.5" ry="4.5" fill="#F5EFE6" />
+          <circle cx="107" cy="125" r="2.6" fill="#1A1612" />
+          <circle cx="135" cy="125" r="2.6" fill="#1A1612" />
+          <!-- brow (slight smirk lift on right) -->
+          <path d="M 98 116 L 114 115" stroke="#F5EFE6" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M 126 113 L 144 116" stroke="#F5EFE6" stroke-width="1.5" stroke-linecap="round" />
+          <!-- nose -->
+          <ellipse cx="120" cy="135" rx="3" ry="2" fill="#3A3128" />
+          <!-- subtle smirk mouth -->
+          <path d="M 110 145 Q 120 150 132 144" stroke="#F5EFE6" stroke-width="1.6" fill="none" stroke-linecap="round" />
+          <!-- ground shadow -->
+          <ellipse cx="120" cy="258" rx="60" ry="6" fill="#000" opacity="0.35" />
+        </svg>
+        <div class="mascot-caption">Bali · v0 placeholder</div>
+      </div>
+
+      <div>
+        <h3 style="margin-top:0">Meet Bali.</h3>
+        <p><strong>Bali</strong> is the langur who lives inside <strong>Bhog</strong>. He's the user's older-bhai coach — strict, sincere, snarky when needed, never preachy. Hanuman-coded strength without religious-deity risk. Vegetarian-compatible. Designed for adults, not kids — athletic proportions, deadpan eyes, subtle smirk. Reads premium, not kindergarten.</p>
+
+        <div class="speech" style="margin-top: var(--s-5)">
+          <div class="who">Bali · onboarding</div>
+          <p class="says">"Main Bali. Tera coach. Trainer ka <span class="num">₹3,000</span> bachayega — tu sirf log kar."</p>
+        </div>
+
+        <div class="speech" style="margin-top: var(--s-3)">
+          <div class="who">Bali · push at 8pm IST</div>
+          <p class="says">"Aaj <span class="num">42g</span> protein, target <span class="num">88g</span>. Dinner log kar, gap close hoga."</p>
+        </div>
+
+        <div class="speech" style="margin-top: var(--s-3)">
+          <div class="who">Bali · log-complete celebration</div>
+          <p class="says">"Sahi! Paneer 50g add karke <span class="num">+15g</span> protein, sirf <span class="num">₹18</span>."</p>
+        </div>
+
+        <div class="callout sage" style="margin-top: var(--s-5)">
+          <div class="lbl">Production note</div>
+          <div class="body">The SVG above is a v0 placeholder. Final art: Ideogram drafts → ₹8–12k Behance/Fiverr India illustrator polish → Lottie animation. Six expressions ship V1: idle, cheer, roast, sleep, coach pose, sad. Motion + real renders deferred to <code>/design-html</code>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-grid cols-3" style="margin-top: var(--s-8)">
+      <div class="card">
+        <h4 style="margin-top:0">Name · Bhog</h4>
+        <p>भोग — food offering / meal as experience. 1 syllable, hard B + open "oh" projection. No fitness-app collision on Play Store. Restaurant chain exists (Class 43) — Bhog app is Class 9 + 44, defensible.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Mascot · Bali</h4>
+        <p>Indian Hanuman langur. Silver-grey fur, distinctive black face/hands. Veg-folivore matches persona. Adult athletic proportions, deadpan-confident expression. Older-bhai voice.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Voice · Hinglish, sincere-snarky</h4>
+        <p>English-led UI strings. Hinglish punchlines on mascot dialogue, pushes, stickers, streak-break recovery. Never preachy. Never cute. Trainer-replacement DNA in every line.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESIGN SYSTEM -->
+  <section class="block" id="design">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2>Design System · Coach Dark</h2>
+    </div>
+    <p>Dark default. Warm charcoal background. Copper-amber primary accent. Ivory text. Sage secondary. Spacious one-card density. Spring motion + coordinated haptics. Distinct from every direct competitor (HealthifyMe-green, Cult.fit-orange, Whoop-red, Hevy-lime, Cred-grey, Cal AI-green). Founder's "not too bright" instinct validated by 2026 dark-mode preference data + global anti-neon gym aesthetic shift.</p>
+
+    <div class="card-grid cols-2" style="margin-top: var(--s-6)">
+      <div class="card">
+        <h4 style="margin-top:0">Philosophy</h4>
+        <ul>
+          <li><strong>Dark default.</strong> Light theme V2 only if requested.</li>
+          <li><strong>Spacious, one-card-at-a-time.</strong> Persona judges quality by whitespace.</li>
+          <li><strong>Restrained accent.</strong> Copper-amber appears only on intent / focus / CTA — not as background.</li>
+          <li><strong>Numerics are mono.</strong> Macros + ₹ + dates use IBM Plex Mono tabular figures.</li>
+          <li><strong>Motion = spring.</strong> Cubic-bezier reads dated; spring physics matches AI-think pacing.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Avoid</h4>
+        <ul>
+          <li><strong>Saffron primary</strong> — BJP/Hindutva political signal post-2022.</li>
+          <li><strong>Neon-on-black</strong> — peaked 2023, reads dated.</li>
+          <li><strong>Bright HealthifyMe-green</strong> — owned by incumbent, reads pharma-cheap.</li>
+          <li><strong>Bridal gold</strong> — wrong cultural register for fitness.</li>
+          <li><strong>Red as brand</strong> — keep red for warning state only.</li>
+          <li><strong>Illustrated food</strong> — undermines photo-to-macros hook.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="block" id="typography">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2>Typography · Inter + Plex Mono</h2>
+    </div>
+    <p>Single-family restraint (Linear / Notion / Strava lane) = premium earned through discipline, not flourish. <strong>Inter</strong> covers all display + body weights. <strong>IBM Plex Mono</strong> for numerics, kcal, ₹, dates. <strong>Mukta</strong> reserved for V2 Devanagari (token-ready, not shipped V1). Static TTFs only — variable fonts unreliable on RN+Hermes across Android 9–13.</p>
+
+    <div class="type-row">
+      <div class="sample"><span class="label">display / 56 · 800 · −3%</span><span class="text" style="font-size:var(--t-56); font-weight:800; letter-spacing:-0.03em; line-height:1">Bhog.</span></div>
+      <div class="sample"><span class="label">display / 40 · 700 · −2%</span><span class="text" style="font-size:var(--t-40); font-weight:700; letter-spacing:-0.02em; line-height:1.1">Trainer replacement.</span></div>
+      <div class="sample"><span class="label">title / 32 · 700</span><span class="text" style="font-size:var(--t-32); font-weight:700; letter-spacing:-0.02em">Aaj ka thali</span></div>
+      <div class="sample"><span class="label">title / 24 · 600</span><span class="text" style="font-size:var(--t-24); font-weight:600; letter-spacing:-0.01em">Paneer butter masala</span></div>
+      <div class="sample"><span class="label">body / 16 · 400</span><span class="text" style="font-size:var(--t-16);">You're at 42g protein, target 88g. Add 50g paneer to today's dal — +15g protein for ₹18.</span></div>
+      <div class="sample"><span class="label">caption / 12 · 500 · +0.05em</span><span class="text" style="font-size:var(--t-12); font-weight:500; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted)">Not medical advice</span></div>
+      <div class="sample"><span class="label">mono / 24 · 500 tnum</span><span class="text num" style="font-size:var(--t-24); font-weight:500">488 kcal · 32g · 54g · 16g</span></div>
+      <div class="sample"><span class="label">mono / 14 · 500</span><span class="text num" style="font-size:var(--t-14)">2026-05-28 · ₹18 · +15g</span></div>
+    </div>
+
+    <div class="card-grid cols-3" style="margin-top: var(--s-6)">
+      <div class="card">
+        <h4 style="margin-top:0">Display + Body</h4>
+        <p><code>Inter</code> · weights 400 / 500 / 600 / 700 / 800. Ships via <code>@expo-google-fonts/inter</code>. ~600 KB bundle.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Numerics</h4>
+        <p><code>IBM Plex Mono</code> · weight 500. <code>fontVariant: ['tabular-nums']</code> on every numeric <code>&lt;Text&gt;</code>. RN ≥ 0.65 native support.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Devanagari V2</h4>
+        <p><code>Mukta</code> (OFL). Per-<code>Text</code> <code>fontFamily</code> swap. Tokens ready; ship V2 only.</p>
+      </div>
+    </div>
+
+    <h3>Type scale</h3>
+    <p>4pt grid · sp/px scale: <code class="num">10 · 12 · 14 · 16 · 18 · 20 · 24 · 32 · 40 · 56</code>. Letter-spacing <code class="num">−3%</code> at display, <code class="num">0</code> at body, <code class="num">+0.5–1.5%</code> on small uppercase captions.</p>
+  </section>
+
+  <!-- PALETTE -->
+  <section class="block" id="palette">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2>Color &amp; Tokens</h2>
+    </div>
+
+    <h3 style="margin-top:0">Surfaces</h3>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="chip" style="background:#1A1612"></div><div class="name">bg</div><div class="hex">#1A1612</div></div>
+      <div class="swatch"><div class="chip" style="background:#211C18"></div><div class="name">bg-elevated</div><div class="hex">#211C18</div></div>
+      <div class="swatch"><div class="chip" style="background:#2B2520"></div><div class="name">bg-card</div><div class="hex">#2B2520</div></div>
+      <div class="swatch"><div class="chip" style="background:#3A3128"></div><div class="name">border</div><div class="hex">#3A3128</div></div>
+      <div class="swatch"><div class="chip" style="background:#4A4036"></div><div class="name">border-strong</div><div class="hex">#4A4036</div></div>
+    </div>
+
+    <h3>Text</h3>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="chip" style="background:#F5EFE6"></div><div class="name">text-primary</div><div class="hex">#F5EFE6</div></div>
+      <div class="swatch"><div class="chip" style="background:#B9AE9F"></div><div class="name">text-secondary</div><div class="hex">#B9AE9F</div></div>
+      <div class="swatch"><div class="chip" style="background:#7A7165"></div><div class="name">text-muted</div><div class="hex">#7A7165</div></div>
+    </div>
+
+    <h3>Accent &amp; semantic</h3>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="chip" style="background:#C9A26B"></div><div class="name">accent (copper)</div><div class="hex">#C9A26B</div></div>
+      <div class="swatch"><div class="chip" style="background:#D4B07A"></div><div class="name">accent-hover</div><div class="hex">#D4B07A</div></div>
+      <div class="swatch"><div class="chip" style="background:#8A9D7F"></div><div class="name">sage</div><div class="hex">#8A9D7F</div></div>
+      <div class="swatch"><div class="chip" style="background:#7DA86E"></div><div class="name">success</div><div class="hex">#7DA86E</div></div>
+      <div class="swatch"><div class="chip" style="background:#D4A24A"></div><div class="name">warning</div><div class="hex">#D4A24A</div></div>
+      <div class="swatch"><div class="chip" style="background:#C26B5C"></div><div class="name">error</div><div class="hex">#C26B5C</div></div>
+      <div class="swatch"><div class="chip" style="background:#6B8DA8"></div><div class="name">info</div><div class="hex">#6B8DA8</div></div>
+    </div>
+
+    <h3>Motion</h3>
+    <ul>
+      <li><strong>Spring physics</strong> over cubic-bezier on all UI transitions.</li>
+      <li><strong>Coordinated haptics</strong>: light impact on tap, success notification on log-complete, warning on advice-rejection retry.</li>
+      <li><strong>Sequenced reveal</strong>: macros settle first, AI advice slides in <span class="num">120ms</span> later — signals "AI thinking" credibly without fake spinners.</li>
+      <li><strong>Bottom-sheet</strong> for secondary surfaces (edit dish, settings, history detail).</li>
+    </ul>
+  </section>
+
+  <!-- CARD DEMO -->
+  <section class="block" id="card-demo">
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2>Meal Card · Locked Layout</h2>
+    </div>
+    <p>The moat lives here. Photo → macros → inline advice — all in one card, single API response, never split across tabs. Below: live render in V1 design tokens.</p>
+
+    <div class="demo-card-shell" style="margin-top: var(--s-6)">
+
+      <div class="meal-card">
+        <div class="dish">Paneer butter masala + roti</div>
+        <div class="conf">confidence 0.91 · IFCT decomposed</div>
+        <div class="macros">
+          <div class="m"><div class="k">488</div><div class="l">kcal</div></div>
+          <div class="m"><div class="k">22g</div><div class="l">protein</div></div>
+          <div class="m"><div class="k">54g</div><div class="l">carbs</div></div>
+          <div class="m"><div class="k">22g</div><div class="l">fat</div></div>
+        </div>
+        <div class="advice">
+          <div class="avatar">B</div>
+          <div class="copy">You're at <strong>42g</strong> protein today, target <strong>88g</strong>. Add <strong>50g paneer</strong> to evening dal → <strong>+15g protein for ₹18</strong>.</div>
+        </div>
+        <div class="disclaimer">Not medical advice. Consult a dietitian for medical conditions.</div>
+      </div>
+
+      <div class="meal-card">
+        <div class="dish">Dosa + sambar</div>
+        <div class="conf">confidence 0.84 · IFCT decomposed</div>
+        <div class="macros">
+          <div class="m"><div class="k">412</div><div class="l">kcal</div></div>
+          <div class="m"><div class="k">14g</div><div class="l">protein</div></div>
+          <div class="m"><div class="k">68g</div><div class="l">carbs</div></div>
+          <div class="m"><div class="k">9g</div><div class="l">fat</div></div>
+        </div>
+        <div class="advice">
+          <div class="avatar">B</div>
+          <div class="copy">Carb-heavy breakfast. Sahi! Add <strong>2 boiled eggs (₹16)</strong> or <strong>100g chana sprouts (₹12)</strong> to hit your 88g protein target.</div>
+        </div>
+        <div class="disclaimer">Not medical advice. Consult a dietitian for medical conditions.</div>
+      </div>
+
+    </div>
+
+    <div class="callout" style="margin-top: var(--s-6)">
+      <div class="lbl">Locked invariant</div>
+      <div class="body">Advice is <strong>always</strong> rendered inline as a child of MacrosCard. <strong>Never</strong> a "Coach" tab. <strong>Never</strong> a chat thread. If advice ever lives in a separate route, the moat collapses to "another calorie tracker."</div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section class="block" id="stack">
+    <div class="section-head">
+      <span class="section-num">06</span>
+      <h2>Tech Stack</h2>
+      <span class="badge locked">LOCKED · 2026-05-28</span>
+    </div>
+
+    <h3 style="margin-top:0">Mobile</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Layer</th><th>Choice</th><th>Version</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Framework</strong></td><td>Expo + React Native</td><td class="num">SDK 54 · RN 0.81</td><td>Managed workflow minimizes native-config risk for first-time RN shipper.</td></tr>
+          <tr><td><strong>Routing</strong></td><td>expo-router</td><td class="num">5.x</td><td>File-based, stack/tab/sheet primitives match the layout already locked.</td></tr>
+          <tr><td><strong>Build</strong></td><td>EAS Build</td><td class="num">latest</td><td>Cloud build, dev/preview/prod profiles, Play Store-ready binaries.</td></tr>
+          <tr><td><strong>Camera</strong></td><td>expo-camera</td><td class="num">SDK 54</td><td>Reference-object overlay; matches portion-estimation UX.</td></tr>
+          <tr><td><strong>Image pipeline</strong></td><td>expo-image-manipulator</td><td class="num">SDK 54</td><td>JPEG ≤1280px / q=0.7 · EXIF strip · HEIC→JPEG. <strong>Mandatory.</strong></td></tr>
+          <tr><td><strong>Auth</strong></td><td>Firebase Phone OTP + @react-native-firebase/auth</td><td class="num">JS 12+ · Native 21</td><td>50K MAU free, no DLT registration, India numbers supported.</td></tr>
+          <tr><td><strong>Push</strong></td><td>FCM HTTP v1</td><td class="num">2026 mandatory</td><td>Service account JSON in EAS env.</td></tr>
+          <tr><td><strong>Type-safety</strong></td><td>TypeScript + Zod (mobile)</td><td class="num">5.x · 3.x</td><td>Schema mirrors Pydantic backend; one source of truth pattern.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Backend</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Layer</th><th>Choice</th><th>Version</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Web framework</strong></td><td>FastAPI</td><td class="num">0.128.x</td><td>Async-native, Pydantic-first, OpenAPI free, Python ecosystem.</td></tr>
+          <tr><td><strong>Schemas</strong></td><td>Pydantic</td><td class="num">v2.x</td><td>Structured output validation for vision + advice. The moat depends on this.</td></tr>
+          <tr><td><strong>ORM</strong></td><td>SQLAlchemy async + asyncpg</td><td class="num">2.0 async</td><td>Async-throughout, no sync DB calls in request path.</td></tr>
+          <tr><td><strong>Migrations</strong></td><td>Alembic</td><td class="num">1.13+</td><td>Standard. Baseline migration ships Phase 2 Week 1.</td></tr>
+          <tr><td><strong>HTTP client</strong></td><td>httpx</td><td class="num">0.27+</td><td>Async HTTP for provider calls.</td></tr>
+          <tr><td><strong>Retry / fallback</strong></td><td>tenacity</td><td class="num">8.x</td><td>429-fallback chain inside <code>ai_provider.py</code>.</td></tr>
+          <tr><td><strong>Scheduler</strong></td><td>APScheduler (in-process)</td><td class="num">3.x</td><td>8pm IST push fan-out. Split point to ARQ/Celery at ~100 DAU.</td></tr>
+          <tr><td><strong>Tracing</strong></td><td>Arize Phoenix + OpenInference</td><td class="num">latest</td><td>Self-hosted on same compute; auto-instruments google-genai + groq + openai SDKs.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Data + storage</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Layer</th><th>Choice</th><th>Region</th><th>Free tier</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Postgres</strong></td><td>Supabase</td><td>Mumbai</td><td class="num">500MB · 50K MAU · auto-pause 1wk idle</td></tr>
+          <tr><td><strong>Photo blob</strong></td><td>Cloudflare R2</td><td><code>jurisdiction=india</code></td><td class="num">10GB · 1M Class A ops/mo · zero egress</td></tr>
+          <tr><td><strong>Auth</strong></td><td>Firebase Auth</td><td>Google · global</td><td class="num">50K MAU · phone OTP free</td></tr>
+          <tr><td><strong>Observability</strong></td><td>Sentry + PostHog</td><td>EU/US</td><td class="num">free tier · 1M PostHog events/mo</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>AI providers · multi-vendor abstraction</h3>
+    <p>All vision + text LLM access funnels through one file: <code>server/app/providers/ai_provider.py</code>. Lint rule (CI) bans provider SDK imports outside <code>providers/</code>. 429-fallback chain wired before Phase 2 ships.</p>
+
+    <pre><code>VisionProvider chain:
+  1. Gemini 2.5 Flash         (Google AI Studio, free 10 RPM / 250K TPM / 500–1500 RPD)
+  2. OpenRouter — Qwen 2.5 VL (free tier · 1000 RPD with $10 credit)
+  3. GPT-4o-mini              (paid · ~₹0.18/call · last-resort)
+
+TextProvider chain:
+  1. Groq Llama 3.3 70B       (free 30 RPM / 1000 RPD)
+  2. OpenRouter — free Llama/Mixtral
+  3. Gemini 2.5 Flash paid    (~₹0.10/call · last-resort)
+
+Dev iteration:
+  Ollama Llama 3.1 8B         (founder's machine · zero cost · zero rate limit)</code></pre>
+  </section>
+
+  <!-- DEPLOY -->
+  <section class="block" id="deploy">
+    <div class="section-head">
+      <span class="section-num">07</span>
+      <h2>Deployment Strategy</h2>
+      <span class="badge locked">FREE · NO CC</span>
+    </div>
+
+    <p><strong>Constraint:</strong> founder has no credit card / no runway. Every service in Phase 0–1 must work on free tier without CC. Fly.io and Railway both eliminated in 2026 (CC required). Stack below is verified free-no-CC.</p>
+
+    <div class="card-grid cols-2" style="margin-top: var(--s-4)">
+      <div class="card">
+        <h4 style="margin-top:0">Compute · Render free (Singapore)</h4>
+        <p>Push-to-deploy from GitHub. Sleeps 15min idle, ~60s wake. <strong>No CC at signup.</strong> +50–100ms latency vs Mumbai-native — acceptable for Phase 0–1. Cross-border processing DPDP-compliant with privacy-policy disclosure.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Postgres · Supabase Mumbai free</h4>
+        <p>500MB, 50K MAU, India region. Auto-pauses after 1wk idle. Defeated by GitHub Actions cron-ping every 6hr against <code>/healthz</code>.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Photo storage · R2 jurisdiction=india</h4>
+        <p>Endpoint <code>&lt;acct&gt;.in.r2.cloudflarestorage.com</code>. Mumbai PoP alone is NOT data-residency — bucket must be created with explicit jurisdiction param. Free 10GB.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Auth · Firebase Phone OTP</h4>
+        <p>50K MAU free. No DLT registration overhead (vs MSG91 SMS). Server verifies ID tokens via <code>firebase-admin</code>.</p>
+      </div>
+    </div>
+
+    <h3>Phase 1 alpha keep-warm</h3>
+    <p>GitHub Actions cron every <span class="num">10 minutes</span> hits Render <code>/healthz</code> during the 14-day alpha window. Disable after alpha to conserve Actions minutes. Mobile-side cache layered on top (Phase 3 build).</p>
+
+    <h3>Upgrade triggers</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Trigger</th><th>Move to</th><th>Cost (₹/mo)</th></tr></thead>
+        <tbody>
+          <tr><td>Gate 7 passes (5/20 D7 retention) AND founder commits ≥2 mo</td><td>Render Starter (no sleep, always-on)</td><td class="num">~₹600</td></tr>
+          <tr><td>Phase 4 alpha at 100+ free users</td><td>Supabase Pro</td><td class="num">~₹2,000</td></tr>
+          <tr><td>Phase 5 public launch, latency SLO &lt;5s P95</td><td>Fly.io Mumbai bom1 (CC required)</td><td class="num">~₹1,100–1,700</td></tr>
+          <tr><td>Phase 3 paid tier launch</td><td>Razorpay UPI Autopay + GSTIN registration</td><td class="num">2.36% fee</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- AI -->
+  <section class="block" id="ai">
+    <div class="section-head">
+      <span class="section-num">08</span>
+      <h2>AI Decisions</h2>
+      <span class="badge locked">AI-SPEC v1</span>
+    </div>
+    <p>Full contract: <code>.planning/phases/01-validation-gates-stack-lock/01-AI-SPEC.md</code> (937 lines, locked).</p>
+
+    <h3 style="margin-top:0">System classification</h3>
+    <p><strong>Hybrid</strong> · Structured Extraction (vision → dish + portion + macros) + Grounded Content Generation (advice from last-3-day meal log). NOT RAG (SQL retrieval, no vector store). NOT agentic (no tool-calling, no plans). NOT conversational (single-turn per meal).</p>
+
+    <h3>Framework decision</h3>
+    <p><strong>Direct SDKs + Pydantic v2 behind <code>ai_provider.py</code> abstraction.</strong> No LangChain / LangGraph / LlamaIndex / CrewAI. Deterministic two-step pipeline doesn't justify framework abstraction tax. Zero framework lock-in: provider swap = swap one file.</p>
+
+    <h3>Pipeline · single API response, &lt;8s P95</h3>
+    <pre><code>POST /meals/photo  (multipart presigned)
+   │
+   ▼
+[1] presigned PUT to R2 india jurisdiction          ── mobile → R2 directly
+[2] FastAPI receives photo_url + user context
+[3a] VisionProvider.identify(photo_url)             ── Gemini 2.5 Flash
+       returns: { items: [{name, portion_g, conf}] }
+[3b] DishDecomposer.macros(items)                   ── deterministic
+       JSON lookup → IFCT 2017 aggregate
+[4]  asyncio.gather(
+       persist_meal(macros),
+       AdviceProvider.coach(user, last_3d, dish)    ── Groq Llama 3.3 70B
+                                                       6s hard timeout
+     )
+[5] rubric_validator.score(advice)                  ── 4/4 check
+       ├─ 4/4 → render
+       ├─ &lt;4/4 → retry once
+       └─ fail → per-dish template fallback
+[6] MealResponse { macros, advice, advice_version, confidence }
+       │
+       ▼
+Mobile renders MacrosCard with inline AdviceInline child</code></pre>
+
+    <h3>Critical failure modes (mitigations baked into spec)</h3>
+    <div class="card-grid cols-2" style="margin-top: var(--s-4)">
+      <div class="card"><h4 style="margin-top:0">Wrong dish / fabricated macros</h4><p>Stratified Gate 0a benchmark · Pydantic schema validation · two-step pipeline (IFCT lookup, never LLM math) · confidence-gated UI on &gt;3 items or conf&lt;0.6.</p></div>
+      <div class="card"><h4 style="margin-top:0">Generic advice</h4><p>Server-side 4/4 rubric validator rejects advice missing food + quantity + ₹ + log reference · retry once · per-dish template fallback · WoZ QA Gate (≥35 founder-written examples, ≥70% AI-vs-WoZ match) before alpha.</p></div>
+      <div class="card"><h4 style="margin-top:0">PII to LLM provider</h4><p>Lint rule in CI bans user.name/phone/dob in advice-prompt path · only de-identified user_id + goal/macros/diet preference fields.</p></div>
+      <div class="card"><h4 style="margin-top:0">Vendor lock-in / rate-limit shock</h4><p><code>ai_provider.py</code> 429-fallback chain · lint ban on provider SDK imports outside <code>providers/</code> · per-call cost log + tag · pre-launch load test (20 concurrent at dinner-hour) · OpenRouter fallback drill (10% traffic 24h) before alpha.</p></div>
+    </div>
+
+    <h3>Eval dimensions · 12 measurable</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Dimension</th><th>Measurement</th><th>Bar</th></tr></thead>
+        <tbody>
+          <tr><td class="num">D1</td><td>Vision dish-name match</td><td>Code</td><td class="num">≥70% (Gate 0a) · ≥75% alpha</td></tr>
+          <tr><td class="num">D2</td><td>Vision macros within ±35%</td><td>Code</td><td class="num">≥60% (Gate 0a) per-bucket</td></tr>
+          <tr><td class="num">D3</td><td>Pydantic schema valid</td><td>Code</td><td class="num">100%</td></tr>
+          <tr><td class="num">D4</td><td>Advice 4/4 rubric</td><td>Code (server validator)</td><td class="num">≥70% Gate 0b · ≥75% alpha · ≥85% Phase 3</td></tr>
+          <tr><td class="num">D5</td><td>Veg protein math correctness</td><td>LLM-judge + RD calibrated</td><td class="num">Spearman ≥0.7 vs RD ground truth</td></tr>
+          <tr><td class="num">D6</td><td>₹/g protein cost realism</td><td>Code (lookup against table)</td><td class="num">±10% of veg_protein_prices</td></tr>
+          <tr><td class="num">D7</td><td>Cultural fit (no quinoa/blueberry)</td><td>Code + LLM-judge</td><td class="num">Banned-foods regex pass · diet-preference cross-check</td></tr>
+          <tr><td class="num">D8</td><td>Goal-appropriate (surplus for muscle-gain)</td><td>Code</td><td class="num">Sign-of-recommendation match goal</td></tr>
+          <tr><td class="num">D9</td><td>Log reference present</td><td>SQL cross-reference</td><td class="num">Quote must match a meal in last 3d</td></tr>
+          <tr><td class="num">D10</td><td>CDSCO banned-words clean</td><td>Code (regex)</td><td class="num">100%</td></tr>
+          <tr><td class="num">D11</td><td>Cost per active user</td><td>Telemetry</td><td class="num">≤₹15/mo</td></tr>
+          <tr><td class="num">D12</td><td>Single-response latency</td><td>Telemetry</td><td class="num">P95 &lt;8s</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- COMPETITORS -->
+  <section class="block" id="competitors">
+    <div class="section-head">
+      <span class="section-num">09</span>
+      <h2>Competitor Landscape</h2>
+    </div>
+    <p>Photo-to-macros is now table stakes. The unoccupied wedge is <strong>inline, culturally-grounded, budget-aware advice rendered on every meal card, free in V1</strong>. No incumbent ships this — HealthifyMe paywalls Ria, Cal AI has zero Indian context, FitTrack AI's veg-protein focus is content-marketing not product depth.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Player</th><th>Position</th><th>Strength</th><th>Weak spot for Bhog</th></tr></thead>
+        <tbody>
+          <tr><td><strong>HealthifyMe</strong></td><td>Mass-market tracker + human coach</td><td class="num">40M users · 12yr Indian DB</td><td>Ria advice generic · service complaints · ₹999/mo Pro gate · cannot claim trainer-replacement (sells human coaches)</td></tr>
+          <tr><td><strong>NutriScan</strong></td><td>Indian-cuisine AI tracker</td><td>India-specific food DB</td><td>New entrant · content-marketing-heavy · no public retention data</td></tr>
+          <tr><td><strong>FitTrack AI</strong></td><td>Free Indian photo tracker</td><td>Free photo logging · veg-protein claim</td><td>Marketing fluff · product depth unproven · no community</td></tr>
+          <tr><td><strong>Cult.fit</strong></td><td>Fitness platform</td><td>Brand · gym network · offline integration</td><td>₹2k+/mo · class-focused · weak food tracking · sells trainers</td></tr>
+          <tr><td><strong>Cal AI</strong></td><td>Global photo tracker</td><td class="num">~$300M ARR · viral demo</td><td>Zero Indian context · no veg/budget logic · English-only voice</td></tr>
+          <tr><td><strong>Gym trainers</strong></td><td>Human coaching · in person</td><td>Trust · accountability</td><td class="num">₹3–8k/mo · generic plans · unstructured WhatsApp PDFs · not 24/7</td></tr>
+          <tr><td><strong>Instagram dietitians</strong></td><td>Free fitness content</td><td>Free · relatable</td><td>Generic · no personalization · no tracking · no accountability</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Moat layers (two stacked + proof points)</h3>
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4 style="margin-top:0">L1 · Technical — photo-history-grounded advice</h4>
+        <p>AI reads last 3 days of user's actual meals → generates specific recommendations citing the user's own log. Cannot be cloned without per-user data. Switching cost compounds with retention.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">L2 · Brand — trainer-replacement positioning</h4>
+        <p>"Replace your <span class="num">₹3,000/mo</span> gym trainer with <span class="num">₹299/mo</span> AI." HealthifyMe / Cult.fit cannot claim this — they sell human coaches. Brand claim is ownable.</p>
+      </div>
+    </div>
+    <p>Proof points: veg-protein-gap solver · ₹/g cost-aware advice · 50-dish pan-Indian recognition · CDSCO/ASCI-clean disclaimer hygiene · inline rendering invariant.</p>
+  </section>
+
+  <!-- ROADMAP -->
+  <section class="block" id="roadmap">
+    <div class="section-head">
+      <span class="section-num">10</span>
+      <h2>Roadmap · 5 phases</h2>
+      <span class="badge locked">Vertical MVP · Coarse</span>
+    </div>
+    <p>Each phase ships a user-visible vertical slice. Coarse granularity per <code>config.json</code>.</p>
+
+    <div class="phase-row">
+      <div class="phase">
+        <div class="num">P1</div>
+        <div>
+          <div class="title">Validation Gates + Stack Lock</div>
+          <div class="goal">Pass Gates 0a–0d. Lock stack/Play account/hosting. No production code.</div>
+        </div>
+        <div class="weeks">Week 0 · current</div>
+      </div>
+      <div class="phase">
+        <div class="num">P2</div>
+        <div>
+          <div class="title">Photo → Macros End-to-End (Backend Spine)</div>
+          <div class="goal">FastAPI + ai_provider + vision + dish decomposition + IFCT + advice engine + correction capture + DPDP plumbing.</div>
+        </div>
+        <div class="weeks">Weeks 1–3</div>
+      </div>
+      <div class="phase">
+        <div class="num">P3</div>
+        <div>
+          <div class="title">Mobile App + Inline Advice + Retention <span class="badge sage" style="margin-left:8px">UI</span></div>
+          <div class="goal">Expo Android · onboarding · camera · MacrosCard with inline advice · weight + water · 8pm push · streaks · WoZ-gated.</div>
+        </div>
+        <div class="weeks">Weeks 4–7</div>
+      </div>
+      <div class="phase">
+        <div class="num">P4</div>
+        <div>
+          <div class="title">Alpha Hardening + Launch Submission</div>
+          <div class="goal">Load test · Sentry/PostHog · 20-user closed alpha · DPDP capstone · Gate 7 retention · Play Production submission Week 12.</div>
+        </div>
+        <div class="weeks">Weeks 8–12</div>
+      </div>
+      <div class="phase">
+        <div class="num">P5</div>
+        <div>
+          <div class="title">Public Launch + Paid Tier + V1.1</div>
+          <div class="goal">Public Production · post-launch monitoring · Razorpay UPI Autopay · GSTIN · V1.1 weight-loss (trigger-gated on D7 ≥25% + advice 4/4 ≥75%).</div>
+        </div>
+        <div class="weeks">Weeks 13+ · M4+</div>
+      </div>
+    </div>
+
+    <h3>Pitfall corrections baked in</h3>
+    <ul>
+      <li>Gemini <strong>2.5 Flash</strong> (not 2.0 — retires 2026-03-03)</li>
+      <li>R2 <strong><code>jurisdiction=india</code></strong> (not Mumbai PoP)</li>
+      <li>Supabase Mumbai (Neon excluded — no India region)</li>
+      <li>DPDP plumbing in Phase 2 Week 1 (not Phase 4 Week 11)</li>
+      <li>Play Developer account in Phase 1 Week 0d (3–7d verification buffer)</li>
+      <li>WoZ QA promoted from task to Gate (Phase 3 → Phase 4 blocker)</li>
+      <li>Manual weight + water tracker added to V1 table stakes</li>
+      <li>Production submission Week 12 (not 14) for 7–14d first-developer review</li>
+      <li>Fly.io Mumbai vs Render Singapore decision locked: Render free (no CC)</li>
+    </ul>
+  </section>
+
+  <!-- DECISIONS -->
+  <section class="block" id="decisions">
+    <div class="section-head">
+      <span class="section-num">11</span>
+      <h2>Phase 1 Decisions (D-01 – D-19)</h2>
+      <span class="badge locked">Locked</span>
+    </div>
+    <p>From <code>.planning/phases/01-validation-gates-stack-lock/01-CONTEXT.md</code>. Each decision below seeds an ADR-lite entry in <code>.planning/decisions/</code> (folder created by Phase 2 planner).</p>
+
+    <h3 style="margin-top:0">Hosting</h3>
+    <div class="card-grid cols-2">
+      <div class="card"><h4 style="margin-top:0">D-01 · Compute</h4><p>Render free (Singapore). Fly + Railway eliminated (CC required 2026).</p></div>
+      <div class="card"><h4 style="margin-top:0">D-02 · DB</h4><p>Supabase Mumbai free + GitHub Actions cron-ping every 6hr against <code>/healthz</code>.</p></div>
+      <div class="card"><h4 style="margin-top:0">D-03 · Cold-start</h4><p>Cron every 10min during 14-day alpha window. Disable after alpha to save Actions minutes.</p></div>
+      <div class="card"><h4 style="margin-top:0">D-04 · Photos</h4><p>R2 with <code>jurisdiction=india</code> (free 10GB, no CC).</p></div>
+      <div class="card"><h4 style="margin-top:0">D-05 · Auth</h4><p>Firebase Phone OTP (free 50K MAU, no CC).</p></div>
+    </div>
+
+    <h3>Gate 0a · vision benchmark labeling</h3>
+    <div class="card-grid cols-2">
+      <div class="card"><h4 style="margin-top:0">D-06 · Labeler</h4><p>Claude Opus 4.7 (existing subscription, zero incremental cost) + founder manually verifies every label.</p></div>
+      <div class="card"><h4 style="margin-top:0">D-07 · Macros</h4><p>Deterministic IFCT 2017 lookup — never LLM math.</p></div>
+      <div class="card"><h4 style="margin-top:0">D-08 · Decomposition source</h4><p>Layered cascade: NIN if accessible → Tarla Dalal / Unlock.fit scrape → Opus draft + IFCT verify + Munmun/Ryan published-recipe cross-ref. Output at <code>data/dish_decomposition.json</code>.</p></div>
+      <div class="card"><h4 style="margin-top:0">D-09 · Stratification</h4><p>10 / 10 / 10 (single / mixed / thali). Per-bucket pass bar.</p></div>
+      <div class="card"><h4 style="margin-top:0">D-10 · Reviewer Concern</h4><p>Circular-bias risk (LLM labels another LLM). Mitigations: different family (Opus≠Gemini), deterministic IFCT, every-label verification. RD audit reserved as V1.5 trigger.</p></div>
+    </div>
+
+    <h3>Gate 0c · Trial User recruit + commitment bar</h3>
+    <div class="card-grid cols-2">
+      <div class="card"><h4 style="margin-top:0">D-11 · Pitch</h4><p>Short, direct, founder-voice (3–4 sentences). Honest framing, no salesy hype.</p></div>
+      <div class="card"><h4 style="margin-top:0">D-12 · Commitment bar</h4><p>Verbal "yes, send link when ready" + WhatsApp confirm. Unambiguous yes only.</p></div>
+      <div class="card"><h4 style="margin-top:0">D-13 · ₹299 WTP capture</h4><p>Open-ended price ladder ("₹0, ₹100, ₹299, ₹499, more?"). Capture verbatim. ≥3 quotes needed.</p></div>
+      <div class="card"><h4 style="margin-top:0">D-14 · Recruit funnel</h4><p>Personal network first — gym buddies, college fitness friends, Insta DMs. Clique-bias documented as known caveat.</p></div>
+    </div>
+
+    <h3>Veg-protein ₹/g table</h3>
+    <div class="card-grid cols-2">
+      <div class="card"><h4 style="margin-top:0">D-15 · Source</h4><p>Zepto + BigBasket + Blinkit scrape across 4 metros + published RD price sheets (Munmun / Ryan / NFNA).</p></div>
+      <div class="card"><h4 style="margin-top:0">D-16 · Refresh cadence</h4><p>Manual quarterly + automated monthly anomaly alert (>15% drift).</p></div>
+      <div class="card"><h4 style="margin-top:0">D-17 · Storage</h4><p>Postgres table <code>veg_protein_prices</code> (per-region schema ready for V1.5). Alembic migration in Phase 2 Week 1–2.</p></div>
+      <div class="card"><h4 style="margin-top:0">D-18 · Coverage</h4><p>Top 50 sources — pan-Indian staples + Western staples (oats, sprouts, nuts, whey) + regional (ragi, jowar, idli/dosa batter, sattu, makhana).</p></div>
+    </div>
+
+    <h3>Process</h3>
+    <div class="callout">
+      <div class="lbl">D-19 · Decisions ledger</div>
+      <div class="body">Each D-01..D-18 entry seeds a 1-paragraph ADR-lite file at <code>.planning/decisions/YYYY-MM-DD-decision-slug.md</code> with status / context / decision / consequences. Phase 2 planner creates the folder + seeds from this list.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section class="block" id="checklist">
+    <div class="section-head">
+      <span class="section-num">12</span>
+      <h2>Week-1 Checklist</h2>
+      <span class="badge pending">Gate 0 · before any code</span>
+    </div>
+    <p>Concrete steps the founder runs <strong>this week</strong>. No code begins until every box below is checked.</p>
+
+    <h3 style="margin-top:0">Gate 0a · Vision benchmark</h3>
+    <div class="card">
+      <div class="check"><input type="checkbox" id="c1" /><div class="body"><div class="title">Photograph 30 of your own meals (10 single-dish · 10 mixed · 10 thali)</div><div class="meta">3–5 days · founder owns the camera roll</div></div></div>
+      <div class="check"><input type="checkbox" id="c2" /><div class="body"><div class="title">Build <code>data/dish_decomposition.json</code> for all 50 whitelist dishes</div><div class="meta">NIN check → scrape Tarla Dalal + Unlock.fit → Opus draft → IFCT verify → cross-ref Munmun / Ryan · ~5–7 hours</div></div></div>
+      <div class="check"><input type="checkbox" id="c3" /><div class="body"><div class="title">Label dish-name + portion + macros ground truth for all 30 photos</div><div class="meta">Opus 4.7 drafts · founder verifies every single label</div></div></div>
+      <div class="check"><input type="checkbox" id="c4" /><div class="body"><div class="title">Run each photo through Gemini 2.5 Flash with V0 prompt template (AI-SPEC Appendix A)</div><div class="meta">Free tier · Google AI Studio · no CC</div></div></div>
+      <div class="check"><input type="checkbox" id="c5" /><div class="body"><div class="title">Score: ≥70% dish-name match · ≥60% macros within ±35% · <strong>per-bucket pass</strong></div><div class="meta">If fail: improve prompt with in-context examples · retry · or try Qwen 2.5 VL via OpenRouter free tier</div></div></div>
+    </div>
+
+    <h3>Gate 0b · Advice rubric</h3>
+    <div class="card">
+      <div class="check"><input type="checkbox" id="c6" /><div class="body"><div class="title">Log your own meals 14 days through validated vision + advice prompt</div><div class="meta">Founder is the first Trial User · capture every meal · every advice reply</div></div></div>
+      <div class="check"><input type="checkbox" id="c7" /><div class="body"><div class="title">Score every advice reply on 4/4 rubric: food + quantity + ₹ + log reference</div><div class="meta">Pass bar: ≥70% scoring 4/4</div></div></div>
+      <div class="check"><input type="checkbox" id="c8" /><div class="body"><div class="title">If fail → iterate prompt before any UI code</div><div class="meta">No UI is built around an unvalidated advice engine</div></div></div>
+    </div>
+
+    <h3>Gate 0c · Trial User commitments</h3>
+    <div class="card">
+      <div class="check"><input type="checkbox" id="c9" /><div class="body"><div class="title">List 20 named contacts with WhatsApp number + city + gym status + diet preference + goal</div><div class="meta">Personal network first · spreadsheet at <code>data/trial_users_phase1.csv</code></div></div></div>
+      <div class="check"><input type="checkbox" id="c10" /><div class="body"><div class="title">Send the short founder-voice WhatsApp pitch to each</div><div class="meta">"Hey [name], building an AI app for Indian-veg-budget calorie tracking + advice…"</div></div></div>
+      <div class="check"><input type="checkbox" id="c11" /><div class="body"><div class="title">Capture ≥10 unambiguous verbal "yes, send link when ready" + WhatsApp confirms</div><div class="meta">Below 10 commitments → user-acquisition assumption broken · replan distribution</div></div></div>
+      <div class="check"><input type="checkbox" id="c12" /><div class="body"><div class="title">Run open-ended price ladder on 5 most-promising contacts · capture ≥3 verbatim ₹299-WTP quotes</div><div class="meta">"What would you pay per month? ₹0, ₹100, ₹299, ₹499, more?" — never lead with ₹299</div></div></div>
+      <div class="check"><input type="checkbox" id="c13" /><div class="body"><div class="title">Run 5 · 20-minute interviews · 3 questions only</div><div class="meta">What did you eat yesterday in detail? What frustrates you most about tracking/fitness? Would you pay ₹299/mo for an AI that solves that — yes/no/why?</div></div></div>
+      <div class="check"><input type="checkbox" id="c14" /><div class="body"><div class="title">Pick 1 person from the 5 as persona anchor · write 1-page profile</div><div class="meta">Name · age · city · job · frustration in their words · what would make them recommend</div></div></div>
+    </div>
+
+    <h3>Gate 0d · Stack lock + admin</h3>
+    <div class="card">
+      <div class="check"><input type="checkbox" id="c15" /><div class="body"><div class="title">Buy Google Play Developer account ($25 one-time)</div><div class="meta">3–7 day identity verification clock starts here · blocks Week 8 Internal Testing if not started Week 0</div></div></div>
+      <div class="check"><input type="checkbox" id="c16" /><div class="body"><div class="title">Sign up for Render · Supabase Mumbai · Cloudflare R2 (jurisdiction=india) · Firebase · Google AI Studio · Groq · OpenRouter</div><div class="meta">All free tier · no CC required · ≤30 min total</div></div></div>
+      <div class="check"><input type="checkbox" id="c17" /><div class="body"><div class="title">Commit stack lock note to <code>.planning/decisions/2026-MM-DD-stack-lock.md</code></div><div class="meta">Documents: chosen versions · rationale · fallbacks · what NOT to do</div></div></div>
+    </div>
+
+    <h3>Veg-protein price table seed</h3>
+    <div class="card">
+      <div class="check"><input type="checkbox" id="c18" /><div class="body"><div class="title">Scrape top 50 veg-protein items from Zepto + BigBasket + Blinkit across Delhi / Mumbai / Bangalore / Hyderabad</div><div class="meta">One-time scrape · ~3–4 hours</div></div></div>
+      <div class="check"><input type="checkbox" id="c19" /><div class="body"><div class="title">Cross-reference against Munmun / Ryan Fernando / NFNA published price sheets</div><div class="meta">Anchor values for staples (paneer, dal, soya, chana, peanut, eggs)</div></div></div>
+      <div class="check"><input type="checkbox" id="c20" /><div class="body"><div class="title">Output Phase 2 seed file (CSV or JSON · planner converts to Postgres migration)</div><div class="meta">Schema: id · food_name · source_platform · city · price_per_kg_inr · protein_per_100g · cost_per_g_protein_inr · scrape_date</div></div></div>
+    </div>
+
+    <h3>Mascot + brand prep</h3>
+    <div class="card">
+      <div class="check"><input type="checkbox" id="c21" /><div class="body"><div class="title">Run Ideogram (free, no CC) on the Bali prompt · generate 4 variants</div><div class="meta">Prompt is in Brand section above · pick best · iterate before commissioning illustrator</div></div></div>
+      <div class="check"><input type="checkbox" id="c22" /><div class="body"><div class="title">Shortlist 2–3 Behance / Fiverr India illustrators for ₹8–12k polish + Lottie</div><div class="meta">Defer commission until Phase 3 Week 4 onboarding lands · don't over-invest pre-Gate-0</div></div></div>
+      <div class="check"><input type="checkbox" id="c23" /><div class="body"><div class="title">File Class 9 + 44 trademark search for "Bhog" at <a class="inline" href="https://ipindia.gov.in" target="_blank">ipindia.gov.in</a></div><div class="meta">Restaurant chain exists at Class 43 · likely defensible · 1 hour</div></div></div>
+    </div>
+  </section>
+
+  <!-- RISKS -->
+  <section class="block" id="risks">
+    <div class="section-head">
+      <span class="section-num">13</span>
+      <h2>Open Risks &amp; Reviewer Concerns</h2>
+    </div>
+    <div class="card-grid cols-2">
+      <div class="card"><span class="badge risk">CIRCULAR-BIAS</span><h4>Opus labels another LLM</h4><p>D-06 uses Opus 4.7 to label ground truth for Gemini 2.5 Flash under test. Different family + IFCT-deterministic macros + every-label verification mitigate. RD audit reserved as V1.5 trigger if Phase 6 alpha shows real-user accuracy collapse.</p></div>
+      <div class="card"><span class="badge risk">TIMELINE</span><h4>First-time RN shipper drift</h4><p>14-week target may stretch to 18–20 for first-time React Native shipper. Mitigation: Expo managed workflow, Hello-World Week 1, EAS Build configured Week 1, pre-budget 5–10 day buffer.</p></div>
+      <div class="card"><span class="badge risk">VENDOR</span><h4>Provider free-tier rate limits</h4><p>Gemini 10 RPM caps at ~50 lunch-concurrent users. Mitigation: 429-fallback chain, OpenRouter fallback drill (10% traffic 24h), per-call provider tag for attribution, pre-launch load test before alpha.</p></div>
+      <div class="card"><span class="badge risk">MOAT</span><h4>Advice "on the side" temptation</h4><p>Founder framed advice as "on the side" earlier — doc has corrected to inline-on-every-card. If Phase 3 UI ever buries advice in a coach tab, moat collapses. Locked as <strong>Invariant</strong> in Card Demo section.</p></div>
+      <div class="card"><span class="badge pending">DEMAND</span><h4>No verbatim ₹299 quote yet</h4><p>Gate 0c closes this in Week 1. If fewer than 3 ₹299 quotes captured → pricing thesis weakens → re-evaluate paid tier model before Phase 5.</p></div>
+      <div class="card"><span class="badge pending">VISION</span><h4>Thali photo accuracy untested</h4><p>Literature shows 49–76% error on multi-item Asian dishes. Gate 0a thali bucket tests directly. If fails: "snap each item separately" UX in V1, multi-item-single-photo to V1.5.</p></div>
+      <div class="card"><span class="badge deferred">V1.5</span><h4>Two-persona temptation</h4><p>"Let's target both" instinct re-surfaces. V1 locks one persona (urban youth muscle-gain). Weight-loss = V1.1 trigger-gated on muscle-gain D7 ≥25% + advice 4/4 ≥75%. Housewife persona = V2 separate brand.</p></div>
+      <div class="card"><span class="badge deferred">V2</span><h4>Cal AI competitive durability</h4><p>Cal AI can ship Indian context with a prompt update. Real durable moat = dataset (post-PMF) + brand (Trainer-Replacement is ours). 6–12mo head-start realistic, not "forever."</p></div>
+    </div>
+  </section>
+
+  <!-- REFS -->
+  <section class="block" id="refs">
+    <div class="section-head">
+      <span class="section-num">14</span>
+      <h2>Canonical References</h2>
+    </div>
+    <p>Every downstream skill, agent, and planner must read these before acting.</p>
+
+    <h3 style="margin-top:0">Project-level</h3>
+    <ul>
+      <li><code>.planning/PROJECT.md</code> — locked V1 scope · persona · moat · premises</li>
+      <li><code>.planning/REQUIREMENTS.md</code> — 67 v1 REQ-IDs mapped to phases</li>
+      <li><code>.planning/ROADMAP.md</code> — 5-phase coarse plan · success criteria · UI hint markers</li>
+      <li><code>.planning/STATE.md</code> — session log, last stopped at</li>
+      <li><code>.planning/config.json</code> — workflow config (YOLO · coarse · research · plan-check · verifier · model:quality)</li>
+    </ul>
+
+    <h3>Research</h3>
+    <ul>
+      <li><code>.planning/research/SUMMARY.md</code> — synthesis + 3 stack corrections (Gemini 2.5 Flash · R2 jurisdiction=india · Supabase Mumbai)</li>
+      <li><code>.planning/research/STACK.md</code> — Context7-verified versions</li>
+      <li><code>.planning/research/FEATURES.md</code> — table stakes vs differentiators vs anti-features · 50-dish whitelist · weight-log + water-tracker additions</li>
+      <li><code>.planning/research/ARCHITECTURE.md</code> — <code>ai_provider.py</code> as load-bearing · presigned PUT · two-step vision</li>
+      <li><code>.planning/research/PITFALLS.md</code> — 27 catalogued · WoZ-as-Gate · DPDP-to-Week-1 · Play account Week 0d</li>
+      <li><code>.planning/research/VISUAL-IDENTITY.md</code> — Coach Dark palette + accent rationale</li>
+      <li><code>.planning/research/TYPOGRAPHY.md</code> — Inter + Plex Mono lock</li>
+      <li><code>.planning/research/MASCOT.md</code> — Langur "Bali" · production approach · expression set</li>
+      <li><code>.planning/research/NAME.md</code> + <code>NAME-V2.md</code> — name brainstorm + sound-catchy round 2</li>
+    </ul>
+
+    <h3>Phase 1 contracts</h3>
+    <ul>
+      <li><code>.planning/phases/01-validation-gates-stack-lock/01-AI-SPEC.md</code> — 937-line locked AI design contract</li>
+      <li><code>.planning/phases/01-validation-gates-stack-lock/01-CONTEXT.md</code> — Phase 1 decisions D-01 through D-19</li>
+      <li><code>.planning/phases/01-validation-gates-stack-lock/01-DISCUSSION-LOG.md</code> — audit trail of alternatives considered</li>
+    </ul>
+
+    <h3>Vision source · adversarial-reviewed</h3>
+    <ul>
+      <li><code>~/.gstack/projects/ai-calorie-weight-loss/nitin-unknown-design-20260527-181050.md</code> — /office-hours design doc (iteration 4, 3 adversarial review passes)</li>
+    </ul>
+
+    <h3>Indian nutrition + pricing</h3>
+    <ul>
+      <li>IFCT 2017 (NIN/ICMR) · raw-ingredient nutrition baseline</li>
+      <li>NIN cooked-dish dataset · verify accessibility during Gate 0a</li>
+      <li>ISSN 2024 Position Stand on Protein · 1.6–2.2 g/kg muscle-gain band</li>
+      <li>Tarla Dalal / Unlock.fit recipe nutrition · dish decomposition cross-ref</li>
+      <li>Munmun Ganeriwal · Ryan Fernando · NFNA · pricing + macro authority</li>
+      <li>Zepto / BigBasket / Blinkit · quick-commerce pricing source</li>
+    </ul>
+
+    <h3>Regulatory</h3>
+    <ul>
+      <li>DPDP Act 2023 (MeitY) · Indian region storage · consent ledger · 30-day hard-delete</li>
+      <li>CDSCO Medical Devices Rules 2017 · banned words: treat / cure / diagnose / medicine / drug</li>
+      <li>ASCI Code 2023 · health/fitness advertising claim substantiation</li>
+      <li>Razorpay UPI Autopay · Phase 3 paid tier · ₹15K monthly mandate ceiling</li>
+    </ul>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="row">
+      <div>
+        <strong>Bhog · V1 Design Spec</strong><br>
+        <span class="build">commit: phase-1 · 2026-05-28 · single source of truth</span>
+      </div>
+      <div style="text-align: right">
+        <span class="badge sage">Design before code</span><br>
+        <span class="build" style="margin-top: 4px; display: inline-block">no production code until Gates 0a–0d pass</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
