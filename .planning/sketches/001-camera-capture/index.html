@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Sketch 001 — Camera capture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../themes/default.css" />
+<style>
+  /* Viewfinder shared */
+  .vf {
+    flex: 1; position: relative; background: #0E0907;
+    background-image: radial-gradient(ellipse 80% 50% at 50% 60%, #2B2520, #0E0907);
+    overflow: hidden;
+  }
+  .vf::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.07  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.7;
+  }
+  /* Fake "thali" plate visible in viewfinder */
+  .fake-plate {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 220px; height: 220px; border-radius: 999px;
+    background: radial-gradient(circle, #4A3A28 0%, #2B2017 70%);
+    box-shadow: inset 0 6px 14px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.6);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 18px;
+  }
+  .fake-plate .item {
+    border-radius: 999px;
+    background: radial-gradient(circle, var(--c1), var(--c2));
+  }
+  /* Capture buttons */
+  .shutter-ring {
+    width: 72px; height: 72px; border-radius: 999px;
+    border: 4px solid var(--text-primary); background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.5);
+    cursor: pointer; transition: transform var(--transition);
+  }
+  .shutter-ring:active { transform: scale(0.92); }
+  .control-pill {
+    background: rgba(0,0,0,0.5); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px; padding: 8px 14px;
+    font-size: var(--t-12); color: var(--text-primary); font-weight: 500;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  /* === Variant A: Reticle overlay === */
+  .va .reticle {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 270px; height: 270px; pointer-events: none;
+  }
+  .va .reticle::before {
+    content: ""; position: absolute; inset: 0;
+    border: 2px solid var(--accent); border-radius: 999px;
+    opacity: 0.7;
+    box-shadow: inset 0 0 0 30px rgba(201,162,107,0.05);
+  }
+  .va .corner {
+    position: absolute; width: 22px; height: 22px;
+    border: 2px solid var(--accent);
+  }
+  .va .corner.tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+  .va .corner.tr { top: -1px; right: -1px; border-left: 0; border-bottom: 0; }
+  .va .corner.bl { bottom: -1px; left: -1px; border-right: 0; border-top: 0; }
+  .va .corner.br { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+  .va .ref-hint {
+    position: absolute; left: 50%; bottom: -32px; transform: translateX(-50%);
+    background: rgba(0,0,0,0.7); padding: 5px 12px; border-radius: 999px;
+    font-size: var(--t-11); color: var(--text-primary);
+    white-space: nowrap;
+  }
+  .va .top-bar {
+    position: absolute; top: var(--s-4); left: var(--s-4); right: var(--s-4);
+    display: flex; justify-content: space-between; gap: var(--s-2); z-index: 2;
+  }
+  .va .bottom-bar {
+    position: absolute; bottom: var(--s-5); left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-around; padding: 0 var(--s-5);
+  }
+  .va .modes { display: flex; gap: 4px; font-family: "IBM Plex Mono", monospace; font-size: var(--t-11); color: var(--text-muted); }
+  .va .modes span { padding: 6px 10px; border-radius: 14px; }
+  .va .modes span.on { background: rgba(201,162,107,0.18); color: var(--accent); }
+
+  /* === Variant B: Minimal-tap === */
+  .vb .min-shutter {
+    position: absolute; left: 50%; bottom: var(--s-8); transform: translateX(-50%);
+    width: 88px; height: 88px; border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 0 8px rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.6);
+    cursor: pointer; transition: transform var(--transition);
+    display: flex; align-items: center; justify-content: center;
+    color: #1A1612; font-weight: 700;
+  }
+  .vb .min-shutter::after { content: ""; width: 12px; height: 12px; border-radius: 999px; background: #1A1612; }
+  .vb .min-cap {
+    position: absolute; left: 50%; bottom: 32px; transform: translateX(-50%);
+    font-family: "IBM Plex Mono", monospace; font-size: var(--t-10);
+    color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase;
+    width: 100%; text-align: center;
+  }
+  .vb .close {
+    position: absolute; top: var(--s-4); right: var(--s-4); z-index: 2;
+    width: 32px; height: 32px; border-radius: 999px;
+    background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-primary); cursor: pointer; font-size: var(--t-18);
+  }
+
+  /* === Variant C: Coach-narrated === */
+  .vc .coach-bubble {
+    position: absolute; left: var(--s-4); top: var(--s-4); z-index: 3;
+    background: rgba(43, 37, 32, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--s-3); max-width: 290px;
+    display: flex; gap: var(--s-3); align-items: flex-start;
+  }
+  .vc .coach-bubble .avatar {
+    width: 36px; height: 36px; border-radius: 999px;
+    background: var(--accent); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #1A1612; font-weight: 700; font-size: var(--t-14);
+  }
+  .vc .coach-bubble .who { font-family: "IBM Plex Mono", monospace; font-size: var(--t-10); color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+  .vc .coach-bubble .msg { font-size: var(--t-13); color: var(--text-primary); margin-top: 2px; line-height: 1.45; }
+  .vc .ref-ring {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 240px; height: 240px; border-radius: 999px;
+    border: 2px dashed var(--accent); opacity: 0.6;
+    pointer-events: none;
+  }
+  .vc .coin-hint {
+    position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 999px;
+    font-size: var(--t-10); color: var(--text-primary);
+    display: flex; gap: 6px; align-items: center;
+  }
+  .vc .coin-hint::before { content: "₹"; color: var(--accent); font-weight: 700; }
+  .vc .bottom { position: absolute; bottom: var(--s-5); left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: var(--s-5); }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <a href="../">↑ all sketches</a>
+  <a href="../../specs/bhog-v1-design-spec.html">spec</a>
+</div>
+
+<div class="page-wrap">
+  <div class="sketch-header">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:var(--t-11);color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase">Sketch 001</span>
+    <h1 style="margin-top:6px">Camera capture</h1>
+    <p>Reticle overlay vs minimal-tap vs coach-narrated. Which makes the hook moment land?</p>
+  </div>
+
+  <div class="var-tabs">
+    <button class="var-tab active" data-v="a">A · Reticle</button>
+    <button class="var-tab" data-v="b">B · Minimal-tap</button>
+    <button class="var-tab" data-v="c">C · Coach-narrated</button>
+  </div>
+
+  <!-- Variant A — Reticle overlay -->
+  <div class="var-panel active" data-v="a">
+    <div class="variant-block">
+      <div class="v-label">Variant A · Reticle overlay</div>
+      <div class="phone va">
+        <div class="vf">
+          <div class="top-bar">
+            <div class="control-pill">⚡ Flash auto</div>
+            <div class="control-pill">↻ Flip</div>
+          </div>
+          <div class="fake-plate" style="--c1:#C9A26B;--c2:#7A4F1A">
+            <div class="item" style="background: radial-gradient(circle, #E8D8C0, #B89066)"></div>
+            <div class="item" style="background: radial-gradient(circle, #C8743A, #6B3514)"></div>
+            <div class="item" style="background: radial-gradient(circle, #F5E8C0, #C8B070)"></div>
+            <div class="item" style="background: radial-gradient(circle, #9BAA84, #4E5C3D)"></div>
+          </div>
+          <div class="reticle">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <div class="ref-hint">Center plate · place ₹10 coin for scale</div>
+          </div>
+          <div class="bottom-bar">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:var(--t-10);color:var(--text-muted);letter-spacing:0.08em">GALLERY</div>
+            <div class="shutter-ring"></div>
+            <div class="modes"><span>FOOD</span><span class="on">THALI</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="v-desc">Reticle + corner markers + ₹-coin reference hint. Explicit framing aid. Best for thali multi-item where confidence-gate UX matters.</p>
+    </div>
+  </div>
+
+  <!-- Variant B — Minimal tap -->
+  <div class="var-panel" data-v="b">
+    <div class="variant-block">
+      <div class="v-label">Variant B · Minimal-tap</div>
+      <div class="phone vb">
+        <div class="vf">
+          <button class="close">×</button>
+          <div class="fake-plate" style="--c1:#C9A26B;--c2:#7A4F1A">
+            <div class="item" style="background: radial-gradient(circle, #E8D8C0, #B89066)"></div>
+            <div class="item" style="background: radial-gradient(circle, #C8743A, #6B3514)"></div>
+            <div class="item" style="background: radial-gradient(circle, #F5E8C0, #C8B070)"></div>
+            <div class="item" style="background: radial-gradient(circle, #9BAA84, #4E5C3D)"></div>
+          </div>
+          <div class="min-cap">tap to log</div>
+          <div class="min-shutter"></div>
+        </div>
+      </div>
+      <p class="v-desc">Just a viewfinder + giant shutter. Zero UI chrome. Fastest-to-first-shot. Bali speaks AFTER, on the result card.</p>
+    </div>
+  </div>
+
+  <!-- Variant C — Coach narrated -->
+  <div class="var-panel" data-v="c">
+    <div class="variant-block">
+      <div class="v-label">Variant C · Coach-narrated</div>
+      <div class="phone vc">
+        <div class="vf">
+          <div class="coach-bubble">
+            <div class="avatar">B</div>
+            <div>
+              <div class="who">Bali</div>
+              <div class="msg">Bhai, plate ko phone ke neeche center kar. ₹10 ka coin rakh — portion sahi nikalega.</div>
+            </div>
+          </div>
+          <div class="fake-plate" style="--c1:#C9A26B;--c2:#7A4F1A">
+            <div class="item" style="background: radial-gradient(circle, #E8D8C0, #B89066)"></div>
+            <div class="item" style="background: radial-gradient(circle, #C8743A, #6B3514)"></div>
+            <div class="item" style="background: radial-gradient(circle, #F5E8C0, #C8B070)"></div>
+            <div class="item" style="background: radial-gradient(circle, #9BAA84, #4E5C3D)"></div>
+          </div>
+          <div class="ref-ring"></div>
+          <div class="coin-hint">10 · for scale</div>
+          <div class="bottom">
+            <button class="control-pill">Skip</button>
+            <div class="shutter-ring"></div>
+            <button class="control-pill">Manual</button>
+          </div>
+        </div>
+      </div>
+      <p class="v-desc">Bali narrates first-time. Mascot becomes UX, not decoration. Trade-off: chatty on shot #50, needs auto-dismiss after N captures.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.var-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      const v = t.dataset.v;
+      document.querySelectorAll('.var-tab').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+      document.querySelectorAll('.var-panel').forEach(p => p.classList.toggle('active', p.dataset.v === v));
+    });
+  });
+</script>
+</body>
+</html>

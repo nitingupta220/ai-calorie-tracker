@@ -479,6 +479,7 @@
       <button class="nav-item" data-target="checklist"><span class="nav-num">12</span>Week-1 Checklist<span class="nav-meta">23</span></button>
       <button class="nav-item" data-target="risks"><span class="nav-num">13</span>Open Risks<span class="nav-meta">8</span></button>
       <button class="nav-item" data-target="refs"><span class="nav-num">14</span>References</button>
+      <button class="nav-item" data-target="sketches"><span class="nav-num">15</span>App Page Sketches<span class="nav-meta">4</span></button>
     </div>
     <div class="nav-divider"></div>
 
@@ -516,34 +517,173 @@
       <div class="section-head"><span class="section-num">01</span><h2>Brand · Bhog &amp; Bali</h2></div>
       <div class="mascot-row">
         <div class="mascot-frame">
-          <svg class="mascot-svg" viewBox="0 0 240 280" xmlns="http://www.w3.org/2000/svg" aria-label="Bali — Langur mascot for Bhog">
-            <path d="M 70 230 Q 20 220 22 170 Q 24 130 60 132" fill="none" stroke="#9C918A" stroke-width="9" stroke-linecap="round" />
-            <ellipse cx="120" cy="200" rx="55" ry="48" fill="#B8AFA6" />
-            <path d="M 70 190 Q 120 215 170 190 L 168 210 Q 120 234 72 210 Z" fill="#C9A26B" />
-            <text x="120" y="207" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" font-weight="800" fill="#1A1612">B</text>
-            <path d="M 78 178 Q 95 195 145 192 Q 130 175 100 168" fill="#1A1612" />
-            <path d="M 160 178 Q 145 195 95 192 Q 110 175 140 168" fill="#1A1612" opacity="0.85" />
-            <ellipse cx="120" cy="115" rx="48" ry="48" fill="#B8AFA6" />
-            <ellipse cx="120" cy="128" rx="34" ry="32" fill="#1A1612" />
-            <circle cx="76" cy="105" r="13" fill="#B8AFA6" /><circle cx="164" cy="105" r="13" fill="#B8AFA6" />
-            <circle cx="76" cy="105" r="6" fill="#1A1612" /><circle cx="164" cy="105" r="6" fill="#1A1612" />
-            <path d="M 78 90 Q 90 70 120 70 Q 150 70 162 90 Q 145 96 120 96 Q 95 96 78 90 Z" fill="#D8CFC4" />
-            <ellipse cx="106" cy="124" rx="5.5" ry="4.5" fill="#F5EFE6" /><ellipse cx="134" cy="124" rx="5.5" ry="4.5" fill="#F5EFE6" />
-            <circle cx="107" cy="125" r="2.6" fill="#1A1612" /><circle cx="135" cy="125" r="2.6" fill="#1A1612" />
-            <path d="M 98 116 L 114 115" stroke="#F5EFE6" stroke-width="1.5" stroke-linecap="round" />
-            <path d="M 126 113 L 144 116" stroke="#F5EFE6" stroke-width="1.5" stroke-linecap="round" />
-            <ellipse cx="120" cy="135" rx="3" ry="2" fill="#3A3128" />
-            <path d="M 110 145 Q 120 150 132 144" stroke="#F5EFE6" stroke-width="1.6" fill="none" stroke-linecap="round" />
-            <ellipse cx="120" cy="258" rx="60" ry="6" fill="#000" opacity="0.35" />
+          <svg class="mascot-svg" viewBox="0 0 240 300" xmlns="http://www.w3.org/2000/svg" aria-label="Bali — Langur mascot for Bhog">
+            <defs>
+              <!-- Fur texture via subtle noise -->
+              <filter id="fur" x="-5%" y="-5%" width="110%" height="110%">
+                <feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="2" seed="7" />
+                <feColorMatrix values="0 0 0 0 0.6  0 0 0 0 0.55  0 0 0 0 0.5  0 0 0 0.22 0" />
+                <feComposite in2="SourceGraphic" operator="in" />
+                <feComposite in="SourceGraphic" operator="over" />
+              </filter>
+              <!-- Body fur gradient (silver-grey langur with warm midtone) -->
+              <radialGradient id="furBody" cx="42%" cy="32%" r="78%">
+                <stop offset="0%" stop-color="#D8D0C4" />
+                <stop offset="48%" stop-color="#A89F94" />
+                <stop offset="100%" stop-color="#6E665B" />
+              </radialGradient>
+              <radialGradient id="furHead" cx="40%" cy="30%" r="80%">
+                <stop offset="0%" stop-color="#DCD4C8" />
+                <stop offset="50%" stop-color="#A89F94" />
+                <stop offset="100%" stop-color="#73695D" />
+              </radialGradient>
+              <!-- Black face mask gradient -->
+              <radialGradient id="face" cx="50%" cy="42%" r="60%">
+                <stop offset="0%" stop-color="#3A2E25" />
+                <stop offset="55%" stop-color="#1F1813" />
+                <stop offset="100%" stop-color="#0E0907" />
+              </radialGradient>
+              <!-- Eye iris gradient -->
+              <radialGradient id="iris" cx="40%" cy="38%" r="70%">
+                <stop offset="0%" stop-color="#8B6B3A" />
+                <stop offset="60%" stop-color="#4E3919" />
+                <stop offset="100%" stop-color="#1F140A" />
+              </radialGradient>
+              <!-- Silver crown highlight -->
+              <linearGradient id="crown" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#EFE8DA" />
+                <stop offset="100%" stop-color="#B2A99C" />
+              </linearGradient>
+              <!-- Chest band gradient (copper-amber) -->
+              <linearGradient id="band" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#DBB47A" />
+                <stop offset="50%" stop-color="#C9A26B" />
+                <stop offset="100%" stop-color="#9E7B47" />
+              </linearGradient>
+              <!-- Floor shadow -->
+              <radialGradient id="floor" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(0,0,0,0.5)" />
+                <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+              </radialGradient>
+            </defs>
+
+            <!-- Floor shadow -->
+            <ellipse cx="120" cy="278" rx="68" ry="8" fill="url(#floor)" />
+
+            <!-- Tail (looping, with shading) -->
+            <path d="M 68 238 Q 18 232 18 178 Q 20 130 56 130 Q 68 130 76 138" fill="none" stroke="#8A8073" stroke-width="11" stroke-linecap="round" opacity="0.95" />
+            <path d="M 68 238 Q 22 230 22 178 Q 26 134 58 134" fill="none" stroke="#A89F94" stroke-width="6" stroke-linecap="round" />
+
+            <!-- Body (torso) with fur gradient -->
+            <ellipse cx="120" cy="210" rx="60" ry="52" fill="url(#furBody)" filter="url(#fur)" />
+            <!-- Body inner highlight -->
+            <ellipse cx="106" cy="195" rx="22" ry="18" fill="#DCD4C8" opacity="0.3" />
+
+            <!-- Chest band -->
+            <path d="M 64 200 Q 120 224 176 200 L 174 222 Q 120 246 66 222 Z" fill="url(#band)" />
+            <!-- Band stitching highlight -->
+            <path d="M 70 207 Q 120 228 170 207" stroke="#EFD9B0" stroke-width="0.8" fill="none" opacity="0.6" />
+            <!-- "B" embroidered -->
+            <text x="120" y="219" text-anchor="middle" font-family="Inter, sans-serif" font-size="18" font-weight="800" fill="#1A1612">B</text>
+
+            <!-- Arms crossed — back arm -->
+            <path d="M 78 184 Q 92 200 144 196 Q 152 198 152 188 Q 130 178 100 172 Q 86 172 78 184 Z" fill="#1F1813" filter="url(#fur)" />
+            <!-- Front arm -->
+            <path d="M 162 184 Q 148 200 96 196 Q 88 198 88 188 Q 110 178 140 172 Q 154 172 162 184 Z" fill="#251D17" filter="url(#fur)" />
+            <!-- Hand knuckle hint -->
+            <circle cx="90" cy="192" r="3" fill="#0E0907" /><circle cx="150" cy="192" r="3" fill="#0E0907" />
+
+            <!-- Head with fur gradient -->
+            <ellipse cx="120" cy="118" rx="52" ry="52" fill="url(#furHead)" filter="url(#fur)" />
+            <!-- Head side shadow for dimension -->
+            <ellipse cx="142" cy="124" rx="22" ry="34" fill="#6E665B" opacity="0.35" />
+
+            <!-- Silver crown (fringe) — multi-stop highlight -->
+            <path d="M 74 88 Q 88 64 120 62 Q 152 64 166 88 Q 168 92 165 96 Q 145 100 120 100 Q 95 100 75 96 Q 72 92 74 88 Z" fill="url(#crown)" />
+            <!-- Crown strands -->
+            <path d="M 84 90 Q 86 80 90 76" stroke="#EFE8DA" stroke-width="1" fill="none" opacity="0.7" />
+            <path d="M 100 88 Q 102 75 106 70" stroke="#EFE8DA" stroke-width="1" fill="none" opacity="0.7" />
+            <path d="M 120 86 Q 120 72 122 66" stroke="#EFE8DA" stroke-width="1" fill="none" opacity="0.7" />
+            <path d="M 140 88 Q 138 75 134 70" stroke="#EFE8DA" stroke-width="1" fill="none" opacity="0.7" />
+            <path d="M 156 90 Q 154 80 150 76" stroke="#EFE8DA" stroke-width="1" fill="none" opacity="0.7" />
+
+            <!-- Ears -->
+            <ellipse cx="74" cy="108" rx="14" ry="16" fill="url(#furHead)" filter="url(#fur)" />
+            <ellipse cx="166" cy="108" rx="14" ry="16" fill="url(#furHead)" filter="url(#fur)" />
+            <!-- Ear inner (black) -->
+            <ellipse cx="76" cy="110" rx="7" ry="9" fill="#1F1813" />
+            <ellipse cx="164" cy="110" rx="7" ry="9" fill="#1F1813" />
+            <!-- Ear inner highlight -->
+            <ellipse cx="77" cy="106" rx="2" ry="3" fill="#3A2E25" opacity="0.8" />
+            <ellipse cx="165" cy="106" rx="2" ry="3" fill="#3A2E25" opacity="0.8" />
+
+            <!-- Black face mask (THE distinctive langur feature) -->
+            <ellipse cx="120" cy="132" rx="38" ry="35" fill="url(#face)" />
+            <!-- Face cheek highlight -->
+            <ellipse cx="104" cy="128" rx="6" ry="9" fill="#3A2E25" opacity="0.5" />
+            <ellipse cx="136" cy="128" rx="6" ry="9" fill="#3A2E25" opacity="0.5" />
+
+            <!-- Brow ridge (subtle smirk lift) -->
+            <path d="M 96 116 Q 106 113 116 116" stroke="#3A2E25" stroke-width="1.8" fill="none" stroke-linecap="round" />
+            <path d="M 124 113 Q 134 110 146 114" stroke="#3A2E25" stroke-width="1.8" fill="none" stroke-linecap="round" />
+
+            <!-- Eyes — sclera (ivory), iris (warm brown), pupil, highlight -->
+            <ellipse cx="106" cy="126" rx="6.5" ry="5.2" fill="#F5EFE6" />
+            <ellipse cx="134" cy="126" rx="6.5" ry="5.2" fill="#F5EFE6" />
+            <!-- Sclera shadow under brow -->
+            <ellipse cx="106" cy="123" rx="6" ry="2" fill="#3A2E25" opacity="0.25" />
+            <ellipse cx="134" cy="123" rx="6" ry="2" fill="#3A2E25" opacity="0.25" />
+            <!-- Iris -->
+            <circle cx="107" cy="127" r="3.6" fill="url(#iris)" />
+            <circle cx="135" cy="127" r="3.6" fill="url(#iris)" />
+            <!-- Pupil -->
+            <circle cx="108" cy="127" r="1.8" fill="#0E0907" />
+            <circle cx="136" cy="127" r="1.8" fill="#0E0907" />
+            <!-- Eye highlight (catchlight — what makes it feel alive) -->
+            <circle cx="108.6" cy="125.5" r="1.1" fill="#FFFFFF" />
+            <circle cx="136.6" cy="125.5" r="1.1" fill="#FFFFFF" />
+            <!-- Lower eyelid hint -->
+            <path d="M 100 130 Q 106 132 112 130" stroke="#0E0907" stroke-width="0.8" fill="none" opacity="0.5" />
+            <path d="M 128 130 Q 134 132 140 130" stroke="#0E0907" stroke-width="0.8" fill="none" opacity="0.5" />
+
+            <!-- Nose — dimensional -->
+            <path d="M 116 140 Q 120 138 124 140 Q 124 144 120 146 Q 116 144 116 140 Z" fill="#0E0907" />
+            <ellipse cx="118" cy="140" rx="0.8" ry="0.5" fill="#3A2E25" />
+
+            <!-- Mouth — subtle confident smirk (asymmetric = alive) -->
+            <path d="M 108 152 Q 120 156 134 150" stroke="#F5EFE6" stroke-width="1.6" fill="none" stroke-linecap="round" />
+            <path d="M 116 155 Q 120 157 124 155" stroke="#1F1813" stroke-width="0.8" fill="none" opacity="0.6" />
+
+            <!-- Chin / jaw subtle shadow -->
+            <ellipse cx="120" cy="162" rx="14" ry="4" fill="#1F1813" opacity="0.4" />
           </svg>
-          <div class="mascot-caption">Bali · v0 placeholder</div>
+          <div class="mascot-caption">Bali · v1 placeholder · richer SVG</div>
         </div>
         <div>
           <p><strong>Bali</strong> = langur inside <strong>Bhog</strong>. Older-bhai coach. Strict, sincere, snarky when needed. Hanuman-coded strength without religious-deity risk. Veg-folivore matches persona. Adult athletic proportions, deadpan eyes, subtle smirk. Premium, not kindergarten.</p>
           <div class="speech"><div class="who">Bali · onboarding</div><p class="says">"Main Bali. Tera coach. Trainer ka <span class="num">₹3,000</span> bachayega — tu sirf log kar."</p></div>
           <div class="speech"><div class="who">Bali · push 8pm IST</div><p class="says">"Aaj <span class="num">42g</span> protein, target <span class="num">88g</span>. Dinner log kar, gap close hoga."</p></div>
           <div class="speech"><div class="who">Bali · log-complete</div><p class="says">"Sahi! Paneer 50g add karke <span class="num">+15g</span> protein, sirf <span class="num">₹18</span>."</p></div>
-          <div class="callout sage"><div class="lbl">Production</div><div class="body">SVG above = v0 placeholder. Final: Ideogram drafts → ₹8–12k Behance/Fiverr India illustrator polish → Lottie. 6 expressions V1: idle, cheer, roast, sleep, coach pose, sad. Motion + real renders deferred to <code>/design-html</code>.</div></div>
+          <div class="callout sage"><div class="lbl">Production</div><div class="body">SVG above = v1 placeholder with fur texture + catchlight eyes + radial fur gradients. Final art: photo-illustrative render (NOT flat vector cartoon) via Ideogram → ₹8–12k Behance/Fiverr India illustrator polish → Lottie animation. 6 expressions V1: idle, cheer, roast, sleep, coach pose, sad.</div></div>
+
+          <h4 style="margin-top:var(--s-5)">Ideogram / Midjourney prompt</h4>
+          <p style="font-size:var(--t-13)">Paste this into Ideogram (free, no CC) or Midjourney to generate the real Bali render. Goal: <strong>feels like a real langur character</strong>, not flat cartoon.</p>
+<pre style="font-size:var(--t-12); white-space:pre-wrap"><code>Photo-illustrative portrait of an adult Indian Hanuman langur character
+named "Bali". Semi-realistic 2.5D rendering with subtle painterly fur
+texture, catchlight in deep amber-brown eyes, distinctive black face
+mask with silver-grey crown of fur and silvery body, athletic adult
+proportions (NOT baby-faced, NOT chibi, NOT Pixar 3D, NOT flat-vector
+cartoon). Confident deadpan-friendly expression with subtle smirk,
+arms crossed in confident coach pose, long tail looped behind, wearing
+a copper-amber chest band (hex #C9A26B) with embroidered letter "B".
+Background: solid deep warm charcoal #1A1612 with very soft vignette.
+Lighting: single warm key light from upper-left, soft fill, gentle rim
+light on silver fringe. Style references: studio character portraits
+in the spirit of Stitch Fix or Headspace mascots — recognizable as a
+character but feeling like a real being, not animated. Photoreal fur
+detail on body, slight head tilt, eyes engage the viewer.
+Negative: cartoon, kindergarten, chibi, 3D-Pixar, flat-vector, neon,
+saffron-orange, religious iconography, weapons, aggressive face.</code></pre>
         </div>
       </div>
       <h3>Brand pillars</h3>
@@ -1017,6 +1157,70 @@ Dev:
         <div><strong>Bhog · V1 Design Spec</strong><br><span class="build">commit: phase-1 · 2026-05-28 · single source of truth</span></div>
         <div style="text-align:right"><span class="badge sage">Design before code</span><br><span class="build" style="margin-top:4px; display:inline-block">no production code until Gates 0a–0d pass</span></div>
       </footer>
+    </section>
+
+    <!-- 15 SKETCHES -->
+    <section class="block" id="sketches">
+      <div class="section-head"><span class="section-num">15</span><h2>App Page Sketches</h2><span class="badge sage">/gsd-sketch · v0</span></div>
+      <p>HTML wireframe mockups for 4 core screens. Each sketch has 3 variants — click thumbnail for full-screen interactive view. Winners feed into <code>/design-shotgun</code> + <code>/design-html</code> later sessions.</p>
+
+      <style>
+        .sketch-grid { display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: var(--s-4); }
+        .sketch-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; text-decoration: none; display: flex; flex-direction: column; transition: all var(--transition); }
+        .sketch-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+        .sketch-frame { height: 360px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .sketch-frame iframe { width: 380px; height: 820px; border: none; transform: scale(0.42); transform-origin: top center; pointer-events: none; }
+        .sketch-info { padding: var(--s-3) var(--s-4); }
+        .sketch-info .num { font-family: "IBM Plex Mono", monospace; font-size: var(--t-10); color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
+        .sketch-info .name { font-size: var(--t-16); font-weight: 600; margin-top: 2px; color: var(--text-primary); }
+        .sketch-info .desc { font-size: var(--t-12); color: var(--text-muted); margin-top: 6px; line-height: 1.4; }
+        .sketch-info .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: var(--s-3); }
+        .sketch-tag { font-family: "IBM Plex Mono", monospace; font-size: var(--t-10); padding: 2px 7px; border-radius: 999px; background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); }
+      </style>
+
+      <div class="sketch-grid">
+        <a class="sketch-card" href="../sketches/001-camera-capture/index.html" target="_blank">
+          <div class="sketch-frame"><iframe src="../sketches/001-camera-capture/index.html" loading="lazy"></iframe></div>
+          <div class="sketch-info">
+            <div class="num">Sketch 001</div>
+            <div class="name">Camera capture</div>
+            <div class="desc">3 variants: reticle overlay · minimal-tap · coach-narrated. Where does Bali enter — capture moment or result?</div>
+            <div class="tags"><span class="sketch-tag">camera</span><span class="sketch-tag">hook</span><span class="sketch-tag">mascot</span></div>
+          </div>
+        </a>
+        <a class="sketch-card" href="../sketches/002-home-today/index.html" target="_blank">
+          <div class="sketch-frame"><iframe src="../sketches/002-home-today/index.html" loading="lazy"></iframe></div>
+          <div class="sketch-info">
+            <div class="num">Sketch 002</div>
+            <div class="name">Home · Today</div>
+            <div class="desc">3 variants: hub-stack · carousel-hero · minimal-list. Daily macros + meals + streak + water composition.</div>
+            <div class="tags"><span class="sketch-tag">home</span><span class="sketch-tag">retention</span><span class="sketch-tag">daily</span></div>
+          </div>
+        </a>
+        <a class="sketch-card" href="../sketches/003-meal-detail/index.html" target="_blank">
+          <div class="sketch-frame"><iframe src="../sketches/003-meal-detail/index.html" loading="lazy"></iframe></div>
+          <div class="sketch-info">
+            <div class="num">Sketch 003</div>
+            <div class="name">Meal detail · moat surface</div>
+            <div class="desc">3 variants: modal-sheet · full-page · expand-in-place. Inline advice + correction without breaking the moat invariant.</div>
+            <div class="tags"><span class="sketch-tag">moat</span><span class="sketch-tag">advice</span><span class="sketch-tag">correction</span></div>
+          </div>
+        </a>
+        <a class="sketch-card" href="../sketches/004-onboarding-flow/index.html" target="_blank">
+          <div class="sketch-frame"><iframe src="../sketches/004-onboarding-flow/index.html" loading="lazy"></iframe></div>
+          <div class="sketch-info">
+            <div class="num">Sketch 004</div>
+            <div class="name">Onboarding flow</div>
+            <div class="desc">3 variants: swipe-stack · vertical-scroll · conversational. Where does Bali enter? Form vs chat?</div>
+            <div class="tags"><span class="sketch-tag">onboarding</span><span class="sketch-tag">dpdp</span><span class="sketch-tag">first-impression</span></div>
+          </div>
+        </a>
+      </div>
+
+      <div class="callout sage" style="margin-top: var(--s-5)">
+        <div class="lbl">Next step</div>
+        <div class="body">Open each sketch · switch between 3 variants per screen · pick winners. Next session: run <code>/design-shotgun</code> on the winning variants to generate AI-rendered visual mockups. After that: <code>/design-html</code> to finalize production HTML/CSS.</div>
+      </div>
     </section>
 
   </main>

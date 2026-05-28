@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Sketch 004 — Onboarding flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../themes/default.css" />
+<style>
+  .scroll { flex: 1; overflow-y: auto; }
+  .scroll::-webkit-scrollbar { width: 0; }
+
+  /* Progress dots */
+  .prog-dots { display: flex; gap: 6px; padding: var(--s-3) var(--s-4); }
+  .prog-dots .dot { flex: 1; height: 3px; border-radius: 2px; background: var(--border); }
+  .prog-dots .dot.done { background: var(--accent); }
+  .prog-dots .dot.current { background: var(--accent); opacity: 0.5; }
+
+  /* Bali speech */
+  .bali-row { display: flex; gap: var(--s-3); align-items: flex-start; }
+  .bali-av {
+    width: 48px; height: 48px; border-radius: 999px;
+    background: var(--accent); color: #1A1612;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: var(--t-20); flex-shrink: 0;
+  }
+  .bali-bubble {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--s-3) var(--s-4);
+    position: relative; flex: 1;
+  }
+  .bali-bubble::before {
+    content: ""; position: absolute; left: -7px; top: 14px;
+    width: 14px; height: 14px;
+    background: var(--bg-card); border-left: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    transform: rotate(45deg);
+  }
+  .bali-bubble .who { font-family: "IBM Plex Mono", monospace; font-size: var(--t-10); color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+  .bali-bubble .msg { font-size: var(--t-14); color: var(--text-primary); margin-top: 4px; line-height: 1.5; }
+
+  /* Choice card */
+  .choice {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--s-4);
+    cursor: pointer; transition: all var(--transition);
+    display: flex; gap: var(--s-3); align-items: center;
+  }
+  .choice:hover { background: var(--bg-card-hover); border-color: var(--border-strong); }
+  .choice.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .choice .icon { font-size: 28px; width: 48px; text-align: center; flex-shrink: 0; }
+  .choice .body .ttl { font-size: var(--t-15); font-weight: 600; color: var(--text-primary); }
+  .choice .body .sub { font-size: var(--t-12); color: var(--text-muted); margin-top: 2px; }
+
+  /* Step label */
+  .step-num {
+    font-family: "IBM Plex Mono", monospace; font-size: var(--t-10);
+    color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;
+  }
+  .step-num strong { color: var(--accent); }
+
+  /* Toggle */
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: var(--s-3) 0; border-bottom: 1px solid var(--border); }
+  .toggle-row:last-child { border-bottom: 0; }
+  .toggle-row .lbl { font-size: var(--t-14); font-weight: 500; color: var(--text-primary); }
+  .toggle-row .desc { font-size: var(--t-12); color: var(--text-muted); margin-top: 2px; max-width: 220px; }
+  .toggle {
+    width: 40px; height: 22px; border-radius: 999px; background: var(--bg-elevated);
+    border: 1px solid var(--border); position: relative; cursor: pointer; transition: all var(--transition);
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: ""; position: absolute; left: 2px; top: 2px;
+    width: 16px; height: 16px; border-radius: 999px;
+    background: var(--text-muted); transition: all var(--transition);
+  }
+  .toggle.on { background: var(--accent); border-color: var(--accent); }
+  .toggle.on::after { left: 20px; background: #1A1612; }
+
+  /* === Variant A — Swipe stack === */
+  .va .cards-track {
+    display: flex; gap: var(--s-3); padding: 0 var(--s-4);
+    overflow: visible;
+  }
+  .va .o-card {
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+    padding: var(--s-4);
+    display: flex; flex-direction: column; gap: var(--s-3);
+    min-width: 92%;
+  }
+
+  /* === Variant B — Vertical scroll === */
+  .vb .step-section {
+    padding: var(--s-5) var(--s-4); border-bottom: 1px solid var(--border);
+  }
+  .vb .step-section:last-child { border-bottom: 0; }
+  .vb h2 { font-size: var(--t-20); font-weight: 700; letter-spacing: -0.01em; margin-top: var(--s-2); }
+
+  /* === Variant C — Card tap progress === */
+  .vc .conv-msg { margin-bottom: var(--s-4); }
+  .vc .user-pick {
+    background: var(--accent); color: #1A1612;
+    padding: var(--s-3) var(--s-4); border-radius: var(--radius-lg);
+    align-self: flex-end; max-width: 70%; margin-left: auto;
+    font-size: var(--t-14); font-weight: 500;
+  }
+</style>
+</head>
+<body>
+<div class="toolbar"><a href="../">↑ all sketches</a><a href="../../specs/bhog-v1-design-spec.html">spec</a></div>
+
+<div class="page-wrap">
+  <div class="sketch-header">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:var(--t-11);color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase">Sketch 004</span>
+    <h1 style="margin-top:6px">Onboarding · 6-step flow</h1>
+    <p>Bali introduces himself + collects goal/body/diet/budget + DPDP consents. Swipe-stack vs scroll vs conversational.</p>
+  </div>
+
+  <div class="var-tabs">
+    <button class="var-tab active" data-v="a">A · Swipe-stack</button>
+    <button class="var-tab" data-v="b">B · Vertical scroll</button>
+    <button class="var-tab" data-v="c">C · Conversational</button>
+  </div>
+
+  <!-- A: Swipe stack -->
+  <div class="var-panel active" data-v="a">
+    <div class="variant-block">
+      <div class="v-label">Variant A · Swipe-stack</div>
+      <div class="phone va">
+        <div class="phone-status"><span>9:41</span><span>● 5G · 84%</span></div>
+        <div class="prog-dots">
+          <div class="dot done"></div><div class="dot done"></div><div class="dot current"></div>
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="step-num" style="padding: 0 var(--s-4)">Step <strong>3 of 6</strong> · Diet preference</div>
+        <div class="scroll" style="padding: var(--s-4)">
+          <div class="bali-row" style="margin-bottom:var(--s-5)">
+            <div class="bali-av">B</div>
+            <div class="bali-bubble">
+              <div class="who">Bali</div>
+              <div class="msg">Tu veg hai ya non-veg? Yeh tera advice change karega — main jaanna chahta hoon.</div>
+            </div>
+          </div>
+          <div class="stack" style="gap: var(--s-2)">
+            <div class="choice selected">
+              <div class="icon">🌱</div>
+              <div class="body">
+                <div class="ttl">Vegetarian</div>
+                <div class="sub">Paneer · dal · soya · eggs (if OK)</div>
+              </div>
+            </div>
+            <div class="choice">
+              <div class="icon">🌿</div>
+              <div class="body">
+                <div class="ttl">Eggetarian</div>
+                <div class="sub">Veg + eggs · no chicken/fish</div>
+              </div>
+            </div>
+            <div class="choice">
+              <div class="icon">🥚</div>
+              <div class="body">
+                <div class="ttl">Non-veg</div>
+                <div class="sub">Chicken · fish · egg · all veg</div>
+              </div>
+            </div>
+            <div class="choice">
+              <div class="icon">🌰</div>
+              <div class="body">
+                <div class="ttl">Vegan</div>
+                <div class="sub">No dairy, no eggs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding: var(--s-3) var(--s-4); border-top: 1px solid var(--border); display: flex; gap: var(--s-2)">
+          <button class="btn" style="flex:1">Back</button>
+          <button class="btn primary" style="flex:2">Continue →</button>
+        </div>
+      </div>
+      <p class="v-desc">One step per screen. Big cards. Bali narrates intent. Best for clarity + completion-rate. Swipe gestures + 6 dots show progress at all times.</p>
+    </div>
+  </div>
+
+  <!-- B: Vertical scroll -->
+  <div class="var-panel" data-v="b">
+    <div class="variant-block">
+      <div class="v-label">Variant B · Vertical scroll</div>
+      <div class="phone vb">
+        <div class="phone-status"><span>9:41</span><span>● 5G · 84%</span></div>
+        <div style="padding: var(--s-4); border-bottom: 1px solid var(--border); display:flex; justify-content:space-between; align-items:center">
+          <div style="font-size: var(--t-15); font-weight: 700">Set up Bhog</div>
+          <div class="step-num">2 / 6 done</div>
+        </div>
+        <div class="scroll">
+          <div class="step-section">
+            <div class="step-num"><strong>1 ✓</strong> Welcome</div>
+            <h2 style="opacity: 0.4">Hi, main Bali</h2>
+            <p style="color: var(--text-muted); font-size: var(--t-13); margin-top: 4px">Tera coach. Trainer ka ₹3,000 bachayega.</p>
+          </div>
+          <div class="step-section">
+            <div class="step-num"><strong>2 ✓</strong> Goal</div>
+            <h2 style="opacity: 0.4">Muscle gain</h2>
+            <p style="color: var(--text-muted); font-size: var(--t-13); margin-top: 4px">+300 kcal surplus target</p>
+          </div>
+          <div class="step-section" style="background: var(--accent-dim); border-color: rgba(201,162,107,0.3)">
+            <div class="step-num"><strong>3</strong> Diet preference</div>
+            <h2 style="margin-top: var(--s-2)">What do you eat?</h2>
+            <div class="stack" style="gap: var(--s-2); margin-top: var(--s-3)">
+              <div class="choice selected"><div class="icon">🌱</div><div class="body"><div class="ttl">Vegetarian</div></div></div>
+              <div class="choice"><div class="icon">🌿</div><div class="body"><div class="ttl">Eggetarian</div></div></div>
+              <div class="choice"><div class="icon">🥚</div><div class="body"><div class="ttl">Non-veg</div></div></div>
+              <div class="choice"><div class="icon">🌰</div><div class="body"><div class="ttl">Vegan</div></div></div>
+            </div>
+            <button class="btn primary" style="width:100%; margin-top: var(--s-3)">Save · Step 4</button>
+          </div>
+          <div class="step-section" style="opacity: 0.35">
+            <div class="step-num"><strong>4</strong> Body + budget</div>
+            <h2 style="color: var(--text-muted); font-size: var(--t-16)">Locked · finish step 3 first</h2>
+          </div>
+          <div class="step-section" style="opacity: 0.35">
+            <div class="step-num"><strong>5</strong> Privacy consents</div>
+            <h2 style="color: var(--text-muted); font-size: var(--t-16)">Locked</h2>
+          </div>
+          <div class="step-section" style="opacity: 0.35">
+            <div class="step-num"><strong>6</strong> First meal</div>
+            <h2 style="color: var(--text-muted); font-size: var(--t-16)">Locked</h2>
+          </div>
+        </div>
+      </div>
+      <p class="v-desc">Long scroll with sequentially unlocked sections. Sees all 6 steps at a glance. Bali is in step 1 only — feels less personality-driven, more form-y.</p>
+    </div>
+  </div>
+
+  <!-- C: Conversational -->
+  <div class="var-panel" data-v="c">
+    <div class="variant-block">
+      <div class="v-label">Variant C · Conversational</div>
+      <div class="phone vc">
+        <div class="phone-status"><span>9:41</span><span>● 5G · 84%</span></div>
+        <div style="padding: var(--s-3) var(--s-4); display:flex; align-items:center; gap: var(--s-3); border-bottom: 1px solid var(--border)">
+          <div class="bali-av" style="width:36px;height:36px;font-size:var(--t-15)">B</div>
+          <div>
+            <div style="font-size: var(--t-15); font-weight: 600">Bali</div>
+            <div style="font-size: var(--t-10); font-family:'IBM Plex Mono',monospace; color: var(--sage); letter-spacing:0.06em; text-transform: uppercase">● setting you up</div>
+          </div>
+          <div style="margin-left:auto;font-family:'IBM Plex Mono',monospace; font-size: var(--t-10); color: var(--text-muted)">3 / 6</div>
+        </div>
+        <div class="scroll" style="padding: var(--s-4); display:flex; flex-direction:column; gap: var(--s-3)">
+          <div class="bali-row conv-msg">
+            <div class="bali-av">B</div>
+            <div class="bali-bubble">
+              <div class="who">Bali</div>
+              <div class="msg">Namaste! Main Bali. Tera AI coach.</div>
+            </div>
+          </div>
+          <div class="user-pick">Hi 👋</div>
+          <div class="bali-row conv-msg">
+            <div class="bali-av">B</div>
+            <div class="bali-bubble">
+              <div class="who">Bali</div>
+              <div class="msg">Goal kya hai — muscle banana hai ya weight kam karna?</div>
+            </div>
+          </div>
+          <div class="user-pick">Muscle gain</div>
+          <div class="bali-row conv-msg">
+            <div class="bali-av">B</div>
+            <div class="bali-bubble">
+              <div class="who">Bali</div>
+              <div class="msg">Sahi. Aur tu kya khaata hai? Veg, egg, non-veg?</div>
+            </div>
+          </div>
+          <div class="stack" style="gap: 8px">
+            <div class="choice selected"><div class="icon">🌱</div><div class="body"><div class="ttl">Vegetarian</div><div class="sub">Tap to pick</div></div></div>
+            <div class="choice"><div class="icon">🌿</div><div class="body"><div class="ttl">Eggetarian</div><div class="sub">Veg + eggs</div></div></div>
+            <div class="choice"><div class="icon">🥚</div><div class="body"><div class="ttl">Non-veg</div><div class="sub">Chicken/fish/egg</div></div></div>
+          </div>
+        </div>
+      </div>
+      <p class="v-desc">Chat-style. Bali is the onboarding flow itself. Conversational personality, highest "wow" but longest path. Risk: feels chatty after step 4. Auto-condense post-onboarding.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.var-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      const v = t.dataset.v;
+      document.querySelectorAll('.var-tab').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+      document.querySelectorAll('.var-panel').forEach(p => p.classList.toggle('active', p.dataset.v === v));
+    });
+  });
+</script>
+</body>
+</html>

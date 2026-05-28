@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Sketch 002 — Home / Today</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../themes/default.css" />
+<style>
+  .scroll { flex: 1; overflow-y: auto; padding: var(--s-4); }
+  .scroll::-webkit-scrollbar { width: 0; }
+
+  /* Macros tile */
+  .macros-tile { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--s-4); }
+  .macros-tile .row-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .macros-tile .greet { font-size: var(--t-13); color: var(--text-secondary); }
+  .macros-tile .streak { font-family: "IBM Plex Mono", monospace; font-size: var(--t-11); color: var(--accent); }
+  .macros-tile .streak::before { content: "🔥 "; }
+  .macros-tile .kcal { font-family: "IBM Plex Mono", monospace; font-size: 44px; font-weight: 500; line-height: 1; margin-top: 6px; color: var(--text-primary); letter-spacing: -0.02em; }
+  .macros-tile .target { font-family: "IBM Plex Mono", monospace; font-size: var(--t-13); color: var(--text-muted); margin-left: 4px; }
+  .macros-tile .progress {
+    height: 6px; border-radius: 999px; background: var(--bg-elevated); margin-top: var(--s-3);
+    overflow: hidden;
+  }
+  .macros-tile .progress .fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-hover)); border-radius: 999px; }
+  .macros-tile .macros-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s-3); margin-top: var(--s-4); padding-top: var(--s-4); border-top: 1px solid var(--border); }
+  .macros-tile .m { display: flex; flex-direction: column; }
+  .macros-tile .m .k { font-family: "IBM Plex Mono", monospace; font-size: var(--t-18); color: var(--text-primary); font-weight: 500; }
+  .macros-tile .m .k .of { color: var(--text-muted); font-size: var(--t-12); }
+  .macros-tile .m .l { font-size: var(--t-10); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; font-weight: 600; }
+  .macros-tile .m .bar { height: 3px; background: var(--bg-elevated); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .macros-tile .m .bar div { height: 100%; background: var(--accent); border-radius: 2px; }
+  .macros-tile .m.protein .bar div { background: var(--sage); }
+
+  /* Meal row */
+  .meal-row {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: var(--s-3); display: flex; gap: var(--s-3); align-items: center;
+  }
+  .meal-row .thumb {
+    width: 56px; height: 56px; border-radius: var(--radius-md);
+    background: radial-gradient(circle at 30% 30%, #4A3A28, #2B2017);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: var(--t-20);
+  }
+  .meal-row .info { flex: 1; min-width: 0; }
+  .meal-row .name { font-size: var(--t-14); font-weight: 600; color: var(--text-primary); }
+  .meal-row .when { font-family: "IBM Plex Mono", monospace; font-size: var(--t-10); color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 1px; }
+  .meal-row .kcal-tag { font-family: "IBM Plex Mono", monospace; font-size: var(--t-13); color: var(--text-primary); font-weight: 500; }
+
+  /* Small tile */
+  .tile {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: var(--s-4); display: flex; flex-direction: column; gap: 4px;
+  }
+  .tile .lbl { font-family: "IBM Plex Mono", monospace; font-size: var(--t-10); color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+  .tile .val { font-family: "IBM Plex Mono", monospace; font-size: var(--t-24); color: var(--text-primary); font-weight: 500; }
+
+  /* FAB */
+  .fab {
+    position: absolute; bottom: var(--s-6); right: var(--s-5); z-index: 10;
+    width: 56px; height: 56px; border-radius: 999px;
+    background: var(--accent); color: #1A1612;
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--t-28); font-weight: 300;
+    box-shadow: 0 8px 24px rgba(201,162,107,0.4);
+    cursor: pointer; transition: transform var(--transition);
+    border: 0;
+  }
+  .fab:active { transform: scale(0.92); }
+
+  /* Tabs at bottom */
+  .tab-bar {
+    height: 64px; border-top: 1px solid var(--border); background: var(--bg);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 0 var(--s-3); padding-bottom: 8px;
+  }
+  .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    color: var(--text-muted); font-size: var(--t-10); font-weight: 500;
+  }
+  .tab.active { color: var(--accent); }
+  .tab .icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+  /* === Variant B — Carousel hero === */
+  .vb .hero {
+    background: linear-gradient(160deg, var(--bg-card), var(--bg-elevated));
+    border: 1px solid var(--border); border-radius: var(--radius-xl);
+    padding: var(--s-5); text-align: center;
+  }
+  .vb .hero .ring {
+    width: 160px; height: 160px; margin: 0 auto;
+    border-radius: 999px;
+    background: conic-gradient(var(--accent) 0deg 200deg, var(--bg-elevated) 200deg 360deg);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .vb .hero .ring::before {
+    content: ""; position: absolute; inset: 12px;
+    background: var(--bg-card); border-radius: 999px;
+  }
+  .vb .hero .ring .inner { position: relative; z-index: 1; text-align: center; }
+  .vb .hero .ring .inner .kc { font-family: "IBM Plex Mono", monospace; font-size: 32px; font-weight: 500; color: var(--text-primary); letter-spacing: -0.02em; }
+  .vb .hero .ring .inner .lb { font-size: var(--t-10); color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .vb .carousel { display: flex; gap: var(--s-3); overflow-x: auto; padding: var(--s-2) 0 var(--s-2); margin: 0 calc(var(--s-4) * -1); padding-left: var(--s-4); padding-right: var(--s-4); scrollbar-width: none; }
+  .vb .carousel::-webkit-scrollbar { display: none; }
+  .vb .meal-card-h { min-width: 240px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--s-3); }
+
+  /* === Variant C — Minimal list === */
+  .vc .feed { display: flex; flex-direction: column; gap: var(--s-3); }
+  .vc .stat-row { display: flex; gap: var(--s-2); align-items: baseline; padding: 0 var(--s-2); }
+  .vc .stat-row .big { font-family: "IBM Plex Mono", monospace; font-size: var(--t-32); font-weight: 500; color: var(--text-primary); letter-spacing: -0.02em; }
+  .vc .stat-row .pct { color: var(--accent); font-family: "IBM Plex Mono", monospace; font-size: var(--t-12); }
+  .vc .stat-row .lbl { color: var(--text-muted); font-size: var(--t-12); font-family: "IBM Plex Mono", monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="toolbar"><a href="../">↑ all sketches</a><a href="../../specs/bhog-v1-design-spec.html">spec</a></div>
+
+<div class="page-wrap">
+  <div class="sketch-header">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:var(--t-11);color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase">Sketch 002</span>
+    <h1 style="margin-top:6px">Home / Today</h1>
+    <p>Daily macros progress + last 3 meals + streak + water. Hub-stack vs carousel-hero vs minimal-list.</p>
+  </div>
+
+  <div class="var-tabs">
+    <button class="var-tab active" data-v="a">A · Hub-stack</button>
+    <button class="var-tab" data-v="b">B · Carousel-hero</button>
+    <button class="var-tab" data-v="c">C · Minimal-list</button>
+  </div>
+
+  <!-- A: Hub stack -->
+  <div class="var-panel active" data-v="a">
+    <div class="variant-block">
+      <div class="v-label">Variant A · Hub-stack</div>
+      <div class="phone">
+        <div class="phone-status"><span>9:41</span><span>● 5G · 84%</span></div>
+        <div class="p-head"><h1>Aaj ka thali</h1><div class="sub">Wed · 28 May</div></div>
+        <div class="scroll stack">
+          <div class="macros-tile">
+            <div class="row-top"><div class="greet">Good morning, bhai</div><div class="streak">7-day streak</div></div>
+            <div><span class="kcal">1,247</span><span class="target">/ 2,400 kcal</span></div>
+            <div class="progress"><div class="fill" style="width:52%"></div></div>
+            <div class="macros-row">
+              <div class="m protein"><div class="k">42<span class="of">/88g</span></div><div class="l">protein</div><div class="bar"><div style="width:48%"></div></div></div>
+              <div class="m"><div class="k">128<span class="of">/280g</span></div><div class="l">carbs</div><div class="bar"><div style="width:46%"></div></div></div>
+              <div class="m"><div class="k">38<span class="of">/72g</span></div><div class="l">fat</div><div class="bar"><div style="width:53%"></div></div></div>
+            </div>
+          </div>
+          <div class="row" style="gap:var(--s-3)">
+            <div class="tile" style="flex:1"><div class="lbl">Water</div><div class="val">5 / 8</div></div>
+            <div class="tile" style="flex:1"><div class="lbl">Weight</div><div class="val">68.4 kg</div></div>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:var(--t-10);color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;font-weight:600;margin-top:var(--s-2);padding-left:var(--s-1)">Today's meals · 2</div>
+          <div class="meal-row"><div class="thumb">🥣</div><div class="info"><div class="name">Poha + chai</div><div class="when">8:24 am · breakfast</div></div><div class="kcal-tag">320</div></div>
+          <div class="meal-row"><div class="thumb">🍛</div><div class="info"><div class="name">Paneer butter masala + 2 roti</div><div class="when">1:10 pm · lunch</div></div><div class="kcal-tag">488</div></div>
+          <div class="meal-row" style="opacity:0.5;border-style:dashed"><div class="thumb">+</div><div class="info"><div class="name">Log dinner</div><div class="when">Target: 800 kcal · 35g protein</div></div></div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab active"><div class="icon">▦</div>Today</div>
+          <div class="tab"><div class="icon">🗒</div>History</div>
+          <div class="tab"><div class="icon">⚖</div>Weight</div>
+          <div class="tab"><div class="icon">⚙</div>Settings</div>
+        </div>
+        <button class="fab">+</button>
+      </div>
+      <p class="v-desc">Vertical hub. Macros on top, sibling tiles, meal list. Most info-dense, scrolls fine. Bali speaks via push only.</p>
+    </div>
+  </div>
+
+  <!-- B: Carousel hero -->
+  <div class="var-panel" data-v="b">
+    <div class="variant-block">
+      <div class="v-label">Variant B · Carousel-hero</div>
+      <div class="phone vb">
+        <div class="phone-status"><span>9:41</span><span>● 5G · 84%</span></div>
+        <div class="p-head"><h1>Aaj ka thali</h1><div class="sub">7-day 🔥</div></div>
+        <div class="scroll stack">
+          <div class="hero">
+            <div style="font-size:var(--t-12); color:var(--text-muted); letter-spacing:0.08em; text-transform:uppercase; font-family:'IBM Plex Mono',monospace; margin-bottom:var(--s-2)">52% of day</div>
+            <div class="ring"><div class="inner"><div class="kc">1,247</div><div class="lb">of 2,400 kcal</div></div></div>
+            <div style="display:flex;justify-content:space-around;margin-top:var(--s-3);font-family:'IBM Plex Mono',monospace;font-size:var(--t-12);color:var(--text-secondary)">
+              <span style="color:var(--sage)">P 42g</span>
+              <span>C 128g</span>
+              <span>F 38g</span>
+            </div>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:var(--t-10);color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;font-weight:600;padding-left:var(--s-1);margin-top:var(--s-2)">Today's meals →</div>
+          <div class="carousel">
+            <div class="meal-card-h"><div style="font-size:var(--t-14);font-weight:600">Poha + chai</div><div style="font-family:'IBM Plex Mono',monospace;font-size:var(--t-10);color:var(--text-muted);margin-top:2px">8:24 am · 320 kcal</div><div style="font-size:var(--t-12);color:var(--text-primary);margin-top:var(--s-3);line-height:1.4">"Sahi! Low protein. Add boiled eggs?"</div></div>
+            <div class="meal-card-h"><div style="font-size:var(--t-14);font-weight:600">Paneer + roti</div><div style="font-family:'IBM Plex Mono',monospace;font-size:var(--t-10);color:var(--text-muted);margin-top:2px">1:10 pm · 488 kcal</div><div style="font-size:var(--t-12);color:var(--text-primary);margin-top:var(--s-3);line-height:1.4">"+15g protein from 50g paneer for ₹18."</div></div>
+            <div class="meal-card-h" style="opacity:0.5;border-style:dashed;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:var(--t-13);min-height:120px">+ Log dinner</div>
+          </div>
+          <div class="row" style="gap:var(--s-3)">
+            <div class="tile" style="flex:1"><div class="lbl">Water</div><div class="val">5/8</div></div>
+            <div class="tile" style="flex:1"><div class="lbl">Weight</div><div class="val">68.4kg</div></div>
+          </div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab active"><div class="icon">▦</div>Today</div>
+          <div class="tab"><div class="icon">🗒</div>History</div>
+          <div class="tab"><div class="icon">⚖</div>Weight</div>
+          <div class="tab"><div class="icon">⚙</div>Settings</div>
+        </div>
+        <button class="fab">+</button>
+      </div>
+      <p class="v-desc">Hero ring up top + horizontal meal carousel. Most visually striking — best for Insta screenshot share. Trade-off: lower meal density.</p>
+    </div>
+  </div>
+
+  <!-- C: Minimal list -->
+  <div class="var-panel" data-v="c">
+    <div class="variant-block">
+      <div class="v-label">Variant C · Minimal-list</div>
+      <div class="phone vc">
+        <div class="phone-status"><span>9:41</span><span>● 5G · 84%</span></div>
+        <div class="p-head"><h1>Today</h1><div class="sub" style="color:var(--accent)">🔥 7</div></div>
+        <div class="scroll">
+          <div class="stat-row" style="margin-bottom:var(--s-2)">
+            <span class="big">1,247</span>
+            <span class="lbl">kcal</span>
+            <span class="pct">52%</span>
+          </div>
+          <div class="stat-row" style="margin-bottom:var(--s-5)">
+            <span style="color:var(--sage);font-family:'IBM Plex Mono',monospace;font-size:var(--t-13)">42g</span>
+            <span style="color:var(--text-muted);font-size:var(--t-12);font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;text-transform:uppercase">protein</span>
+            <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:var(--t-12);color:var(--accent)">−46g</span>
+          </div>
+          <div class="feed">
+            <div class="meal-row"><div class="thumb">🥣</div><div class="info"><div class="name">Poha + chai</div><div class="when">8:24 am</div></div><div class="kcal-tag">320</div></div>
+            <div class="meal-row"><div class="thumb">🍛</div><div class="info"><div class="name">Paneer butter masala</div><div class="when">1:10 pm</div></div><div class="kcal-tag">488</div></div>
+            <div class="meal-row" style="background: var(--accent-dim); border-color: rgba(201,162,107,0.3)"><div class="thumb" style="background:rgba(201,162,107,0.2)">B</div><div class="info"><div style="font-size:var(--t-12); color:var(--text-primary); line-height:1.5"><strong style="color:var(--accent)">Bali:</strong> Dinner ka time. Add 50g paneer → +15g protein for ₹18.</div></div></div>
+            <div class="meal-row" style="opacity:0.5;border-style:dashed"><div class="thumb">+</div><div class="info"><div class="name">Tap to log</div><div class="when">Dinner · target 800 kcal</div></div></div>
+          </div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab active"><div class="icon">▦</div>Today</div>
+          <div class="tab"><div class="icon">🗒</div>History</div>
+          <div class="tab"><div class="icon">⚖</div>Weight</div>
+          <div class="tab"><div class="icon">⚙</div>Settings</div>
+        </div>
+        <button class="fab">+</button>
+      </div>
+      <p class="v-desc">Stripped to a feed: kcal + protein at top, meal rows + inline Bali card. Most retention-optimal — Bali lives in the feed not in pushes alone.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.var-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      const v = t.dataset.v;
+      document.querySelectorAll('.var-tab').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+      document.querySelectorAll('.var-panel').forEach(p => p.classList.toggle('active', p.dataset.v === v));
+    });
+  });
+</script>
+</body>
+</html>
