@@ -485,7 +485,7 @@
 
     <!-- Sidebar checklist preview -->
     <div class="side-check">
-      <h5>Week-1 todos <span class="progress" id="sc-progress">0 / 23</span></h5>
+      <h5>Week-1 todos <span class="progress" id="sc-progress">10 / 37</span></h5>
       <ul id="sc-list">
         <!-- populated by JS, mirrors main checklist -->
       </ul>
@@ -1037,15 +1037,34 @@ Dev:
     <!-- 12 CHECKLIST -->
     <section class="block" id="checklist">
       <div class="section-head"><span class="section-num">12</span><h2>Week-1 Checklist</h2><span class="badge pending">Gate 0 · before any code</span></div>
-      <p>Concrete steps founder runs <strong>this week</strong>. No code begins until every box checked. Tick boxes mirror to sidebar progress (<span id="ct-info">23 total</span>).</p>
+      <p>Concrete steps founder runs <strong>this week</strong>. No code begins until every box checked. Tick boxes mirror to sidebar progress (<span id="ct-info">37 total · 10 pre-checked harness items as of 2026-05-28</span>). DEFERRED tags = founder explicitly postponed.</p>
 
-      <h3 style="margin-top:0">Gate 0a · Vision benchmark</h3>
+      <h3 style="margin-top:0">Harness prep · CC-drafted 2026-05-28</h3>
+      <p style="font-size:var(--t-12);color:var(--text-muted);margin-bottom:var(--s-3)">Artifacts built today by /plan-eng-review + /plan-ceo-review + /plan-design-review + Gate 0a kickoff. Founder verification still required where noted.</p>
       <div class="card" style="padding:0">
-        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Photograph 30 of your own meals (10 single-dish · 10 mixed · 10 thali)</div><div class="meta">3–5 days · founder owns camera roll</div></div></div>
-        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Build data/dish_decomposition.json for all 50 whitelist dishes</div><div class="meta">NIN check → Tarla Dalal + Unlock.fit scrape → Opus draft → IFCT verify → cross-ref Munmun/Ryan · ~5–7 hrs</div></div></div>
-        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Label dish + portion + macros ground truth for all 30 photos</div><div class="meta">Opus 4.7 drafts · founder verifies every single label</div></div></div>
-        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Run each photo through Gemini 2.5 Flash with V0 prompt template</div><div class="meta">Free tier · Google AI Studio · no CC</div></div></div>
+        <div class="check done"><input type="checkbox" checked /><div class="body"><div class="title">data/ifct_lookup.json — ~90 raw ingredients seeded</div><div class="meta">Per IFCT 2017 · founder cross-check vs PDF still pending</div></div></div>
+        <div class="check done"><input type="checkbox" checked /><div class="body"><div class="title">data/dish_decomposition.json — 50 dishes drafted (15 pan · 12 N · 12 S · 11 W/E)</div><div class="meta">Opus 4.7 cascade per D-08 · founder verification of gram amounts still pending</div></div></div>
+        <div class="check done"><input type="checkbox" checked /><div class="body"><div class="title">data/veg_protein_prices_schema.sql — full schema + materialized view + triggers</div><div class="meta">Phase 2 Alembic migration consumes this · seed data pending Gate 0c scrape</div></div></div>
+        <div class="check done"><input type="checkbox" checked /><div class="body"><div class="title">data/photos/CURATION-CHECKLIST.md — founder photo brief written</div><div class="meta">10/10/10 stratification rules · capture conventions · ground-truth label format · pass bar</div></div></div>
+        <div class="check done"><input type="checkbox" checked /><div class="body"><div class="title">evals/gate_0a_vision.md — eval harness spec written</div><div class="meta">Pipeline + scoring + Phase 2 Week 1 Python skeleton · ready for code start</div></div></div>
+        <div class="check done"><input type="checkbox" checked /><div class="body"><div class="title">.planning/decisions/ seeded with D-01..D-19 + D-CEO-01..03</div><div class="meta">ADR-lite per D-19 · downstream agents reference before Phase 2</div></div></div>
+        <div class="check done"><input type="checkbox" checked /><div class="body"><div class="title">DESIGN.md — 287-line token contract</div><div class="meta">Coach Dark · Inter+Plex Mono · all components · brand voice · locked invariants</div></div></div>
+        <div class="check done"><input type="checkbox" checked /><div class="body"><div class="title">TODOS.md — 12 deferred items captured (8 eng + 4 CEO + 3 design-005)</div><div class="meta">Schemas · provider retry · DPDP · EAS pipeline · WhatsApp · streak · budget optimizer</div></div></div>
+        <div class="check done"><input type="checkbox" checked /><div class="body"><div class="title">5 finalized screen HTMLs (001 camera · 002 home · 003 meal · 004 onboard · 005 budget)</div><div class="meta">All Pretext-wired · Coach Dark token-locked · ARIA + a11y · Phase 3 RN port-ready</div></div></div>
+        <div class="check done"><input type="checkbox" checked /><div class="body"><div class="title">Reviews logged: /plan-eng-review CLEAR · /plan-ceo-review CLEAR · /plan-design-review CLEAR</div><div class="meta">All 3 plan reviews passed pre-code · dashboard CLEARED</div></div></div>
+      </div>
+
+      <h3>Gate 0a · Vision benchmark</h3>
+      <div class="card" style="padding:0">
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">⏰ DEFERRED — Acquire Gemini 2.5 Flash API key (Google AI Studio)</div><div class="meta">aistudio.google.com → Create API key · free 10 RPM / 250K TPM / 500 RPD · no CC · ~5 min · set GEMINI_API_KEY env</div></div></div>
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">⏰ DEFERRED — Photograph 30 of your own meals (10 single-dish · 10 mixed · 10 thali)</div><div class="meta">3–5 days · founder owns camera roll · per data/photos/CURATION-CHECKLIST.md</div></div></div>
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Verify data/dish_decomposition.json gram amounts vs Tarla Dalal / Unlock.fit / NIN</div><div class="meta">~3–4 hrs · CC drafted the 50-dish seed · founder verifies before Gate 0a labeling pass</div></div></div>
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Verify data/ifct_lookup.json values vs IFCT 2017 PDF</div><div class="meta">~1–2 hrs · CC seeded ~90 common ingredients · founder cross-checks kcal / protein / carb / fat</div></div></div>
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Write data/photos/&lt;bucket&gt;/labels_truth.csv as photos accumulate</div><div class="meta">filename · dish_id · portion_g · notes — matches dish_decomposition keys</div></div></div>
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Opus 4.7 labels each photo blind → labels_opus.csv</div><div class="meta">Run via Claude CLI · founder verifies every single label per D-06</div></div></div>
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Run each photo through Gemini 2.5 Flash via Phase 2 evals/gate_0a_vision.py</div><div class="meta">Built per evals/gate_0a_vision.md skeleton · Phase 2 Week 1 deliverable</div></div></div>
         <div class="check"><input type="checkbox" /><div class="body"><div class="title">Score: ≥70% dish-name · ≥60% macros within ±35% · per-bucket pass</div><div class="meta">Fail → improve prompt with in-context examples · retry · or try Qwen 2.5 VL via OpenRouter</div></div></div>
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Document Gate 0a pass/fail in .planning/decisions/YYYY-MM-DD-gate-0a-{pass|fail}.md</div><div class="meta">Per D-19 format</div></div></div>
       </div>
 
       <h3>Gate 0b · Advice rubric</h3>

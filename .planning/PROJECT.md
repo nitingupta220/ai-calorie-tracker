@@ -32,7 +32,7 @@ A user can photograph their Indian meal and immediately get accurate macros + on
 - [ ] Phone OTP signup via Firebase Auth
 - [ ] Privacy + DPDP plumbing — privacy policy, "Delete my data" button, Indian-region storage (Cloudflare R2 Mumbai), consent screens, 30-day hard-delete on account deletion
 - [ ] CDSCO + ASCI-compliant disclaimer in app and marketing copy
-- [ ] Multi-provider AI abstraction (`ai_provider.py`) — free-first routing (Google AI Studio Gemini 2.0 Flash → Groq Llama 3.3 → OpenRouter free → paid Gemini/GPT-4o-mini fallback)
+- [ ] Multi-provider AI abstraction (`ai_provider.py`) — free-first routing (Google AI Studio Gemini 2.5 Flash → Groq Llama 3.3 → OpenRouter free → paid Gemini/GPT-4o-mini fallback)
 - [ ] Internal alpha distribution via Play Internal Testing with 20 hand-recruited Trial Users
 - [ ] Photo dataset growth toward 3,000+ labeled meals for V1.5 fine-tuning
 
@@ -80,7 +80,7 @@ A user can photograph their Indian meal and immediately get accurate macros + on
 
 ## Constraints
 
-- **Tech stack**: React Native + Expo + EAS Build (V1); FastAPI + Postgres on Railway; Cloudflare R2 Mumbai for photo storage; Firebase phone OTP — Reason: Expo minimizes native-config complexity for first-time RN shipper; Indian-region storage required by DPDP Act
+- **Tech stack**: React Native + Expo + EAS Build (V1); FastAPI on Render free (Singapore) + Supabase Mumbai Postgres; Cloudflare R2 with `jurisdiction=india` for photo storage; Firebase phone OTP — Reason: Render is the only no-CC FastAPI host in 2026 (Fly removed free, Railway requires CC). Supabase Mumbai + R2 india jurisdiction satisfy DPDP residency for PII + photos. Singapore compute disclosed in privacy policy. Re-evaluate Mumbai compute (Fly bom1 or Render India) at Phase 4-5 trigger
 - **AI models**: Multi-provider abstraction via `ai_provider.py`; Phase 0 testing = 100% free tiers (Google AI Studio Gemini 2.0 Flash + Groq Llama 3.3 70B); Phase 1 alpha = free-first then paid; Phase 2+ = paid Gemini Flash primary, OpenRouter fallback — Reason: bootstrap budget, vendor-risk mitigation
 - **Budget**: ~₹0 in Phase 0, ~₹0-200 across Phase 1 alpha (4 weeks), ~₹1,700/mo ceiling at 100 free users — Reason: solo bootstrap founder, no external funding
 - **Timeline**: 14-week target to public launch; 10-12 weeks if founder has shipped React Native before, 14-20 weeks if first-time RN shipper — Reason: founder native-app fluency unknown
@@ -121,4 +121,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-27 after initialization (synthesized from /office-hours design doc iteration 4)*
+*Last updated: 2026-05-28 — corrected Gemini 2.5 Flash + Render hosting drift per /plan-eng-review D1 (was Gemini 2.0, Railway). Original: 2026-05-27 from /office-hours design doc iteration 4.*

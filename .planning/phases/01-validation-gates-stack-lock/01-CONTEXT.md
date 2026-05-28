@@ -16,15 +16,28 @@ Phase 1 locks all four risk gates (Gate 0a vision benchmark, Gate 0b advice rubr
 ### Hosting (Compute + Database + Storage)
 
 - **D-01:** **Compute = Render free tier (Singapore region)** for FastAPI backend during Phase 0-1 + Phase 6 alpha. No credit card required. Push-to-deploy from GitHub. Free web service sleeps after 15 min idle with ~60s wake.
-  - **Reason:** Fly.io and Railway both require credit card in 2026 (Fly removed free tier; Railway requires CC since Aug 2023). Render is the only free-no-CC option that fits FastAPI well. Cross-border processing from Singapore is DPDP-compliant with consent + standard safeguards disclosed in privacy policy.
+  - **Reason:** Fly.io and Railway both require credit card in 2026 (Fly removed free tier; Railway requires CC since Aug 2023). Render is the only free-no-CC option that fits FastAPI well.
+  - **DPDP cross-border risk (flagged by /plan-eng-review D3, 2026-05-28):** DPDP Act 2023 §16 empowers the Central Government to whitelist transfer destinations. As of 2026-05, no final notification has approved Singapore explicitly. Current posture relies on consent + privacy-policy disclosure. **Risk-monitoring contract:**
+    1. Founder monitors MeitY DPDP notifications monthly (subscribe to MeitY press releases + Indian privacy-tech newsletter).
+    2. Privacy policy explicitly names Singapore (Render) as processing region + lists alternative regions auto-migration would route to.
+    3. Migration trigger = ANY MeitY notification restricting or qualifying Singapore data flow. Pre-built Fly bom1 (CC-gated) or Render India (when launched) deployment recipe sits in `.planning/decisions/dpdp-migration-runbook.md` (Phase 2 Week 1 deliverable).
   - **Trade-off:** +50-100ms latency vs Mumbai-native compute. Acceptable for Phase 1 alpha (20 users); re-evaluate Mumbai hosting (Fly bom1 + CC) at Phase 4 alpha completion or Phase 5 public launch.
 
 - **D-02:** **Database = Supabase Mumbai free tier** (500MB, 50K MAU, no CC required). Indian region satisfies DPDP residency requirement for PII (user profile, meal logs, consent ledger).
   - **Free-tier quirk:** Supabase auto-pauses after 1 week idle. Handled via GitHub Actions cron-ping every 6h (free, ~10 lines yaml). Disable cron when paid tier kicks in.
 
-- **D-03:** **Cold-start mitigation during Phase 1 alpha = GitHub Actions cron every 10 minutes against Render `/healthz`** for the 14-day alpha window. Keeps Render warm during user-active periods. Disable after alpha to conserve Actions minutes.
+- **D-03:** **Cold-start mitigation during Phase 1 alpha = GitHub Actions cron every 10 minutes against Render `/healthz`, scheduled 04:30-16:30 UTC (10:00-22:00 IST) only.** Hits the 14h Indian meal-active window; sleeps 22:00-08:00 IST. Off-hours requests pay 60s cold-start (acceptable for 20-user alpha). Math: 14h × 30d = ~420h/mo, well under Render free 750h/mo cap with ~300h headroom for deploys + ad-hoc restarts.
+  - **Why active-hours only:** 24/7 cron would burn 720-744h/mo and exhaust Render free allowance with zero headroom. One overage = service paused for the month.
   - **Layered with mobile-side caching** (recent meal results cached locally) — deferred to Phase 3 mobile build.
   - **Upgrade trigger:** Move to Render Starter $7/mo (CC required) ONLY if Gate 7 retention passes AND founder commits to ≥2 months of Phase 4+ work.
+  - **Locked by /plan-eng-review D2 (2026-05-28).**
+
+- **D-03b (added by /plan-eng-review D4, 2026-05-28):** **Cold-start UX policy = honest "Bali waking up" banner during slow uploads.** Mobile detects upload response-time > 5s and renders Bali speech bubble: *"Ek second bhai, coach jaag raha hai... ~30s."* No infrastructure change. Phase 3 mobile build adds:
+  1. Upload-start timer
+  2. At 5s elapsed: insert Bali bubble in advice surface
+  3. At 30s elapsed: bubble copy switches to *"Thoda aur bhai, server start ho raha hai"*
+  4. At 60s elapsed: fallback to *"Server slow hai, ek baar phir try kar"* + retry button
+  Estimate: ~1 hour Phase 3 mobile work. Wires through `<MacrosCard />` skeleton state.
 
 - **D-04:** **Photo storage = Cloudflare R2 with `jurisdiction=india`** (free 10GB, no CC required at signup). Endpoint `<acct>.in.r2.cloudflarestorage.com`. Bucket created with explicit jurisdiction parameter — Mumbai PoP alone does NOT satisfy DPDP residency.
 
