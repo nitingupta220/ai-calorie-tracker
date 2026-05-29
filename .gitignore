@@ -1,0 +1,59 @@
+# ─── Secrets / env (NEVER commit — INFRA-OPS-SPEC secrets matrix) ───
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+**/service-account*.json
+**/firebase-admin*.json
+google-services.json
+GoogleService-Info.plist
+*credentials*.json
+
+# ─── Python (server/) ───
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+build/
+# uv keeps uv.lock tracked; ignore its cache only
+.uv/
+
+# ─── Node / Expo (mobile/) ───
+node_modules/
+.expo/
+.expo-shared/
+dist/
+web-build/
+*.tsbuildinfo
+.eas/
+ios/
+android/
+*.jks
+*.keystore
+
+# ─── Data / artifacts (keep seeds + schema; ignore raw photos + scrape dumps) ───
+data/photos/**/*.jpg
+data/photos/**/*.jpeg
+data/photos/**/*.png
+data/photos/**/*.heic
+!data/photos/**/CURATION-CHECKLIST.md
+evals/datasets/*.parquet
+evals/*_results.json
+evals/gate_0a_run-*.json
+
+# ─── Tooling / local ───
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+*.swp
+.gstack/
