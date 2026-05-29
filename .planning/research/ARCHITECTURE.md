@@ -1,8 +1,18 @@
 # Architecture Research
 
+> ⚠️ **PARTIALLY SUPERSEDED — read `.planning/phases/01-validation-gates-stack-lock/01-CONTEXT.md` (D-01..D-19 + D-CEO-01..03) and `CLAUDE.md` FIRST.**
+> This is a point-in-time research artifact (2026-05-27). The following items are STALE and overridden by later locked decisions — do NOT plan against them:
+> - **Compute:** "Railway / railway.toml" → **Render free (Singapore)** per D-01. Railway eliminated (CC required 2026).
+> - **Vision model:** "Gemini 2.0 Flash (15 RPM / 1500 RPD)" → **Gemini 2.5 Flash** (10 RPM / 250K TPM / 500 RPD) per CLAUDE.md + D-stack. 2.0 retires 2026-03-03.
+> - **Cron:** "in-process APScheduler" for hard-delete / keep-alive / push → **GitHub Actions scheduled workflows** per D-03 (Render free sleeps; in-process cron will NOT fire). APScheduler only valid once on always-on paid compute.
+> - **Auth wire:** "HTTPS (JWT)" / app-minted JWT → **Firebase ID token used directly as Bearer**, verified per-request via `firebase-admin.verify_id_token` per D-05 (no separate app JWT).
+> - **State mgmt:** "Zustand/Redux" → **Zustand + TanStack Query** (Redux is anti-pattern #12).
+> The *component topology, two-step vision pipeline, ai_provider.py abstraction, presign-first upload, and append-only event-log patterns* below remain VALID. Treat infra/provider/cron/auth specifics as superseded.
+
 **Domain:** AI-powered Indian-context nutrition coach (mobile + backend, vision + advice LLM)
 **Researched:** 2026-05-27
 **Confidence:** HIGH (stack locked in design doc + standard 2026 mobile-AI patterns)
+**Superseded-banner added:** 2026-05-29 per /plan-eng-review + bhog-decision-audit workflow (blocker #1)
 
 ## Standard Architecture
 
