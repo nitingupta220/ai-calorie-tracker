@@ -130,9 +130,9 @@ An AI-powered nutrition + advice app for urban Indian youth (18-30) that uses fo
 ### Nutrition Data Layer
 | Source | Format | Purpose | Implementation |
 |---|---|---|---|
-| **IFCT 2017** (Indian Food Composition Tables) | 528 raw foods, CSV/JSON | Macros ground truth for raw ingredients | Load into Postgres `nutrition_facts` table; query by ingredient name + alias |
-| **Dish decomposition layer** | LLM-prompted | Cooked dish → ingredient breakdown | E.g., "paneer butter masala" → 80g paneer + 50g tomato + 10g butter + 5g cashew. Prompt template + ~50-dish whitelist as in-context examples. |
-| **Founder-curated portion table** | Spreadsheet → JSON | Typical Indian portion sizes per dish | Built during Gate 0a (Week 0). One roti ≈ 30g flour ≈ 100 kcal. One katori dal ≈ 150g. |
+| **IFCT 2017** (Indian Food Composition Tables) | 528 raw foods, CSV/JSON | Macros ground truth for raw ingredients | Load into Postgres `nutrition_facts` table; query by ingredient name + alias. **⚠️ License-gated (D-31):** IFCT is ICMR-NIN copyright — "no part stored/reproduced electronically *for creating a product* without prior written permission of NIN." Commercial (₹299/mo) use needs a written-permission email to NIN (may be free; cannot be skipped). The IFCT food table is NOT shipped with INDB — request from ICMR-NIN. |
+| **Dish decomposition layer** | INDB-seeded + LLM for gaps | Cooked dish → ingredient breakdown | Seed from **INDB** (1,014 recipes, one row per ingredient with food_code + amount/unit; grams need the `INDB.do` unit→g conversion — only ~46% rows are already grams). Covers ~43/50 whitelist; LLM-decompose only the ~4 gaps (pani_puri, pongal_ven, bisi_bele_bath, litti). **Seed, not drop-in (D-30).** |
+| **Founder-curated portion table** | Spreadsheet → JSON | Typical Indian portion sizes per dish | Built during Gate 0a (Week 0). INDB serving sizes = standardized priors, NOT measured — **Gate-0a truth must be WEIGHED on a kitchen scale** (INDB ≠ image-linked truth). Add a rich/plain oil-variant axis (INDB = one fixed oil amount). One roti ≈ 30g flour ≈ 100 kcal. One katori dal ≈ 150g. |
 ### Push Notifications
 | Technology | Version | Purpose | Why |
 |---|---|---|---|
@@ -195,7 +195,7 @@ An AI-powered nutrition + advice app for urban Indian youth (18-30) that uses fo
 | 5 | Skip JPEG conversion (SDK 54 HEIC default) | Backend can't process HEIC; ~30% upload failures | `expo-image-manipulator` to JPEG before upload |
 | 6 | Trust client-submitted phone number | Spoofable | Always `firebase-admin.verify_id_token()` server-side |
 | 7 | Local notifications only for retention | Android kills them inconsistently | FCM server-driven scheduling |
-| 8 | USDA FoodData as nutrition source | Western portions/ingredients | IFCT 2017 + dish-decomposition layer |
+| 8 | USDA FoodData as nutrition source | Western portions/ingredients | IFCT 2017 + INDB seed + dish-decomposition layer. **NB (D-30/D-31):** IFCT/INDB are license-gated (NIN written permission for commercial use) and INDB is a SEED not a drop-in (grams need conversion; IFCT table requested separately; no weighed image-linked truth) — do not assume free/instant. |
 | 9 | MSG91 + DLT for V1 | 3-7 day registration delay; founder is in Gates 0a-0d | Firebase Auth phone OTP; defer MSG91 to Phase 3 |
 | 10 | Stripe for India payments | Higher card decline rate; weaker UPI integration | Razorpay UPI Autopay |
 | 11 | Card e-mandates over UPI Autopay for ₹299 | Higher failure rate at low ticket | UPI Autopay (₹15K limit suffices) |
@@ -242,7 +242,7 @@ An AI-powered nutrition + advice app for urban Indian youth (18-30) that uses fo
 | Auth (Firebase phone OTP) | **HIGH** | Firebase docs + Expo integration guides |
 | AI providers (Gemini/Groq/OpenRouter) | **HIGH** | Multiple 2026-dated sources align on limits |
 | Payments (Razorpay UPI Autopay) | **HIGH** | Razorpay official 2026 docs |
-| Nutrition (IFCT 2017) | **MEDIUM** | Source dataset known; integration pattern from design doc |
+| Nutrition (IFCT 2017 + INDB) | **MEDIUM** | INDB verified live (1,014 recipes, seed-only — grams need conversion); IFCT/INDB commercial use is license-gated, NIN written permission required (D-30/D-31) |
 | Analytics (PostHog) | **HIGH** | PostHog docs + comparison sources |
 ## Roadmap Implications
 <!-- GSD:stack-end -->

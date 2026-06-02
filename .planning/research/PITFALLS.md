@@ -733,6 +733,14 @@ Source map for confidence calls:
 
 **Prevention:** (1) **Weigh the 30 benchmark plates** on a kitchen scale → real gram truth (at least the single-dish bucket). (2) **Ingest INDB alongside IFCT** to seed the decomposition table + portion priors far better than guessing — strong recommendation. (3) Use Nutrition5k/SimpleFood45 to calibrate the ±35% methodology, not as Indian truth. (4) Verify licenses before commercial use (Nutrition5k = CC BY 4.0; Kaggle/Roboflow sets per-page; INDB depends on IFCT-derived sources).
 
+### V-07 · Ground-truth is license-gated (IFCT/INDB), not free [HIGH]
+
+**What goes wrong:** The plan assumed IFCT 2017 is a free drop-in macro layer. Adversarially verified (2026-06-02, by parsing the live sources): IFCT 2017 is ICMR-NIN copyright — *"no part can be stored or reproduced in any electronic format for creating a product without the prior written permission of the National Institute of Nutrition."* Personal-use only. INDB (the IFCT-derived recipe DB) ships with **NO license** on its GitHub repo (all rights reserved); the paper's CC BY covers only the manuscript, not the data. Since INDB embeds IFCT values, the restriction follows downstream.
+
+**Why it matters here:** A commercial ₹299/mo app storing IFCT/INDB-derived macros to power the product is squarely "stored… for creating a product" — so a **written-permission step from ICMR-NIN is unavoidable** before the paid tier ships. It may be granted free (use is "encouraged"), but it cannot be skipped. A launch gate, not a nice-to-have — and it breaks the original "IFCT is a free drop-in" assumption (D-31 / TODOS-10).
+
+**Prevention:** Email ICMR-NIN + Anuvaad early; gate IFCT/INDB macros behind the free tier / a feature flag until permission lands; for de-risking, lean LLM-decomposition + portion on permissive sources (USDA FDC public-domain, UK CoFID OGL) where they cover the ingredient — acknowledging India-specific IFCT values remain the gap needing sign-off. Also note INDB is a **seed, not a drop-in** (grams need the `INDB.do` unit→g conversion; the IFCT food table is not shipped; no weighed/image-linked truth; one fixed oil amount per dish) — D-30.
+
 ## Sources
 
 - Design doc primary: `/home/nitin/.gstack/projects/ai-calorie-weight-loss/nitin-unknown-design-20260527-181050.md` (HIGH — adversarial-reviewed, iteration 4)

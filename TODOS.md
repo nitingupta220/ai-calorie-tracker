@@ -134,19 +134,27 @@ Each entry: **what** / **why** / **pros** / **cons** / **context** / **blocked b
 
 ---
 
-## 9. Ingest INDB (Indian Nutrient Databank) for portion/decomposition priors
+## 9. INDB integration — seed dish_decomposition.json (verified 2026-06-02, D-30)
 
-**What.** Ingest INDB (~1,095 food items + ~1,014 Indian recipes with per-ingredient gram amounts + per-serving macros; IFCT-derived; open-access — anuvaad.org.in / GitHub `lindsayjaacks/Indian-Nutrient-Databank-INDB-`) alongside IFCT 2017 to seed `data/dish_decomposition.json` portion priors and verify its rows before Gate 0a.
+**What.** Use INDB (Indian Nutrient Databank — GitHub `lindsayjaacks/Indian-Nutrient-Databank-INDB-`) as the SEED for `data/dish_decomposition.json`: (1) download `recipes.xlsx` + `INDB.xlsx` + `recipes_servingsize.xlsx` + `INDB.do`; (2) run / re-implement `INDB.do`'s ~45 unit→gram rules in Python to produce per-ingredient grams (~54% of rows are non-gram); (3) map the ~43 matchable whitelist dishes into `dish_decomposition.json` (ingredient, grams, food_code, per-serving macros); (4) LLM-decompose ONLY the ~4 gaps (pani_puri, pongal_ven, bisi_bele_bath, litti); (5) request the IFCT food table (NIN_fct) from ICMR-NIN to recompute/extend; (6) set `verified_by` (not null).
 
-**Why.** Verified 2026-06-02: NO free Indian dataset carries weighed-gram macro truth — INDB is the closest (real recipe grams). `dish_decomposition.json` is currently Opus-drafted (`verified_by:null`); INDB replaces guesses with sourced gram amounts and de-risks the portion→macro half the gate measures (PITFALLS V-06). Founder ruling D-21 / F-16.
+**Why.** Verified live: INDB is the best Indian seed (1,014 recipes × ingredient rows) but a SEED not a drop-in (grams need conversion, IFCT table not shipped, no weighed truth, one fixed oil amount). Turns `dish_decomposition.json` from Opus guesses into sourced data for ~86% of the whitelist (D-30).
 
-**Pros.** Free; IFCT-derived (consistent with our reference layer); turns the decomposition table from assumption into sourced data; directly improves Gate-0a truth.
+**Cons.** ~1-2 days (gram-conversion + mapping + gap dishes + rich/plain oil-variant axis). The 86% coverage is name-level, NOT yet ±35%-validated.
 
-**Cons.** ~3-5h ingest + mapping INDB items → 50-dish whitelist + `ifct_lookup` keys. License is IFCT-derived — verify before commercial use.
+**Blocked by.** Nothing for the seed work; BUT shipping IFCT/INDB macros in the paid tier is blocked by TODOS-10 (license).
 
-**Context.** Do before the Gate-0a decomposition-verification step. Output: `data/indb/` + `dish_decomposition.json` with `verified_by` set (not null).
+---
 
-**Blocked by.** Nothing — can start now (parallel to photo curation).
+## 10. IFCT/INDB commercial license — LAUNCH GATE (D-31)
+
+**What.** Obtain written permission for commercial use of IFCT 2017 + confirm INDB data license. Email ICMR-NIN (nin@ap.nic.in / ifct2017@gmail.com) for IFCT product/commercial use; email Anuvaad (awasthi@anuvaad.org.in / aswathy@anuvaad.org.in) to confirm INDB license + request an explicit repo LICENSE (ideally CC BY 4.0).
+
+**Why.** IFCT 2017 (ICMR-NIN copyright) forbids electronic reproduction "for creating a product" without prior written permission; INDB repo has no license; the paper's CC BY covers only the manuscript. A ₹299/mo app storing IFCT/INDB-derived macros needs this permission — unavoidable on any reading (may be granted free). Adversarially verified, HIGH confidence (D-31).
+
+**Cons.** External dependency on NIN/Anuvaad response time. Until granted, gate IFCT/INDB macros behind the free tier / a feature flag.
+
+**Blocked by.** Nothing — send the emails now; track as a launch gate (before Phase 5 public/paid launch).
 
 ---
 
