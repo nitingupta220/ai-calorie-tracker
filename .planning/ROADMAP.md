@@ -26,7 +26,7 @@ All v1 code is deferred until Phase 1 gates pass; design-doc artifacts (`.planni
 **Depends on**: Nothing (first phase)
 **Requirements**: GATE-01, GATE-02, GATE-03, GATE-04
 **Success Criteria** (what must be TRUE):
-  1. Founder has run 30 **weighed**, reference-object meal photos (10 single / 10 mixed / 10 thali) through Gemini 2.5 Flash and demonstrated dish-ID ≥80% AND macros within ±35% of weighed truth (≥70% single / ≥60% mixed); thali is reported-only/non-blocking (V1.5) (Gate 0a, recalibrated 2026-06-02)
+  1. Gate 0a DATA INPUTS ready (the Phase-1 deliverable): 30 **weighed**, reference-object meal photos (10 single / 10 mixed / 10 thali) + a verified `dish_decomposition.json` (`verified_by` set on all 50) + a complete `labels_truth.csv`. The formal Gemini 2.5 Flash verdict — dish-ID ≥80% AND macros within ±35% of weighed truth (≥70% single / ≥60% mixed; thali reported-only) — runs via `gate_0a_vision.py` as the FIRST Phase-2 Week-1 deliverable, before any other Phase-2 work (Gate 0a, recalibrated 2026-06-02)
   2. Founder has logged 14 days of own meals through the validated pipeline + advice engine; ≥70% of replies score 4/4 on the rubric (specific food + quantity + ₹ cost + log reference) (Gate 0b)
   3. Founder has ≥10 verbal commitments + ≥3 verbatim price-WTP quotes from 20 named Trial Users on WhatsApp (Gate 0c)
   4. Stack is locked in `.planning/decisions/` — Expo + RN + FastAPI + Supabase Mumbai + R2 `jurisdiction=india` + Firebase OTP + `ai_provider.py` abstraction + Gemini 2.5 Flash (not 2.0) + compute hosting = Render free Singapore per D-01 (Gate 0d)
