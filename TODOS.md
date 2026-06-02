@@ -134,6 +134,22 @@ Each entry: **what** / **why** / **pros** / **cons** / **context** / **blocked b
 
 ---
 
+## 9. Ingest INDB (Indian Nutrient Databank) for portion/decomposition priors
+
+**What.** Ingest INDB (~1,095 food items + ~1,014 Indian recipes with per-ingredient gram amounts + per-serving macros; IFCT-derived; open-access — anuvaad.org.in / GitHub `lindsayjaacks/Indian-Nutrient-Databank-INDB-`) alongside IFCT 2017 to seed `data/dish_decomposition.json` portion priors and verify its rows before Gate 0a.
+
+**Why.** Verified 2026-06-02: NO free Indian dataset carries weighed-gram macro truth — INDB is the closest (real recipe grams). `dish_decomposition.json` is currently Opus-drafted (`verified_by:null`); INDB replaces guesses with sourced gram amounts and de-risks the portion→macro half the gate measures (PITFALLS V-06). Founder ruling D-21 / F-16.
+
+**Pros.** Free; IFCT-derived (consistent with our reference layer); turns the decomposition table from assumption into sourced data; directly improves Gate-0a truth.
+
+**Cons.** ~3-5h ingest + mapping INDB items → 50-dish whitelist + `ifct_lookup` keys. License is IFCT-derived — verify before commercial use.
+
+**Context.** Do before the Gate-0a decomposition-verification step. Output: `data/indb/` + `dish_decomposition.json` with `verified_by` set (not null).
+
+**Blocked by.** Nothing — can start now (parallel to photo curation).
+
+---
+
 ---
 
 ## CEO Review Deferred Items (2026-05-28)

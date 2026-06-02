@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Pre-Build Validation Gates (Week 0)
 
-- [ ] **GATE-01**: Founder captures 30-photo benchmark stratified across 10 single-dish / 10 mixed / 10 thali; Gemini 2.5 Flash recognition ≥70% dish-name match, ≥60% macros within ±35% of IFCT-derived ground truth (per-bucket pass bar)
+- [ ] **GATE-01**: Founder captures 30-photo benchmark (10 single / 10 mixed / 10 thali) with a reference object (coin/palm) in single+mixed and plates **WEIGHED on a kitchen scale**; Gemini 2.5 Flash scored on two separate bars — dish-ID ≥80% AND macros within ±35% of **weighed-truth** (≥70% single / ≥60% mixed). Thali bucket is **reported-only / non-blocking** (V1.5 re-intro). Report median + P75/P90 macro tail. Decomposition rows verified vs INDB + IFCT first. (Recalibrated 2026-06-02)
 - [ ] **GATE-02**: Founder logs 14 days of own meals through validated vision pipeline + advice engine; ≥70% of advice replies score 4/4 on rubric (specific food + specific quantity + ₹ cost or pantry mention + reference to recent log)
 - [ ] **GATE-03**: Founder identifies 20 named Trial Users with WhatsApp contact; ≥10 verbal commitments; ≥3 verbatim price-WTP quotes ("I'd pay ₹299/mo for...")
 - [ ] **GATE-04**: Tech stack locked (Expo + RN + FastAPI + Supabase Mumbai + R2 india-jurisdiction + Firebase OTP + ai_provider.py abstraction); compute hosting locked to Render free Singapore per D-01 (Fly.io/Railway rejected — credit-card required); Play Developer account purchased ($25) + identity verification submitted

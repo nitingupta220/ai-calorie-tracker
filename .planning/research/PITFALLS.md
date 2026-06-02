@@ -687,6 +687,52 @@ Source map for confidence calls:
 
 ---
 
+## Vision / Calorie-Accuracy Pitfalls (added 2026-06-02 · external-review-verified)
+
+> Folded in after an external adversarial review of the photo→macros premise. Every figure below was fact-checked against primary sources (Nutrition5k CVPR 2021; GPT-4V food study, Nutrients 2025; Martin et al. 2018; RevenueCat 2025–26; OpenAI's HealthifyMe case study). Confidence tags reflect that check. **One reviewer claim FAILED verification and is deliberately omitted: "calorie-tracking retention 68%→21% by week 12 / AI apps churn 30% faster" — unsourced; the only real 30% evidence points the other way (AI personalization *reduces* churn ~30%).** The qualitative "diet apps decay hard over ~12 weeks" thesis is supported (JMIR MyFitnessPal review); the specific numbers are not.
+
+### V-01 · Recognition accuracy ≠ calorie accuracy (dish-ID is the easy ~20%) [HIGH]
+
+**What goes wrong:** The project can conflate "can it name the dish" with "can it tell me the calories." Different problems, order-of-magnitude difference in difficulty. Off-the-shelf transfer-learning models hit ~87–93% top-1 on Indian dish *recognition* (verified: MobileNetV3 87.64% / 92.39% / 93.5%, up to 95.3% augmented); GPT-4 Vision hit 93% precision *identifying* foods from 114 meal photos (Nutrients 2025, PMC11858203). But the **same** GPT-4V study found nutrient *values* unreliable: 11 of 16 nutrients differed significantly (p<0.05), 12 off by >10%. Naming "paneer butter masala" tells you nothing about whether it's 280 or 450 kcal.
+
+**Why it matters here:** The promise ("accurate macros") and the wedge ("trust the app more than your trainer") live entirely on the hard side of this gap. Anti-pattern #4 (photo → dish-ID + portion → deterministic IFCT lookup, never LLM-direct macros) is *correct precisely because of* this gap. But the Gate-0a metric must score the two halves **separately** or it passes on the easy half and ships the hard half broken.
+
+**Prevention:** Score dish-ID and macro-accuracy as independent gate metrics. Hold dish-ID to a HIGH bar (80%+, it's easy); treat macro-within-tolerance as the separately-binding pass criterion. Never let a strong dish-ID number average up a weak macro number. **Caveat:** the 87–93% figures are closed-set top-1 on small clean datasets (13–30 classes); they degrade on a 50-dish open-world whitelist with thalis and real phone photos. Lab ceiling, not field accuracy.
+
+### V-02 · Portion-from-2D is mathematically ill-posed — the calorie-error floor [HIGH]
+
+**What goes wrong:** Estimating real-world volume/mass from a single flat photo is an under-determined inverse problem (monocular scale ambiguity) — geometry, not model quality. Portion error propagates linearly into the calorie number. **Verified figure (Nutrition5k, Thames et al., CVPR 2021, arXiv:2103.03375, Table 3):** single-RGB-image direct calorie model = **26.1% mean calorie error (70.6 kcal MAE)**; adding depth/volume drops it to **16.5% (41.3 kcal MAE)**. The only demonstrated way to roughly halve the error is a depth channel this app does not have. (Caveat: the depth rows use the 3.5k RGB-D subset, not the full 5k. A portion-*independent* per-gram model reaches 9.5% — but that is not absolute-calorie prediction and not what we ship.)
+
+**Why it matters here:** Nutrition5k is the *best case* — clean overhead Western single-component plates. Indian phone photos at arbitrary angles are strictly harder. ±35% tolerance is generous vs the 26% *mean*, but the *tail* (heavy-tadka curries, deep bowls) blows past 35%. Learned priors help the mean, not the tail.
+
+**Prevention:** (1) **Reference object mandatory** in the accuracy-critical gate — coin/palm/plate gives the missing scale prior (Sketch 001's reticle is the right instinct; enforce it). (2) Per-dish portion floors/ceilings clamp absurd outputs. (3) Show macros as a **range**, not a point. (4) Treat the correction UI as the *primary* accuracy tool, not a fallback.
+
+### V-03 · Hidden oil / ghee / cream is invisible in pixels [HIGH]
+
+**What goes wrong:** Absorbed/emulsified fat carries large calorie load with little visual signature. **1 tbsp oil ≈ 120 kcal (100% fat) — verified exact.** "Dal" spans ~100–400 kcal by tadka (plain ~97–107 kcal/100g; light tadka ~137–147; restaurant ghee/cream ~220–270/katori). The model cannot see how much ghee went into the tempering. This is a *second, independent* error source stacked on portion ambiguity — the core reason image-only error stays high even when dish-ID and portion are both right. The deterministic IFCT pipeline only fixes this if the decomposition table's fat grams match the actual dish — which a fixed table cannot know.
+
+**Prevention:** (1) Bound the claim: market "macro estimate / range," never "exact calories" — the moat is veg-protein-gap advice, not exact kcal. (2) Per-dish "rich vs plain" variants in the decomposition table (dal_plain / dal_tadka / dal_restaurant) with a one-tap user selector. (3) Honest ±tolerance badge. (4) Report fat-heavy curries separately in the gate; expect them to be worst.
+
+### V-04 · Human accuracy ceiling: even people get ~5/20 photos within 20% [HIGH]
+
+**What goes wrong / calibration:** Photo calorie estimation is hard for humans too. Crowdsourcing study (Martin et al., Interactive J Med Research 2018, PMID 30401671): 2,028 respondents, 20 photos, averaged only **5/20 (25%) within ±20%** of truth. Two implications, both true: (1) *Defensive* — a model near the ~26% Nutrition5k mean is roughly at the human-from-photo baseline; "not perfect" is the defensible target, and the reviewer's implicit "humans do better" premise is false. (2) *Cautionary* — the user's own ground-truth intuition is also poor, so corrections are a **noisy** training signal, and the founder's eyeballed portion labels (current Gate-0a "truth") are drawn from this same poor distribution.
+
+**Prevention:** Use the 5/20 frame in copy ("estimate, not gospel"). Do NOT treat user corrections as gold labels — weight/dedupe/validate against weighed data before prompt-tuning. Recognize founder eyeball portions are subject to this ceiling (→ the ground-truth circular-bias risk, V-06).
+
+### V-05 · Indian cuisine stacks every failure mode at once (thali = worst case) [HIGH]
+
+**What goes wrong:** The failure modes are independent and a thali triggers all of them: (a) multi-object segmentation (4–7 small items — hardest recognition case), × (b) per-item portion ambiguity in katoris with no scale, × (c) per-item hidden-fat variance, × (d) regional/home-vs-restaurant variance, × (e) off-whitelist gaps. Errors compound *multiplicatively*: a thali naming 4/6 items, each within 26% on portion, each within a tadka band, can still land total macros 40–60% off. Single-dish ≈ Nutrition5k regime; thalis are outside any published accuracy result we can cite.
+
+**Prevention:** (1) Single-dish = V1 happy path; thali = confidence-gated "tap each item to confirm" / "snap items separately," not auto-macro. (2) In the gate, relax/defer the thali bucket and report it separately. (3) Never let a thali failure hide inside an aggregate.
+
+### V-06 · Ground-truth bottleneck: free Indian datasets give labels, not weighed grams [HIGH]
+
+**What goes wrong:** Validating the portion→macro half needs *weighed-gram + per-dish macro* truth. **Every free Indian food dataset provides recognition labels only** (dish-name ↔ image), not grams. Verified inventory: Indian Food Images Dataset (Kaggle, ~4,000 img / 80 classes), The-massive-Indian-Food-Dataset (~4,770 / 15), IndianFoodNet-30 (~5,500 / 30, bounding boxes only) — all labels, zero grams. The datasets that *do* carry weighed-gram truth — **Nutrition5k** (CC BY 4.0, ~5k plates, scale-rig grams + macros + depth) and **SimpleFood45** — are Western. They calibrate *methodology* / a generic portion→mass regressor, not Indian macros. On the Indian composition side: **IFCT 2017** (528 raw foods, per-100g) and especially **INDB — Indian Nutrient Databank** (open-access; ~1,095 items + ~1,014 Indian *recipes* with per-ingredient gram amounts + per-serving macros, IFCT-derived) are the reference tables.
+
+**Why it matters here:** This is the structural reason the current Gate-0a "truth" is weak — `labels_truth.csv` derives truth macros by running the founder's *eyeballed* `portion_g` through `dish_decomposition.json` (Opus-drafted, `verified_by: null`) + `ifct_lookup.json`. So "ground truth" is an assumption-on-an-assumption, scored against Gemini's assumptions → **agreement, not accuracy.**
+
+**Prevention:** (1) **Weigh the 30 benchmark plates** on a kitchen scale → real gram truth (at least the single-dish bucket). (2) **Ingest INDB alongside IFCT** to seed the decomposition table + portion priors far better than guessing — strong recommendation. (3) Use Nutrition5k/SimpleFood45 to calibrate the ±35% methodology, not as Indian truth. (4) Verify licenses before commercial use (Nutrition5k = CC BY 4.0; Kaggle/Roboflow sets per-page; INDB depends on IFCT-derived sources).
+
 ## Sources
 
 - Design doc primary: `/home/nitin/.gstack/projects/ai-calorie-weight-loss/nitin-unknown-design-20260527-181050.md` (HIGH — adversarial-reviewed, iteration 4)
@@ -705,3 +751,12 @@ Source map for confidence calls:
 - Play Store review timelines + Data Safety form requirements (HIGH, 2024-2025)
 - React Native + Expo community timeline retrospectives (r/reactnative, Indiehackers) (MEDIUM — community-reported, varies)
 - Nutrition-app retention benchmarks (industry consensus: Cal AI public metrics, MyFitnessPal D7) (MEDIUM)
+- Nutrition5k portion/calorie ground truth + image-only vs depth error: Thames et al., CVPR 2021, arXiv:2103.03375 (HIGH — primary, exact Table 3 figures)
+- GPT-4 Vision food ID vs nutrient-value accuracy: Nutrients 2025, MDPI 17(4):607 / PMC11858203 (HIGH)
+- Human photo-calorie estimation ceiling (5/20 within ±20%): Martin et al., Interactive J Med Research 2018, PMID 30401671 (HIGH)
+- INDB — Indian Nutrient Databank (recipe gram amounts + per-serving macros, IFCT-derived): anuvaad.org.in; GitHub lindsayjaacks/Indian-Nutrient-Databank-INDB- (HIGH — open-access; **ingest alongside IFCT for portion/decomposition priors**)
+- Indian food recognition accuracy (MobileNetV3 ~88–95% closed-set): transfer-learning literature (MEDIUM — small closed-set datasets, not field accuracy)
+- CaLoRAify (VLM + RAG + LoRA reference architecture): arXiv:2412.09936, Dec 2024 (MEDIUM — single recent paper; NLG metrics not calorie MAE)
+- HealthifyMe "Snap" architecture (GPT-4 Turbo Vision + fine-tuned ensemble + humans-in-loop, ~75% acc): OpenAI case study (openai.com/index/healthify), TechCrunch 2023-09-21 (HIGH)
+- India app monetization (RPI ~$0.06 vs US $0.39; IN/SEA download-to-paid ~1.4%): RevenueCat State of Subscription Apps 2025 (2026 ed. ~$0.11 vs $0.55, same ~5× gap) (HIGH)
+- HealthifyMe FY24 financials + Novo Nordisk GLP-1 / US pivot (Dec 2025): YourStory, Business Standard, Tracxn (MEDIUM-HIGH; coaches ~1,500–2,000+, not 600+)

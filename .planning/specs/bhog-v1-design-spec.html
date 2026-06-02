@@ -476,9 +476,9 @@
       <div class="nav-label">Execute</div>
       <button class="nav-item" data-target="roadmap"><span class="nav-num">10</span>Roadmap<span class="nav-meta">5</span></button>
       <button class="nav-item" data-target="decisions"><span class="nav-num">11</span>Phase 1 Decisions<span class="nav-meta">19</span></button>
-      <button class="nav-item" data-target="decisions-0602"><span class="nav-num">11b</span>Decisions · 2026-06-02<span class="nav-meta">14</span></button>
+      <button class="nav-item" data-target="decisions-0602"><span class="nav-num">11b</span>Decisions · 2026-06-02<span class="nav-meta">16</span></button>
       <button class="nav-item" data-target="checklist"><span class="nav-num">12</span>Week-1 Checklist<span class="nav-meta">23</span></button>
-      <button class="nav-item" data-target="risks"><span class="nav-num">13</span>Open Risks<span class="nav-meta">8</span></button>
+      <button class="nav-item" data-target="risks"><span class="nav-num">13</span>Open Risks<span class="nav-meta">11</span></button>
       <button class="nav-item" data-target="refs"><span class="nav-num">14</span>References</button>
       <button class="nav-item" data-target="sketches"><span class="nav-num">15</span>App Page Sketches<span class="nav-meta">4</span></button>
     </div>
@@ -935,7 +935,7 @@ Dev:
         <thead><tr><th>ID</th><th>Dimension</th><th>Measurement</th><th>Bar</th></tr></thead>
         <tbody>
           <tr><td class="num">D1</td><td>Vision dish-name match</td><td>Code</td><td class="num">≥70% Gate 0a · ≥75% alpha</td></tr>
-          <tr><td class="num">D2</td><td>Vision macros within ±35%</td><td>Code</td><td class="num">≥60% per-bucket Gate 0a</td></tr>
+          <tr><td class="num">D2</td><td>Vision macros within ±35% (weighed truth)</td><td>Code</td><td class="num">≥70% single / ≥60% mixed · thali reported</td></tr>
           <tr><td class="num">D3</td><td>Pydantic schema valid</td><td>Code</td><td class="num">100%</td></tr>
           <tr><td class="num">D4</td><td>Advice 4/4 rubric</td><td>Code</td><td class="num">≥70% · ≥75% alpha · ≥85% P3</td></tr>
           <tr><td class="num">D5</td><td>Veg protein math</td><td>LLM-judge + RD</td><td class="num">Spearman ≥0.7 vs RD</td></tr>
@@ -1015,7 +1015,7 @@ Dev:
         <div class="card"><h4 style="margin-top:0">D-06 · Labeler</h4><p>Claude Opus 4.7 (existing subscription, zero cost) + founder verifies every label.</p></div>
         <div class="card"><h4 style="margin-top:0">D-07 · Macros</h4><p>Deterministic IFCT 2017 lookup — never LLM math.</p></div>
         <div class="card"><h4 style="margin-top:0">D-08 · Decomposition</h4><p>Layered cascade: NIN → Tarla Dalal / Unlock.fit scrape → Opus draft + IFCT verify + Munmun/Ryan cross-ref. Output at <code>data/dish_decomposition.json</code>.</p></div>
-        <div class="card"><h4 style="margin-top:0">D-09 · Stratification</h4><p>10 / 10 / 10 (single / mixed / thali). Per-bucket pass bar.</p></div>
+        <div class="card"><h4 style="margin-top:0">D-09 · Stratification</h4><p>10 / 10 / 10 (single / mixed / thali). Single+mixed blocking; thali reported-only (V1.5) — see F-15. Weighed truth.</p></div>
         <div class="card"><h4 style="margin-top:0">D-10 · Reviewer Concern</h4><p>Circular-bias risk. Mitigations: different family (Opus≠Gemini), deterministic IFCT, manual verify all 30. RD audit = V1.5 trigger.</p></div>
       </div>
       <h3>Gate 0c · Trial User recruit + commitment bar</h3>
@@ -1055,6 +1055,8 @@ Dev:
         <div class="card"><h4 style="margin-top:0">F-12 · CEO scope mapping</h4><p>REQ-CEO-01 → Phase 2 stub + Phase 4 wire · REQ-CEO-02 → Phase 2 cron + Phase 3 mobile · REQ-CEO-03 → Phase 3. Per the locked D-CEO file.</p></div>
         <div class="card"><h4 style="margin-top:0">F-13 · Data fix</h4><p><code>dish_decomposition.json</code> litti_chokha <code>ifct_id</code> → <code>oil_mustard</code> (was dangling <code>mustard_oil</code> — KeyError in <code>derive_macros()</code>).</p></div>
         <div class="card"><h4 style="margin-top:0">F-14 · Pile-1 pending</h4><p>The free authoritative dataset (name / license TBD by founder) feeds ground truth + the 50-dish whitelist. Last unblock before Phase-1 planning.</p></div>
+        <div class="card"><h4 style="margin-top:0">F-15 · Gate-0a recalibrated</h4><p><strong>Weighed-plate</strong> ground truth (not eyeballed); dish-ID (≥80%) scored <strong>separately</strong> from macro-accuracy (±35%: ≥70% single / ≥60% mixed); <strong>thali reported-only / non-blocking</strong> → V1.5; reference object mandatory; median/P75/P90 tail reported. Fixes the portion circular-bias (PITFALLS V-06).</p></div>
+        <div class="card"><h4 style="margin-top:0">F-16 · Accuracy reality</h4><p>External-review-verified: image-only calorie error floors ~26% (Nutrition5k, CVPR 2021); dish-ID is the easy ~20%, portion + hidden-oil is the binding error. Ingest <strong>INDB</strong> (Indian Nutrient Databank) for portion priors. Market "estimate/range"; moat = veg-protein advice, not exact kcal.</p></div>
       </div>
     </section>
 
@@ -1081,13 +1083,13 @@ Dev:
       <h3>Gate 0a · Vision benchmark</h3>
       <div class="card" style="padding:0">
         <div class="check"><input type="checkbox" /><div class="body"><div class="title">⏰ DEFERRED — Acquire Gemini 2.5 Flash API key (Google AI Studio)</div><div class="meta">aistudio.google.com → Create API key · free 10 RPM / 250K TPM / 500 RPD · no CC · ~5 min · set GEMINI_API_KEY env</div></div></div>
-        <div class="check"><input type="checkbox" /><div class="body"><div class="title">⏰ DEFERRED — Photograph 30 of your own meals (10 single-dish · 10 mixed · 10 thali)</div><div class="meta">3–5 days · founder owns camera roll · per data/photos/CURATION-CHECKLIST.md</div></div></div>
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">⏰ DEFERRED — Photograph 30 of your own meals (10 single-dish · 10 mixed · 10 thali)</div><div class="meta">3–5 days · reference object (coin/palm) in ALL single+mixed · weigh each plate on a kitchen scale · per CURATION-CHECKLIST.md</div></div></div>
         <div class="check"><input type="checkbox" /><div class="body"><div class="title">⏰ DEFERRED — Verify data/dish_decomposition.json gram amounts vs Tarla Dalal / Unlock.fit / NIN</div><div class="meta">~3–4 hrs · CC drafted the 50-dish seed · founder verifies before Gate 0a labeling pass</div></div></div>
         <div class="check"><input type="checkbox" /><div class="body"><div class="title">⏰ DEFERRED — Verify data/ifct_lookup.json values vs IFCT 2017 PDF</div><div class="meta">~1–2 hrs · CC seeded ~90 common ingredients · founder cross-checks kcal / protein / carb / fat</div></div></div>
-        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Write data/photos/&lt;bucket&gt;/labels_truth.csv as photos accumulate</div><div class="meta">filename · dish_id · portion_g · notes — matches dish_decomposition keys</div></div></div>
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Weigh each plate (kitchen scale) → write labels_truth.csv with WEIGHED grams</div><div class="meta">filename · dish_id · weighed_total_g · component_weights_g · has_reference_object · notes (recalibrated 2026-06-02)</div></div></div>
         <div class="check"><input type="checkbox" /><div class="body"><div class="title">Opus 4.7 labels each photo blind → labels_opus.csv</div><div class="meta">Run via Claude CLI · founder verifies every single label per D-06</div></div></div>
         <div class="check"><input type="checkbox" /><div class="body"><div class="title">Run each photo through Gemini 2.5 Flash via Phase 2 evals/gate_0a_vision.py</div><div class="meta">Built per evals/gate_0a_vision.md skeleton · Phase 2 Week 1 deliverable</div></div></div>
-        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Score: ≥70% dish-name · ≥60% macros within ±35% · per-bucket pass</div><div class="meta">Fail → improve prompt with in-context examples · retry · or try Qwen 2.5 VL via OpenRouter</div></div></div>
+        <div class="check"><input type="checkbox" /><div class="body"><div class="title">Score (separate bars): dish-ID ≥80% · macros ±35% ≥70% single / ≥60% mixed · thali reported-only</div><div class="meta">Weighed truth · report median+P75/P90 tail · fail → few-shot prompt · retry · Qwen 2.5 VL fallback</div></div></div>
         <div class="check"><input type="checkbox" /><div class="body"><div class="title">Document Gate 0a pass/fail in .planning/decisions/YYYY-MM-DD-gate-0a-{pass|fail}.md</div><div class="meta">Per D-19 format</div></div></div>
       </div>
 
@@ -1135,13 +1137,16 @@ Dev:
       <div class="section-head"><span class="section-num">13</span><h2>Open Risks &amp; Reviewer Concerns</h2></div>
       <div class="card-grid cols-2">
         <div class="card"><span class="badge risk">CIRCULAR-BIAS</span><h4>Opus labels another LLM</h4><p>D-06 uses Opus to label for Gemini under test. Different family + IFCT-deterministic macros + every-label verification mitigate. RD audit = V1.5 trigger.</p></div>
-        <div class="card"><span class="badge risk">TIMELINE</span><h4>First-time RN shipper drift</h4><p>14-week target may stretch 18–20. Mitigation: Expo managed workflow, Hello-World Week 1, EAS configured Week 1, 5–10d buffer.</p></div>
+        <div class="card"><span class="badge locked">RESOLVED</span><h4>RN timeline</h4><p>Founder has ample React Native experience (F-10 · 2026-06-02) → <strong>10–12 week</strong> path locked. First-timer 14–20wk swing + RN-spike pivot trigger dropped.</p></div>
         <div class="card"><span class="badge risk">VENDOR</span><h4>Provider free-tier rate limits</h4><p>Gemini 10 RPM caps ~50 lunch-concurrent. Mitigation: 429-fallback chain, OpenRouter fallback drill 24h, per-call provider tag.</p></div>
         <div class="card"><span class="badge risk">MOAT</span><h4>Advice "on the side" temptation</h4><p>Doc corrected to inline-on-every-card. If P3 UI ever buries advice in coach tab, moat collapses. Locked Invariant in Card Demo.</p></div>
         <div class="card"><span class="badge pending">DEMAND</span><h4>No verbatim ₹299 quote yet</h4><p>Gate 0c closes this Week 1. Below 3 quotes → pricing thesis weakens → re-evaluate paid tier model before Phase 5.</p></div>
         <div class="card"><span class="badge pending">VISION</span><h4>Thali photo accuracy untested</h4><p>Lit shows 49–76% error on multi-item dishes. Gate 0a thali bucket tests. Fail → "snap each item separately" UX V1.</p></div>
         <div class="card"><span class="badge deferred">V1.5</span><h4>Two-persona temptation</h4><p>"Target both" instinct re-surfaces. V1 locks one (youth muscle-gain). Weight-loss = V1.1 trigger-gated. Housewife = V2 separate brand.</p></div>
         <div class="card"><span class="badge deferred">V2</span><h4>Cal AI competitive durability</h4><p>Cal AI can ship Indian context with prompt update. Real durable moat = dataset (post-PMF) + brand. 6–12mo head-start realistic, not "forever."</p></div>
+        <div class="card"><span class="badge risk">GROUND-TRUTH</span><h4>Our "truth" may be wrong the same way the model is</h4><p>Gate-0a truth macros = founder's <em>eyeballed</em> <code>portion_g</code> run through the Opus-drafted (<code>verified_by:null</code>) decomposition table — the same pipeline that scores Gemini. So the gate measures agreement-between-two-estimates, not accuracy. Circular on <strong>portions</strong>, not just labels (D-10). Until plates are weighed + rows verified, a pass ≠ field accuracy. Verified: humans get only ~5/20 photos within ±20% (PMID 30401671).</p></div>
+        <div class="card"><span class="badge risk">ACCURACY-CEILING</span><h4>Image-only calorie error floors at ~26%</h4><p>Best published single-RGB calorie model = ~26.1% mean error; only depth (which we lack) halves it to ~16.5% (Nutrition5k, CVPR 2021). Geometry-driven (monocular scale ambiguity), measured on clean Western plates — Indian phone photos + hidden ghee + thali are harder. ±35% is fine on the mean, fails on the tail. → market "estimate/range", enforce reference object, moat = veg-protein advice not exact kcal.</p></div>
+        <div class="card"><span class="badge risk">COMPETITION</span><h4>HealthifyMe "Snap" already shipped this (2023)</h4><p>Launched Sept 2023: 150k food items, GPT-4 Turbo Vision + fine-tuned ensemble + humans-in-loop, ~75% accuracy, 40M+ users (verified, OpenAI case study). Lesson that helps us: even the incumbent uses GPT-4V <em>plus</em> fine-tuned <em>plus</em> humans and still claims only ~75% — validates anti-pattern #4. Moat is NOT photo accuracy (capped ~75%); it's budget-aware veg-protein-gap advice grounded in the user's own log. Direct AI-photo rivals: Shellel, NutriScan, FitTrack AI.</p></div>
       </div>
     </section>
 
