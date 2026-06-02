@@ -31,10 +31,10 @@ All v1 code is deferred until Phase 1 gates pass; design-doc artifacts (`.planni
   3. Founder has ≥10 verbal commitments + ≥3 verbatim price-WTP quotes from 20 named Trial Users on WhatsApp (Gate 0c)
   4. Stack is locked in `.planning/decisions/` — Expo + RN + FastAPI + Supabase Mumbai + R2 `jurisdiction=india` + Firebase OTP + `ai_provider.py` abstraction + Gemini 2.5 Flash (not 2.0) + compute hosting = Render free Singapore per D-01 (Gate 0d)
   5. Google Play Developer account purchased ($25), identity verification submitted, 3-7 day clock started before Phase 2 begins
-**Plans:** 7 plans
+**Plans:** 1/7 plans executed
 
 Plans:
-- [ ] 01-01-PLAN.md — INDB integration + dish_decomposition.json (Gate 0a prerequisite, Wave 1)
+- [x] 01-01-PLAN.md — INDB integration + dish_decomposition.json (Gate 0a prerequisite, Wave 1)
 - [ ] 01-02-PLAN.md — IFCT/INDB license emails (Gate 0d / launch gate, Wave 1)
 - [ ] 01-03-PLAN.md — veg_protein_prices seed CSV collection (Gate 0b enabler, Wave 1)
 - [ ] 01-04-PLAN.md — Gate 0a photos: 30 weighed photos + Opus labeling (Wave 2, depends 01-01)
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Validation Gates + Stack Lock | 0/TBD | Not started | - |
+| 1. Validation Gates + Stack Lock | 1/7 | In Progress|  |
 | 2. Photo → Macros End-to-End | 0/TBD | Not started | - |
 | 3. Mobile App + Inline Advice + Retention | 0/TBD | Not started | - |
 | 4. Alpha Hardening + Launch Submission | 0/TBD | Not started | - |
