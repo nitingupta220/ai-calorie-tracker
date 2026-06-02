@@ -1,0 +1,17 @@
+recipe_code,dish_id,food_name,food_code,ifct_id_attempted,note
+ASC241,tandoori_chicken,"Lemon, juice (Citrus limon)",E033,,no ifct match
+ASC241,tandoori_chicken,"Lemons, flesh only, raw, weighed with peel and pips",E520,,no ifct match
+ASC241,tandoori_chicken,AJWAIN SEED WHOLE ORGANIC SPICES,G536,,no ifct match
+OSR112,pav_bhaji,"Lemons, flesh only, raw, weighed with peel and pips",E520,,no ifct match
+ASC381,paneer_tikka,"Lemons, flesh only, raw, weighed with peel and pips",E520,,no ifct match
+ASC381,paneer_tikka,Vinegar,G532,,no ifct match
+ASC381,paneer_tikka,"Mint sauce, homemade",X512,,no ifct match
+BFP039,upma,"Lemons, flesh only, raw, weighed with peel and pips",E520,,no ifct match
+BFP044,poha,"Lemons, flesh only, raw, weighed with peel and pips",E520,,no ifct match
+OSR104,thepla_methi,Bajra (Pennisetum typhoideum),A003,,no ifct match
+OSR104,thepla_methi,Jowar (Sorghum vulgare),A005,,no ifct match
+OSR114,bhel_puri,Rice puffed (Oryza sativa ),A012,,no ifct match
+OSR114,bhel_puri,"Lemon, juice (Citrus limon)",E033,,no ifct match
+OSR114,bhel_puri,"Lemon, juice (Citrus limon)",E033,,no ifct match
+OSR114,bhel_puri,Mint leaves (Mentha spicata ),G016,,no ifct match
+OSR114,bhel_puri,"Jaggery, cane (Saccharum officinarum)",I001,,no ifct match

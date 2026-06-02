@@ -1,0 +1,1793 @@
+{
+  "roti_whole_wheat": {
+    "name_en": "Roti / phulka (1 piece)",
+    "name_hi": "रोटी",
+    "bucket": "pan",
+    "tags": [
+      "veg",
+      "staple"
+    ],
+    "serving_label": "1 medium roti",
+    "ingredients": [
+      {
+        "ifct_id": "wheat_flour_whole",
+        "g": 80.0
+      },
+      {
+        "ifct_id": "ghee",
+        "g": 4.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC096 (Chapati/Roti) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC096"
+  },
+  "plain_rice_cooked": {
+    "name_en": "Plain rice cooked (1 plate)",
+    "name_hi": "चावल",
+    "bucket": "pan",
+    "tags": [
+      "veg",
+      "staple"
+    ],
+    "serving_label": "1 plate (~150g cooked)",
+    "ingredients": [
+      {
+        "ifct_id": "rice_parboiled_raw",
+        "g": 100.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC113 (Boiled rice (Uble chawal)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC113"
+  },
+  "dal_toor_tadka": {
+    "name_en": "Toor dal tadka (1 katori)",
+    "name_hi": "तूअर दाल तड़का",
+    "bucket": "pan",
+    "tags": [
+      "veg",
+      "staple",
+      "high-protein-veg"
+    ],
+    "serving_label": "1 katori (~150g cooked)",
+    "ingredients": [
+      {
+        "ifct_id": "toor_dal_raw",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "spinach_palak",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 3.3
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 0.6
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 5.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.3
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "ghee",
+        "g": 10.0
+      }
+    ],
+    "verified_by": "INDB recipe #BFP172 (Arhar with spinach (Arhar dal aur palak)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "BFP172",
+    "_variants": [
+      "dal_toor_tadka_plain",
+      "dal_toor_tadka_restaurant"
+    ],
+    "default_variant": "dal_toor_tadka"
+  },
+  "chana_masala": {
+    "name_en": "Chana masala (1 katori)",
+    "name_hi": "छोले",
+    "bucket": "pan",
+    "tags": [
+      "veg",
+      "high-protein-veg"
+    ],
+    "serving_label": "1 katori (~150g cooked)",
+    "ingredients": [
+      {
+        "ifct_id": "tomato_red",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 1.2
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 3.2
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 25.0
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 6.0
+      },
+      {
+        "ifct_id": "chana_kabuli_raw",
+        "g": 30.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC162 (Chickpeas curry (Safed channa curry)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC162"
+  },
+  "rajma_chawal": {
+    "name_en": "Rajma chawal (1 plate combo)",
+    "name_hi": "राजमा चावल",
+    "bucket": "pan",
+    "tags": [
+      "veg",
+      "high-protein-veg"
+    ],
+    "serving_label": "1 katori rajma + 1 plate rice",
+    "ingredients": [
+      {
+        "ifct_id": "rajma_red_raw",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "tomato_red",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 1.2
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 3.2
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 25.0
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 6.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC165 (Kidney bean curry (Rajmah curry)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC165"
+  },
+  "chai_milk_tea": {
+    "name_en": "Chai (1 cup)",
+    "name_hi": "चाय",
+    "bucket": "pan",
+    "tags": [
+      "bev"
+    ],
+    "serving_label": "1 cup (~150ml)",
+    "ingredients": [
+      {
+        "ifct_id": "milk_full_cream",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "sugar_white",
+        "g": 8.0
+      },
+      {
+        "ifct_id": "tea_leaves_dry",
+        "g": 3.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC001 (Hot tea (Garam Chai)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC001"
+  },
+  "lassi_sweet": {
+    "name_en": "Sweet lassi (1 glass)",
+    "name_hi": "मीठी लस्सी",
+    "bucket": "pan",
+    "tags": [
+      "bev",
+      "dairy"
+    ],
+    "serving_label": "1 glass (~250ml)",
+    "ingredients": [
+      {
+        "ifct_id": "curd_dahi",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "sugar_white",
+        "g": 20.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC021 (Sweet Lassi (Meethi lassi)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC021"
+  },
+  "boiled_eggs_2": {
+    "name_en": "Boiled eggs (2 whole)",
+    "name_hi": "उबले अंडे",
+    "bucket": "pan",
+    "tags": [
+      "egg",
+      "high-protein"
+    ],
+    "serving_label": "2 boiled eggs",
+    "ingredients": [
+      {
+        "ifct_id": "egg_whole_per_egg",
+        "g": 50.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC056 (Boiled egg (Ubla anda)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC056"
+  },
+  "egg_curry_2_eggs": {
+    "name_en": "Egg curry (2 eggs in gravy)",
+    "name_hi": "अंडा करी",
+    "bucket": "pan",
+    "tags": [
+      "egg",
+      "non-veg-soft"
+    ],
+    "serving_label": "2 eggs + gravy",
+    "ingredients": [
+      {
+        "ifct_id": "tomato_red",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 3.3
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 1.2
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 3.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "spice_coriander_seed",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "egg_whole_per_egg",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 8.0
+      }
+    ],
+    "verified_by": "INDB recipe #BFP240 (Egg curry (Anda curry)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "BFP240"
+  },
+  "aloo_paratha": {
+    "name_en": "Aloo paratha (1 piece with ghee)",
+    "name_hi": "आलू पराठा",
+    "bucket": "north",
+    "tags": [
+      "veg",
+      "rich"
+    ],
+    "serving_label": "1 stuffed paratha",
+    "ingredients": [
+      {
+        "ifct_id": "wheat_flour_whole",
+        "g": 80.0
+      },
+      {
+        "ifct_id": "potato",
+        "g": 80.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 3.3
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 25.0
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 27.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC098 (Potato parantha/paratha (Aloo ka parantha/paratha)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC098"
+  },
+  "chole_bhature": {
+    "name_en": "Chole bhature (1 bhatura + chole)",
+    "name_hi": "छोले भटूरे",
+    "bucket": "north",
+    "tags": [
+      "veg",
+      "rich",
+      "indulgent"
+    ],
+    "serving_label": "1 bhatura + 1 katori chole",
+    "ingredients": [
+      {
+        "ifct_id": "wheat_flour_refined",
+        "g": 80.0
+      },
+      {
+        "ifct_id": "curd_dahi",
+        "g": 20.0
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 486.0
+      },
+      {
+        "ifct_id": "sugar_white",
+        "g": 1.0
+      },
+      {
+        "ifct_id": "tomato_red",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 1.2
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 3.2
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 25.0
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "chana_kabuli_raw",
+        "g": 30.0
+      }
+    ],
+    "verified_by": "INDB recipes #ASC143 (bhatura) + #ASC162 (chana) merged (2026-06-02)",
+    "_indb_recipe_id": "ASC143+ASC162"
+  },
+  "butter_chicken": {
+    "name_en": "Butter chicken (1 katori)",
+    "name_hi": "बटर चिकन",
+    "bucket": "north",
+    "tags": [
+      "non-veg",
+      "rich"
+    ],
+    "serving_label": "1 katori (~150g)",
+    "ingredients": [
+      {
+        "ifct_id": "tomato_red",
+        "g": 190.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 6.7
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 10.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 40.0
+      },
+      {
+        "ifct_id": "chicken_breast_raw",
+        "g": 250.0
+      },
+      {
+        "ifct_id": "cream_dairy",
+        "g": 22.5
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 3.5
+      },
+      {
+        "ifct_id": "sugar_white",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "ghee",
+        "g": 20.2
+      }
+    ],
+    "verified_by": "INDB recipe #ASC242 (Butter chicken) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC242",
+    "_variants": [
+      "butter_chicken_plain",
+      "butter_chicken_restaurant"
+    ],
+    "default_variant": "butter_chicken"
+  },
+  "tandoori_chicken": {
+    "name_en": "Tandoori chicken (1 leg piece)",
+    "name_hi": "तंदूरी चिकन",
+    "bucket": "north",
+    "tags": [
+      "non-veg",
+      "high-protein"
+    ],
+    "serving_label": "1 leg piece (~120g)",
+    "ingredients": [
+      {
+        "ifct_id": "garlic_raw",
+        "g": 2.2
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 10.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 20.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "chicken_breast_raw",
+        "g": 250.0
+      },
+      {
+        "ifct_id": "curd_dahi",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 1.0
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 1.0
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 4.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC241 (Tandoori chicken) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC241"
+  },
+  "palak_paneer": {
+    "name_en": "Palak paneer (1 katori)",
+    "name_hi": "पालक पनीर",
+    "bucket": "north",
+    "tags": [
+      "veg",
+      "high-protein-veg"
+    ],
+    "serving_label": "1 katori (~150g)",
+    "ingredients": [
+      {
+        "ifct_id": "spinach_palak",
+        "g": 150.0
+      },
+      {
+        "ifct_id": "tomato_red",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 1.2
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 5.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 25.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "paneer_full_fat",
+        "g": 40.0
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 6.8
+      }
+    ],
+    "verified_by": "INDB recipe #ASC215 (Spinach paneer (Palak paneer)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC215",
+    "_variants": [
+      "palak_paneer_plain",
+      "palak_paneer_restaurant"
+    ],
+    "default_variant": "palak_paneer"
+  },
+  "dal_makhani": {
+    "name_en": "Dal makhani (1 katori)",
+    "name_hi": "दाल मखनी",
+    "bucket": "north",
+    "tags": [
+      "veg",
+      "rich"
+    ],
+    "serving_label": "1 katori (~150g)",
+    "ingredients": [
+      {
+        "ifct_id": "urad_dal_raw",
+        "g": 35.0
+      },
+      {
+        "ifct_id": "rajma_red_raw",
+        "g": 10.0
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 3.5
+      },
+      {
+        "ifct_id": "tomato_red",
+        "g": 25.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 3.7
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 15.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "butter_table",
+        "g": 10.1
+      },
+      {
+        "ifct_id": "cream_dairy",
+        "g": 7.5
+      }
+    ],
+    "verified_by": "INDB recipe #OSR139 (Dal makhani) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "OSR139",
+    "_variants": [
+      "dal_makhani_plain",
+      "dal_makhani_restaurant"
+    ],
+    "default_variant": "dal_makhani"
+  },
+  "naan": {
+    "name_en": "Naan (1 piece)",
+    "name_hi": "नान",
+    "bucket": "north",
+    "tags": [
+      "veg",
+      "indulgent"
+    ],
+    "serving_label": "1 piece",
+    "ingredients": [
+      {
+        "ifct_id": "wheat_flour_refined",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "milk_full_cream",
+        "g": 20.0
+      },
+      {
+        "ifct_id": "curd_dahi",
+        "g": 25.0
+      },
+      {
+        "ifct_id": "sugar_white",
+        "g": 4.0
+      },
+      {
+        "ifct_id": "ghee",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "butter_table",
+        "g": 4.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC142 (Naan) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC142"
+  },
+  "aloo_gobi": {
+    "name_en": "Aloo gobi (1 katori)",
+    "name_hi": "आलू गोभी",
+    "bucket": "north",
+    "tags": [
+      "veg",
+      "low-cal"
+    ],
+    "serving_label": "1 katori (~100g)",
+    "ingredients": [
+      {
+        "ifct_id": "cauliflower_gobi",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "potato",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 1.7
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 6.3
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 13.5
+      }
+    ],
+    "verified_by": "INDB recipe #ASC171 (Potato cauliflower (Aloo gobhi)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC171"
+  },
+  "kadhi_pakora": {
+    "name_en": "Kadhi pakora (1 katori)",
+    "name_hi": "कढ़ी पकोड़ा",
+    "bucket": "north",
+    "tags": [
+      "veg"
+    ],
+    "serving_label": "1 katori (~150g)",
+    "ingredients": [
+      {
+        "ifct_id": "spinach_palak",
+        "g": 20.0
+      },
+      {
+        "ifct_id": "curry_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 15.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 6.7
+      },
+      {
+        "ifct_id": "spice_coriander_seed",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 1.5
+      },
+      {
+        "ifct_id": "chana_dal_raw",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "curd_dahi",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 0.7
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.8
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 493.5
+      }
+    ],
+    "verified_by": "INDB recipe #ASC168 (Besan kadhi with pakodies) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC168"
+  },
+  "bhindi_masala": {
+    "name_en": "Bhindi masala (1 katori)",
+    "name_hi": "भिंडी मसाला",
+    "bucket": "north",
+    "tags": [
+      "veg",
+      "low-cal"
+    ],
+    "serving_label": "1 katori (~100g)",
+    "ingredients": [
+      {
+        "ifct_id": "okra_bhindi",
+        "g": 120.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "spice_coriander_seed",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 15.0
+      }
+    ],
+    "verified_by": "INDB recipe #BFP269 (Okra/Lady's fingers fry (Bhindi sabzi/sabji/subji)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "BFP269"
+  },
+  "pav_bhaji": {
+    "name_en": "Pav bhaji (1 plate with 2 pav)",
+    "name_hi": "पाव भाजी",
+    "bucket": "north",
+    "tags": [
+      "veg",
+      "indulgent"
+    ],
+    "serving_label": "1 katori bhaji + 2 pav",
+    "ingredients": [
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 13.5
+      },
+      {
+        "ifct_id": "cauliflower_gobi",
+        "g": 20.8
+      },
+      {
+        "ifct_id": "peas_green",
+        "g": 29.2
+      },
+      {
+        "ifct_id": "tomato_red",
+        "g": 60.0
+      },
+      {
+        "ifct_id": "carrot",
+        "g": 21.3
+      },
+      {
+        "ifct_id": "potato",
+        "g": 35.0
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 4.1
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 0.3
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 0.7
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 20.0
+      },
+      {
+        "ifct_id": "spice_coriander_seed",
+        "g": 0.6
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 1.3
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.4
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.3
+      },
+      {
+        "ifct_id": "butter_table",
+        "g": 20.2
+      },
+      {
+        "ifct_id": "wheat_flour_refined",
+        "g": 86.0
+      }
+    ],
+    "verified_by": "INDB recipe #OSR112 (Pav bhaji) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "OSR112"
+  },
+  "paneer_tikka": {
+    "name_en": "Paneer tikka (4-5 pieces)",
+    "name_hi": "पनीर टिक्का",
+    "bucket": "north",
+    "tags": [
+      "veg",
+      "high-protein-veg"
+    ],
+    "serving_label": "4-5 grilled cubes",
+    "ingredients": [
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 51.7
+      },
+      {
+        "ifct_id": "tomato_red",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "paneer_full_fat",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 4.0
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 2.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC381 (Paneer shaslik/tikka) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC381"
+  },
+  "dosa_plain": {
+    "name_en": "Plain dosa (1 piece)",
+    "name_hi": "डोसा",
+    "bucket": "south",
+    "tags": [
+      "veg",
+      "staple"
+    ],
+    "serving_label": "1 medium dosa",
+    "ingredients": [
+      {
+        "ifct_id": "rice_parboiled_raw",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "urad_dal_raw",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "butter_table",
+        "g": 13.5
+      }
+    ],
+    "verified_by": "INDB recipe #BFP148 (Plain dosa) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "BFP148"
+  },
+  "masala_dosa": {
+    "name_en": "Masala dosa (1 piece)",
+    "name_hi": "मसाला डोसा",
+    "bucket": "south",
+    "tags": [
+      "veg",
+      "staple"
+    ],
+    "serving_label": "1 dosa with potato masala",
+    "ingredients": [
+      {
+        "ifct_id": "rice_parboiled_raw",
+        "g": 60.0
+      },
+      {
+        "ifct_id": "chana_dal_raw",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "urad_dal_raw",
+        "g": 22.0
+      },
+      {
+        "ifct_id": "potato",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "curry_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 75.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 3.3
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 1.0
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 31.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC146 (Masala dosa) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC146"
+  },
+  "idli_sambar": {
+    "name_en": "Idli with sambar (2 idli + sambar)",
+    "name_hi": "इडली सांबार",
+    "bucket": "south",
+    "tags": [
+      "veg",
+      "staple"
+    ],
+    "serving_label": "2 idli + 1 katori sambar",
+    "ingredients": [
+      {
+        "ifct_id": "rice_parboiled_raw",
+        "g": 60.0
+      },
+      {
+        "ifct_id": "urad_dal_raw",
+        "g": 22.0
+      },
+      {
+        "ifct_id": "chana_dal_raw",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "toor_dal_raw",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "brinjal_baingan",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "drumstick_moringa",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "okra_bhindi",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "tomato_red",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "curry_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 5.0
+      },
+      {
+        "ifct_id": "spice_coriander_seed",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "coconut_fresh",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 8.0
+      }
+    ],
+    "verified_by": "INDB recipes #ASC144 (idli) + #ASC167 (sambar) merged (2026-06-02)",
+    "_indb_recipe_id": "ASC144+ASC167"
+  },
+  "medu_vada": {
+    "name_en": "Medu vada (2 pieces)",
+    "name_hi": "मेदु वड़ा",
+    "bucket": "south",
+    "tags": [
+      "veg",
+      "fried"
+    ],
+    "serving_label": "2 fried vadas",
+    "ingredients": [
+      {
+        "ifct_id": "urad_dal_raw",
+        "g": 60.0
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 240.0
+      }
+    ],
+    "verified_by": "INDB recipe #BFP436 (Plain urad dal vada (Uzunne vada/Minapa garelu/Ulundu vadai/Medu vada)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "BFP436"
+  },
+  "upma": {
+    "name_en": "Upma (1 plate)",
+    "name_hi": "उपमा",
+    "bucket": "south",
+    "tags": [
+      "veg",
+      "breakfast"
+    ],
+    "serving_label": "1 plate (~150g cooked)",
+    "ingredients": [
+      {
+        "ifct_id": "rava_suji",
+        "g": 40.0
+      },
+      {
+        "ifct_id": "urad_dal_raw",
+        "g": 5.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 6.7
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "curry_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 5.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.3
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 15.0
+      }
+    ],
+    "verified_by": "INDB recipe #BFP039 (Semolina upma (Suji/Rava upma)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "BFP039"
+  },
+  "curd_rice": {
+    "name_en": "Curd rice (1 plate)",
+    "name_hi": "दही चावल",
+    "bucket": "south",
+    "tags": [
+      "veg",
+      "staple"
+    ],
+    "serving_label": "1 plate (~200g)",
+    "ingredients": [
+      {
+        "ifct_id": "rice_parboiled_raw",
+        "g": 80.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 6.7
+      },
+      {
+        "ifct_id": "curry_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "milk_full_cream",
+        "g": 60.0
+      },
+      {
+        "ifct_id": "curd_dahi",
+        "g": 61.2
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 4.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC126 (Curd rice (Dahi bhaat/Dahi chawal/ Perugu annam/Daddojanam/Thayir saadam)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC126"
+  },
+  "appam_stew": {
+    "name_en": "Appam with veg stew (2 appam + stew)",
+    "name_hi": "अप्पम स्टू",
+    "bucket": "south",
+    "tags": [
+      "veg",
+      "kerala"
+    ],
+    "serving_label": "2 appam + 1 katori stew",
+    "ingredients": [
+      {
+        "ifct_id": "rice_parboiled_raw",
+        "g": 25.0
+      },
+      {
+        "ifct_id": "rava_suji",
+        "g": 2.5
+      },
+      {
+        "ifct_id": "coconut_fresh",
+        "g": 125.0
+      },
+      {
+        "ifct_id": "coconut_milk",
+        "g": 5.2
+      },
+      {
+        "ifct_id": "sugar_white",
+        "g": 1.2
+      }
+    ],
+    "verified_by": "INDB recipe #BFP153 (Appam) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "BFP153"
+  },
+  "rasam_rice": {
+    "name_en": "Rasam rice (1 plate)",
+    "name_hi": "रसम चावल",
+    "bucket": "south",
+    "tags": [
+      "veg",
+      "low-cal"
+    ],
+    "serving_label": "1 plate (~200g)",
+    "ingredients": [
+      {
+        "ifct_id": "toor_dal_raw",
+        "g": 10.0
+      },
+      {
+        "ifct_id": "tomato_red",
+        "g": 53.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 10.0
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "curry_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 0.6
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 5.0
+      },
+      {
+        "ifct_id": "spice_coriander_seed",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.8
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "rice_parboiled_raw",
+        "g": 50.0
+      }
+    ],
+    "verified_by": "INDB recipe #BFP176 (Rasam with tamarind (Puli rasam/ Chintapandu rasam/ Charu/Saaru)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "BFP176"
+  },
+  "poha": {
+    "name_en": "Poha (1 plate)",
+    "name_hi": "पोहा",
+    "bucket": "west_east",
+    "tags": [
+      "veg",
+      "breakfast",
+      "maharashtra"
+    ],
+    "serving_label": "1 plate (~150g cooked)",
+    "ingredients": [
+      {
+        "ifct_id": "poha_flakes",
+        "g": 40.0
+      },
+      {
+        "ifct_id": "potato",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 3.3
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "curry_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "peanut_groundnut_raw",
+        "g": 10.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.3
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 10.0
+      }
+    ],
+    "verified_by": "INDB recipe #BFP044 (Poha) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "BFP044"
+  },
+  "dhokla_steamed": {
+    "name_en": "Dhokla (4 pieces)",
+    "name_hi": "ढोकला",
+    "bucket": "west_east",
+    "tags": [
+      "veg",
+      "gujarat",
+      "steamed"
+    ],
+    "serving_label": "4 pieces (~120g)",
+    "ingredients": [
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 3.3
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 6.3
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "chana_dal_raw",
+        "g": 150.0
+      },
+      {
+        "ifct_id": "curd_dahi",
+        "g": 150.0
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 4.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC474 (Dhokla) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC474"
+  },
+  "thepla_methi": {
+    "name_en": "Methi thepla (1 piece)",
+    "name_hi": "मेथी थेपला",
+    "bucket": "west_east",
+    "tags": [
+      "veg",
+      "gujarat"
+    ],
+    "serving_label": "1 thepla",
+    "ingredients": [
+      {
+        "ifct_id": "wheat_flour_whole",
+        "g": 40.0
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 5.3
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "spice_coriander_seed",
+        "g": 0.3
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.3
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.3
+      },
+      {
+        "ifct_id": "chana_dal_raw",
+        "g": 13.3
+      },
+      {
+        "ifct_id": "curd_dahi",
+        "g": 22.5
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 4.2
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.3
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 18.0
+      }
+    ],
+    "verified_by": "INDB recipe #OSR104 (Methi thepla) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "OSR104"
+  },
+  "bhel_puri": {
+    "name_en": "Bhel puri (1 plate)",
+    "name_hi": "भेल पुरी",
+    "bucket": "west_east",
+    "tags": [
+      "veg",
+      "street",
+      "low-protein"
+    ],
+    "serving_label": "1 plate (~150g)",
+    "ingredients": [
+      {
+        "ifct_id": "wheat_flour_refined",
+        "g": 60.0
+      },
+      {
+        "ifct_id": "chana_dal_raw",
+        "g": 95.5
+      },
+      {
+        "ifct_id": "tomato_red",
+        "g": 31.0
+      },
+      {
+        "ifct_id": "potato",
+        "g": 70.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 18.2
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 6.0
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 1.4
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 7.0
+      },
+      {
+        "ifct_id": "spice_coriander_seed",
+        "g": 7.5
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 2.2
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.3
+      },
+      {
+        "ifct_id": "peanut_groundnut_raw",
+        "g": 7.0
+      },
+      {
+        "ifct_id": "ginger_raw",
+        "g": 1.8
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 6.0
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 492.1
+      },
+      {
+        "ifct_id": "sugar_white",
+        "g": 2.0
+      }
+    ],
+    "verified_by": "INDB recipe #OSR114 (Bhel puri ) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "OSR114"
+  },
+  "khichdi_yellow": {
+    "name_en": "Yellow khichdi (1 katori)",
+    "name_hi": "खिचड़ी",
+    "bucket": "west_east",
+    "tags": [
+      "veg",
+      "comfort"
+    ],
+    "serving_label": "1 katori (~200g cooked)",
+    "ingredients": [
+      {
+        "ifct_id": "rice_parboiled_raw",
+        "g": 20.0
+      },
+      {
+        "ifct_id": "moong_dal_raw",
+        "g": 10.0
+      },
+      {
+        "ifct_id": "spinach_palak",
+        "g": 25.0
+      },
+      {
+        "ifct_id": "carrot",
+        "g": 25.0
+      },
+      {
+        "ifct_id": "curd_dahi",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "butter_table",
+        "g": 5.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC487 (Vegetable khichdi/khichri) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "ASC487"
+  },
+  "fish_curry_bengali": {
+    "name_en": "Bengali fish curry (1 katori)",
+    "name_hi": "मछली करी",
+    "bucket": "west_east",
+    "tags": [
+      "non-veg",
+      "bengal"
+    ],
+    "serving_label": "1 katori (~150g)",
+    "ingredients": [
+      {
+        "ifct_id": "tomato_red",
+        "g": 5.0
+      },
+      {
+        "ifct_id": "coriander_leaves",
+        "g": 4.0
+      },
+      {
+        "ifct_id": "garlic_raw",
+        "g": 0.6
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 2.2
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "fish_rohu_raw",
+        "g": 100.0
+      },
+      {
+        "ifct_id": "curd_dahi",
+        "g": 15.0
+      },
+      {
+        "ifct_id": "spice_garam_masala",
+        "g": 1.0
+      },
+      {
+        "ifct_id": "spice_red_chilli_powder",
+        "g": 0.8
+      },
+      {
+        "ifct_id": "oil_mustard",
+        "g": 15.0
+      }
+    ],
+    "verified_by": "INDB recipe #BFP223 (Bengal fish curry (Bengali machli curry)) + INDB per-serving macros (2026-06-02)",
+    "_indb_recipe_id": "BFP223"
+  },
+  "sambar_rice": {
+    "name_en": "Sambar rice (1 plate)",
+    "name_hi": "सांबार चावल",
+    "bucket": "south",
+    "tags": [
+      "veg",
+      "staple"
+    ],
+    "serving_label": "1 plate (~200g cooked combined)",
+    "ingredients": [
+      {
+        "ifct_id": "chana_dal_raw",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "urad_dal_raw",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "toor_dal_raw",
+        "g": 50.0
+      },
+      {
+        "ifct_id": "brinjal_baingan",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "drumstick_moringa",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "okra_bhindi",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "tomato_red",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "curry_leaves",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "onion_pink",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "capsicum_shimla",
+        "g": 5.0
+      },
+      {
+        "ifct_id": "spice_coriander_seed",
+        "g": 2.0
+      },
+      {
+        "ifct_id": "spice_turmeric_haldi",
+        "g": 0.5
+      },
+      {
+        "ifct_id": "coconut_fresh",
+        "g": 30.0
+      },
+      {
+        "ifct_id": "spice_cumin_jeera",
+        "g": 0.2
+      },
+      {
+        "ifct_id": "oil_refined",
+        "g": 8.0
+      },
+      {
+        "ifct_id": "rice_parboiled_raw",
+        "g": 50.0
+      }
+    ],
+    "verified_by": "INDB recipe #ASC167 (sambar) + rice component (2026-06-02)",
+    "_indb_recipe_id": "ASC167+rice"
+  }
+}
