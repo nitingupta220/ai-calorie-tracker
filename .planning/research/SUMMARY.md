@@ -16,7 +16,7 @@ Dominant risks are not technical: accuracy collapse on multi-item thalis (Pitfal
 **Three stack corrections vs design doc:**
 1. **Gemini 2.5 Flash** as vision primary, not 2.0 (retires 2026-03-03).
 2. **Cloudflare R2 `jurisdiction=india`** (endpoint `<acct>.in.r2.cloudflarestorage.com`), not Mumbai PoP.
-3. **Hosting decision required before Week 1:** Fly.io Mumbai (bom1, sub-20ms, $13-20/mo prod) vs Railway Singapore (+50-100ms, better DX). **Supabase Mumbai is the managed Postgres** (Neon excluded — no India region).
+3. **Hosting locked (D-01): Render free tier, Singapore region** for compute. Fly.io Mumbai (bom1, sub-20ms, $13-20/mo prod) and Railway Singapore (+50-100ms, better DX) were both rejected — each requires a credit card in 2026, failing the zero-CC bootstrap constraint. Render free has no CC requirement; the Mumbai-compute latency win is a deferred Phase-4 trigger only. **Supabase Mumbai remains the managed Postgres** (Neon excluded — no India region). Note: Render free instances sleep when idle, so server-side cron runs as GitHub Actions scheduled workflows, not in-process APScheduler (D-03).
 
 **Two feature additions** research surfaced as table stakes: **manual weight log** (~4h dev — required for muscle-gain progress) and **water intake tracker** (~2h dev — every incumbent ships it). Both V1.
 
@@ -27,7 +27,7 @@ Dominant risks are not technical: accuracy collapse on multi-item thalis (Pitfal
 - **Expo SDK 54 + RN 0.81 + expo-router 5** — Android-first; EAS Build dev/preview/production; custom dev client for @react-native-firebase native modules.
 - **expo-image-manipulator (mandatory)** — SDK 54 returns HEIC/AVIF on iOS-sourced images; convert to JPEG ≤1280px / q=0.7 (5x R2 savings, 3x vision token savings).
 - **FastAPI 0.128 + Pydantic v2 + SQLAlchemy 2.0 async + asyncpg + Alembic** — async throughout; separate `models/` and `schemas/`.
-- **Fly.io Mumbai (bom1) [recommended] OR Railway Singapore [acceptable]** — pick one Week 0d, don't relitigate.
+- **Render free tier, Singapore region [V1, locked per D-01]** — no credit card required (Fly.io and Railway both rejected: CC required in 2026, fails zero-CC constraint). Mumbai-compute migration is a deferred Phase-4 trigger. Free instances sleep idle → cron via GitHub Actions, not in-process APScheduler (D-03).
 - **Supabase Mumbai Postgres** — only managed Postgres with India region in price band; free tier 500MB / 50K MAU; auto-pauses after 1 week idle.
 - **Cloudflare R2, jurisdiction=india** — presigned PUT direct from mobile; zero egress fees.
 - **Firebase Phone Auth** — 50K MAU free, no DLT required; firebase-admin verifies ID tokens.
@@ -110,7 +110,7 @@ Additional flags: Pitfall 3 (IFCT raw-ingredient gap — decomposition layer Wee
 
 ### Phase 0 — Gates (Week 0, no production code)
 **Rationale:** Risk gates remain entry barrier; stack corrections + Play account + DPDP-schema-readiness land here.
-**Delivers:** Gate 0a (stratified 30-photo benchmark), Gate 0b (14-day founder advice 4/4 ≥70%), Gate 0c (≥10 verbal price + commitment quotes), Gate 0d (stack lock + 3 corrections + **Play Developer account purchased** + Fly-vs-Railway decision documented).
+**Delivers:** Gate 0a (stratified 30-photo benchmark), Gate 0b (14-day founder advice 4/4 ≥70%), Gate 0c (≥10 verbal price + commitment quotes), Gate 0d (stack lock + 3 corrections + **Play Developer account purchased** + compute hosting locked to **Render free Singapore** per D-01, zero-CC — Fly/Railway rejected).
 **Avoids:** Pitfalls 1, 4, 16, 7, 8.
 
 ### Phase 1 — Backend Spine + Vision + DPDP Plumbing (Weeks 1-2)
@@ -195,7 +195,7 @@ Additional flags: Pitfall 3 (IFCT raw-ingredient gap — decomposition layer Wee
 ### Gaps to Address
 
 - **Gemini 2.5 Flash free-tier RPD verification:** STACK.md notes "500 RPD (some reports cite 1500)." → Founder verifies on Google AI Studio Week 0d; if 500 RPD, document paid-Gemini migration trigger at ~250 DAU.
-- **Fly.io Mumbai vs Railway Singapore decision:** Trade-off documented but not picked. → Founder picks Week 0d, writes 1-paragraph rationale to `.planning/decisions/`, does not relitigate.
+- **Compute hosting:** ~~Trade-off documented but not picked.~~ **RESOLVED (D-01): Render free tier, Singapore region.** Fly.io Mumbai and Railway Singapore both rejected (each requires a credit card in 2026 — fails zero-CC constraint). Mumbai-compute migration deferred to Phase-4 trigger. Render free sleeps idle → cron via GitHub Actions (D-03), not in-process APScheduler.
 - **D7 retention baseline for Indian-context AI nutrition:** Industry numbers don't perfectly map to wedge-positioned product. → Use design-doc 5/20 D7 Gate 7 bar; collect WhatsApp verbatim during alpha to ground-truth.
 - **Vegetarian-protein ₹/gram price table:** Mentioned as Week 3 deliverable, no source given. → Founder builds during Gate 0a / Week 3 from local market prices; commits as `data/veg_protein_prices.json` with date stamp.
 - **Supabase auto-pause behavior:** Free tier pauses after 1 week idle. → Cron-ping monitor OR upgrade to $25 Pro before Week 9 alpha.
@@ -229,7 +229,7 @@ Additional flags: Pitfall 3 (IFCT raw-ingredient gap — decomposition layer Wee
 
 Suggested phases (coarse granularity per founder config — may collapse to 5-6):
 
-1. **Phase 0 — Gates (Week 0)** — Risk gates + stack corrections + Play account + Fly-vs-Railway decision.
+1. **Phase 0 — Gates (Week 0)** — Risk gates + stack corrections + Play account + compute hosting locked to Render free Singapore (D-01).
 2. **Phase 1 — Backend Spine + Vision + DPDP Plumbing (Weeks 1-2)** — `ai_provider.py` + vision pipeline + DPDP pulled forward.
 3. **Phase 2 — Advice Engine + Correction Capture (Week 3)** — Moat engine + training-corpus capture.
 4. **Phase 3 — Mobile Client (Weeks 4-6)** — Onboarding + camera + MacrosCard with inline advice + WoZ Gate.

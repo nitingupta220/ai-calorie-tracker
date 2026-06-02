@@ -29,7 +29,7 @@ All v1 code is deferred until Phase 1 gates pass; design-doc artifacts (`.planni
   1. Founder has run 30 stratified meal photos (10 single-dish / 10 mixed / 10 thali) through Gemini 2.5 Flash and demonstrated ≥70% dish-name match + ≥60% macros within ±35% per-bucket (Gate 0a)
   2. Founder has logged 14 days of own meals through the validated pipeline + advice engine; ≥70% of replies score 4/4 on the rubric (specific food + quantity + ₹ cost + log reference) (Gate 0b)
   3. Founder has ≥10 verbal commitments + ≥3 verbatim price-WTP quotes from 20 named Trial Users on WhatsApp (Gate 0c)
-  4. Stack is locked in `.planning/decisions/` — Expo + RN + FastAPI + Supabase Mumbai + R2 `jurisdiction=india` + Firebase OTP + `ai_provider.py` abstraction + Gemini 2.5 Flash (not 2.0) + Fly.io Mumbai vs Railway Singapore decision committed (Gate 0d)
+  4. Stack is locked in `.planning/decisions/` — Expo + RN + FastAPI + Supabase Mumbai + R2 `jurisdiction=india` + Firebase OTP + `ai_provider.py` abstraction + Gemini 2.5 Flash (not 2.0) + compute hosting = Render free Singapore per D-01 (Gate 0d)
   5. Google Play Developer account purchased ($25), identity verification submitted, 3-7 day clock started before Phase 2 begins
 **Plans**: TBD
 
@@ -37,7 +37,7 @@ All v1 code is deferred until Phase 1 gates pass; design-doc artifacts (`.planni
 **Goal**: Stand up the full server-side vertical slice — a user photo posted to the API returns dish name, macros, inline advice, and persists a correction-ready record — with DPDP plumbing baked in from day one.
 **Mode:** mvp
 **Depends on**: Phase 1
-**Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, INFRA-06, INFRA-07, INFRA-08, AUTH-01, AUTH-02, AUTH-04, AUTH-05, TRACK-04, TRACK-05, TRACK-06, TRACK-07, TRACK-08, TRACK-09, TRACK-10, ADVICE-01, ADVICE-02, ADVICE-03, ADVICE-04, ADVICE-05, ADVICE-06, HISTORY-03, HISTORY-04, COMP-01, COMP-03, COMP-04, COMP-05, COMP-08, COMP-09
+**Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, INFRA-06, INFRA-07, INFRA-08, AUTH-01, AUTH-02, AUTH-04, AUTH-05, TRACK-04, TRACK-05, TRACK-06, TRACK-07, TRACK-08, TRACK-09, TRACK-10, ADVICE-01, ADVICE-02, ADVICE-03, ADVICE-04, ADVICE-05, ADVICE-06, HISTORY-03, HISTORY-04, COMP-01, COMP-03, COMP-04, COMP-05, COMP-08, COMP-09, REQ-CEO-01 (table+stub), REQ-CEO-02 (cron)
 **Success Criteria** (what must be TRUE):
   1. A meal photo uploaded by presigned PUT to Cloudflare R2 india jurisdiction is processed end-to-end by the FastAPI backend and returns dish name + macros + 1-2 sentence inline advice within an 8s P95 budget through a single API response (no separate advice fetch)
   2. The vision pipeline correctly identifies all 50 whitelist dishes via Gemini 2.5 Flash, decomposes them into IFCT 2017 ingredients using the founder-curated `data/dish_decomposition.json`, and aggregates macros — out-of-whitelist dishes return "Not recognized — log manually"
@@ -50,7 +50,7 @@ All v1 code is deferred until Phase 1 gates pass; design-doc artifacts (`.planni
 **Goal**: Put the validated backend spine in a user's hands — a usable Expo Android app delivering onboarding, camera capture, MacrosCard with inline advice, history, corrections, manual weight, water tracker, daily push, and streaks — gated by Wizard-of-Oz QA before any automated advice goes live to Trial Users.
 **Mode:** mvp
 **Depends on**: Phase 2
-**Requirements**: AUTH-03, ONBOARD-01, ONBOARD-02, ONBOARD-03, ONBOARD-04, ONBOARD-05, TRACK-01, TRACK-02, TRACK-03, HISTORY-01, HISTORY-02, HISTORY-05, HISTORY-06, RETAIN-01, RETAIN-02, RETAIN-03, RETAIN-04, RETAIN-05, WOZ-01, WOZ-02, WOZ-03, COMP-02, COMP-06
+**Requirements**: AUTH-03, ONBOARD-01, ONBOARD-02, ONBOARD-03, ONBOARD-04, ONBOARD-05, TRACK-01, TRACK-02, TRACK-03, HISTORY-01, HISTORY-02, HISTORY-05, HISTORY-06, RETAIN-01, RETAIN-02, RETAIN-03, RETAIN-04, RETAIN-05, WOZ-01, WOZ-02, WOZ-03, COMP-02, COMP-06, REQ-CEO-02 (mobile), REQ-CEO-03
 **Success Criteria** (what must be TRUE):
   1. A new user installs the Expo Android app, completes phone-OTP signup, walks through onboarding (goal / body / activity / veg-non-veg / budget / granular DPDP consents with AI-training default OFF / push permission rationale / CDSCO-ASCI disclaimer), and lands on a home screen showing day's kcal + protein/carbs/fat progress vs ISSN-2024 1.8 g/kg muscle-gain target
   2. The user opens the in-app camera with a reference-object overlay guide, captures a meal, sees the photo compressed (≤1280px JPEG / q=0.7 / EXIF stripped / HEIC-AVIF converted) and uploaded by presigned PUT, and within 8s P95 receives a `<MacrosCard />` with `<AdviceInline />` child + CDSCO disclaimer footer rendered together
@@ -64,7 +64,7 @@ All v1 code is deferred until Phase 1 gates pass; design-doc artifacts (`.planni
 **Goal**: Harden the app for production load, run a 20-user closed alpha, complete the DPDP public-facing capstone, validate Gate 7 retention, and submit to Play Production Week 12 (not 14) to buffer the 7-14 day first-developer review.
 **Mode:** mvp
 **Depends on**: Phase 3
-**Requirements**: ALPHA-01, ALPHA-02, ALPHA-03, ALPHA-04, ALPHA-05, COMP-07, LAUNCH-01, LAUNCH-02
+**Requirements**: ALPHA-01, ALPHA-02, ALPHA-03, ALPHA-04, ALPHA-05, COMP-07, LAUNCH-01, LAUNCH-02, REQ-CEO-01 (wire)
 **Success Criteria** (what must be TRUE):
   1. Pre-alpha load test passes — 20 concurrent uploads at simulated dinner-hour with ≥95% success rate and P95 <8s; fallback drill completes with 10% traffic routed through OpenRouter for 24h with no quality regression observed
   2. Sentry + PostHog wired across mobile and backend; per-user cost telemetry dashboard live and shows AI cost per active user ≤₹15/mo before any alpha invite is sent

@@ -1,3 +1,7 @@
+> **SUPERSEDED 2026-06-02 — FINAL V1 APP NAME = Bhog (founder decision). The analysis below is retained for history only.**
+
+---
+
 # App Name Research — Hinglish Hybrid AI Personal Coach
 
 **Project:** AI Personal Coach for urban Indian youth (18-30), gym-going / gym-curious. Hook: photo-to-macros. Moat: inline contextual advice grounded in user's recent meal log + Indian-veg-protein-budget context. Positioning: trainer-replacement at Rs 299/mo vs Rs 3,000/mo gym trainer. Vibe: Hinglish hybrid, restrained-modern, mascot-led.

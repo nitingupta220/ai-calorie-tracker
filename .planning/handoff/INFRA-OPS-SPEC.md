@@ -75,6 +75,7 @@ ai-calorie-weight-loss/                 # repo root (current git root)
 ├── .github/workflows/                 # CREATE Phase-2 Wk1 (§5)
 │   ├── evals.yml                      # eval merge gate
 │   ├── cron-keepalive.yml             # Render /healthz + Supabase keep-alive
+│   ├── cron-db-backup.yml             # nightly pg_dump → R2 india (§5d, DR)
 │   └── cron-price-anomaly.yml         # D-16 monthly anomaly
 ├── .planning/  CLAUDE.md  DESIGN.md  TODOS.md
 ```
@@ -183,7 +184,32 @@ Both pinned to the **D-03 active window 04:30–16:30 UTC (10:00–22:00 IST)**.
 - **Action:** SQL job compares current `veg_protein_prices` rows vs the prior quarter snapshot; if any item moved **>15%**, ping founder (WhatsApp/email) for an early manual refresh (D-16 catches festival / tomato-onion shocks). Quarterly manual refresh is a founder calendar task, not a workflow.
 - Depends on the `veg_protein_prices` table (D-17) existing — so this workflow lands after the Alembic migration for that table.
 
-> Workflow YAML is planner/executor discretion (D-CONTEXT "Claude's Discretion" — standard pattern). The **triggers, schedules, target endpoints, and the D-03 window are locked above.**
+### 5d. `cron-db-backup.yml` — nightly DB disaster-recovery backup (DR)
+
+> **Why this exists (DR gap):** Supabase **free tier has NO automated backups and NO point-in-time recovery (PITR)** — those are paid-plan features. A dropped table, bad migration, or project deletion would mean **total, unrecoverable loss** of the two assets we can never reconstruct: the **append-only consent ledger** (`consent_audit` — the DPDP legal record, COMPLIANCE-SPEC.md) and the **correction corpus** (user macro/dish corrections — the V1.5 accuracy training signal, D-10). Keep-alive (§5b) stops the project pausing; it does **not** protect against data loss. This nightly off-site dump is the only DR for Phase 0-2 until the Phase-4 paid-tier trigger turns on Supabase PITR.
+
+- **Schedule:** nightly → `cron: "30 18 * * *"` (18:30 UTC / 00:00 IST — after the D-03 active meal window closes, so the dump captures a full day and never contends with peak traffic).
+- **Action (free GitHub Actions runner):**
+  1. `pg_dump` the Supabase Postgres via `DATABASE_URL` (custom-format: `pg_dump --format=custom --no-owner --no-privileges "$DATABASE_URL_SYNC" -f bhog-$(date +%F).dump`). Use a **sync** `postgresql://` DSN here (not the `+asyncpg` app DSN) — `pg_dump` is a libpq client, not SQLAlchemy.
+  2. Upload to **Cloudflare R2, `jurisdiction=india`** (same residency guarantee as photos — backups contain PII, so they must NOT leave India; reuse `R2_ENDPOINT_URL` `*.in.r2.cloudflarestorage.com`, anti-pattern #2). Target a dedicated prefix/bucket, e.g. `ai-coach-backups-prod/db/`.
+  3. Apply retention (below) by deleting expired objects after upload.
+- **Retention:** keep **7 daily + 4 weekly** dumps. Daily dumps older than 7 days are pruned **unless** they are the Sunday (or month-aligned) dump promoted to the weekly set; weekly dumps older than 4 weeks are pruned. (~11 objects steady-state; R2 free 10 GB tier easily absorbs custom-format dumps of a sub-500 MB DB.)
+- **Secrets (GitHub repo secrets — separate row family from the eval key, §3):** a **sync** `DATABASE_URL_SYNC` (read-capable Supabase DSN) + `R2_*` credentials scoped to the backups prefix. These are CI-side secrets; they do **not** live in Render. Scope the R2 token to the backups prefix only (least privilege — it should not be able to touch the live photos bucket).
+- **Documented restore step (put this verbatim in the workflow header comment so a panicking founder finds it):**
+  ```bash
+  # RESTORE (run locally, NOT in CI — restores into a *fresh* Supabase project or local PG):
+  #   1. Pull the desired dump from R2:
+  #        aws s3 cp s3://ai-coach-backups-prod/db/bhog-YYYY-MM-DD.dump ./restore.dump \
+  #          --endpoint-url "$R2_ENDPOINT_URL"
+  #   2. Create / point at the target DB (NEVER restore over the live prod DB blind).
+  #   3. pg_restore --clean --if-exists --no-owner --no-privileges \
+  #        --dbname "$RESTORE_TARGET_DSN" ./restore.dump
+  #   4. Re-point DATABASE_URL at the restored DB; redeploy Render (region-pin assert re-runs, §6b).
+  ```
+- **Verify (lightweight):** the workflow asserts the dump is non-empty (`test -s` + a `pg_restore --list` parse) before upload, so a silently-failed dump never overwrites a good day's slot. **OPEN — needs founder:** periodic full restore-drill cadence (quarterly recommended) — a backup that has never been restored is a hope, not a backup.
+- Lands once `DATABASE_URL` exists (Supabase up, step §9.1) — same week as the keep-alive crons.
+
+> Workflow YAML is planner/executor discretion (D-CONTEXT "Claude's Discretion" — standard pattern). The **triggers, schedules, target endpoints, retention policy (7 daily + 4 weekly), R2-india residency, and the D-03 window are locked above.**
 
 ---
 
@@ -256,6 +282,21 @@ uv run pytest                            # unit + integration
 
 `ENV=dev` gates Ollama-dev provider and points `PHOENIX_OTLP_ENDPOINT` at localhost. A wrong R2 endpoint or non-allow-listed Supabase ref in `.env` will **abort boot** (§6b) — that is expected; fix `.env`.
 
+### 8a. Dev seed + mocked-provider cassettes (TODO — Phase-2 Wk1, ship with the first vertical slice)
+
+> **Goal:** a fresh engineer can exercise the full `analyze → macros → advice → correction` loop **locally with zero live credentials** — no Gemini/Groq key, no real Firebase ID token, no R2 round-trip. Without this, the only way to touch the loop is to burn provider RPD and stand up Firebase, which blocks day-1 onboarding and makes the loop untestable in CI.
+
+- **`server/scripts/seed_dev.py` (seed script).** Idempotent. Inserts a fixture user + the full FK chain the loop needs, so every downstream table has a valid parent:
+  - one `users` row (a **fake/dev Firebase UID**, `goal=muscle_gain`, a representative `diet`/`budget_bucket` per the MODEL-SPEC DB enums — diet ∈ {veg, egg, non_veg, vegan, lacto_veg_no_egg, lactose_intolerant}; values copied verbatim from MODEL-SPEC, never invented),
+  - one consent set written as **`consent_audit`** events (consent_type `photo` for the photo opt-in — NOT `photo_upload`; per CONTEXT canonical), so the DPDP/consent gate has a row,
+  - one `meals` row + its macro breakdown + one `advice` row + one `corrections` row — a complete sample chain so list/detail endpoints and the correction flow render against real local rows.
+  - Run: `uv run python -m scripts.seed_dev` (drives the DB in `DATABASE_URL`; safe to re-run). Exact table/column names defer to `MODEL-SPEC.md` / `API-SPEC.md` — this doc fixes only *that the chain is seeded*, not the schema.
+- **Cassette / mock provider layer (`ENV=dev` + `MOCK_AI=1`).** A recorded-response shim behind the same `ai_provider.py` interface (AI-SPEC §3) so services call the normal abstraction and never reach the network:
+  - `server/tests/cassettes/` holds canned JSON for each provider call — `vision_classify.json` (dish + portion → IFCT lookup feeds deterministic macros), `advice_generate.json`, `dish_decompose.json`. Responses are the **already-validated** Pydantic shapes (anti-pattern: a cassette that wouldn't pass `model_validate`), so the local loop tests the real parse/guardrail path.
+  - Selected via env (`MOCK_AI=1`, only honored when `ENV=dev`/`ci`) — config-flag, not a code fork (anti-pattern #18: no hardcoded provider branch in service code). The same cassette layer is what `evals.yml` and integration tests use so CI needs **no live AI key** for the non-eval suite (the eval gate itself still uses the real `EVAL_GEMINI_API_KEY`, §5a — cassettes do not replace eval scoring).
+- **Auth bypass for dev (`ENV=dev` only).** The `deps.py` auth dependency accepts a `DEV_FAKE_UID` short-circuit when `ENV=dev` so requests authenticate as the seeded fixture user without a real Firebase token. **Hard-gated to `ENV=dev`** — in `prod` the dependency always runs `firebase-admin.verify_id_token()` (anti-pattern #6: never trust a client phone/UID). A test must assert the bypass is unreachable when `ENV=prod`.
+- **Result:** `seed_dev` + `MOCK_AI=1` + `DEV_FAKE_UID` ⇒ `curl` (or pytest) can drive presign → analyze → macros → advice → correction end-to-end on a clean clone. Implementation detail (recording format, fixture values) is executor discretion; the **three knobs (`MOCK_AI`, `DEV_FAKE_UID`, `seed_dev`), their `ENV=dev`/`ci` gating, the consent_type=`photo` + DB-enum values, and the no-live-key guarantee are locked.**
+
 ---
 
 ## 9. Hosting Setup Checklist (all no-CC, Phase-2 Wk1)
@@ -266,7 +307,7 @@ Do these in order. None require a credit card.
 2. **Cloudflare R2 (D-04, INFRA-07):** create bucket **with jurisdiction = `india`** (NOT just Mumbai PoP — anti-pattern #2). Bucket `ai-coach-meals-prod`. Endpoint = `https://<account_id>.in.r2.cloudflarestorage.com` → `R2_ENDPOINT_URL`. Create scoped API token → `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`. Lifecycle rule: delete 90 days after soft-delete tombstone (DPDP — see COMPLIANCE-SPEC.md).
 3. **Firebase (D-05):** create project, enable Phone auth. Download service-account JSON → mount as Render **Secret File** → `FIREBASE_SERVICE_ACCOUNT_JSON`.
 4. **Render (D-01):** create **free web service, region = Singapore**, connect GitHub repo, **root dir = `server/`**, build = `uv sync`, start = `uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Set all `prod` env vars + secret files from §3. Push-to-deploy from the connected branch. Free service sleeps after 15 min idle (~60s wake) — mitigated by `render-keepalive` cron (§5b).
-5. **GitHub repo secrets:** add `EVAL_GEMINI_API_KEY` (eval-only) for `evals.yml`. Enable branch protection on `main` marking the §5a eval jobs as required checks.
+5. **GitHub repo secrets:** add `EVAL_GEMINI_API_KEY` (eval-only) for `evals.yml`; add `DATABASE_URL_SYNC` (sync read DSN) + backups-prefix-scoped `R2_*` for `cron-db-backup.yml` (§5d DR). Enable branch protection on `main` marking the §5a eval jobs as required checks.
 6. **AI provider keys:** Google AI Studio (`GEMINI_API_KEY`), Groq (`GROQ_API_KEY`), OpenRouter (`OPENROUTER_API_KEY`), OpenAI (`OPENAI_API_KEY`) — all set as Render secrets. (AI provider routing itself = AI-SPEC §3, not this doc.)
 
 ---

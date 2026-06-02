@@ -20,7 +20,7 @@ This stack optimizes for **three hard constraints** the founder named:
 | Design doc said | Research says | Action |
 |---|---|---|
 | Gemini **2.0** Flash primary | Gemini 2.0 Flash **retires 2026-03-03** | Use **Gemini 2.5 Flash** as primary vision (same free tier, better quality) |
-| **Railway** $5/mo backend | Railway has no India region; Singapore = +50-100ms | Consider **Fly.io Mumbai (bom1)** for sub-20ms; Railway acceptable if founder prefers DX |
+| **Railway** $5/mo backend | Railway and Fly.io both require a credit card in 2026 (fails zero-CC) | Locked **Render free tier (Singapore)** per D-01; Fly.io Mumbai = deferred Phase-4 migration target only |
 | **Cloudflare R2 Mumbai edge** for DPDP | Mumbai is a *network PoP*, not a storage *jurisdiction* | Use R2 **`india` jurisdictional bucket** (explicit DPDP guarantee), accessed via `https://<acct>.in.r2.cloudflarestorage.com` |
 
 Everything else in the founder's Week 0d stack lock holds: Expo + RN, FastAPI + Postgres, Firebase phone OTP, multi-provider `ai_provider.py`.
@@ -87,14 +87,17 @@ backend/
 
 ### Hosting / PaaS
 
+**V1 DECISION (locked, per D-01):** Compute = **Render free tier, Singapore region**. This supersedes the Fly-vs-Railway trade-off below. Both Fly.io and Railway were eliminated in 2026 because each requires a credit card on file even for the free/hobby band, which fails the project's zero-credit-card bootstrap constraint. Render's free web service has no CC requirement and is the V1 compute target. The Mumbai-compute latency win (sub-20ms vs Singapore's +50-100ms) is real but is a **deferred Phase-4 trigger** — a Mumbai-migration runbook exists only as a future item, never as the V1 plan.
+
 | Technology | Version | Purpose | Why |
 |---|---|---|---|
-| **Fly.io** (recommended) | current | FastAPI deploy in **Mumbai (bom1)** region | **Only PaaS with native India region** in the founder's price band. Shared-CPU 256MB VM ≈ $1.94/mo; production setup (2 API instances + Postgres) ≈ $13-20/mo. Sub-20ms latency to Mumbai/Bangalore/Delhi users (vs 80-150ms from Singapore). |
-| **Railway** (acceptable alternative) | current | FastAPI deploy in Singapore | Nearest region is Singapore (+50-100ms vs Mumbai). $5 Hobby + usage; better DX (one-click deploy, simpler env management) for first-time deployer. **Use only if Fly.io's CLI/multi-region setup is too steep for V1 launch.** |
+| **Render** (V1, locked) | current | FastAPI deploy on **free web service, Singapore region** | **No credit card required** on the free tier — the only PaaS in the founder's band that clears the zero-CC constraint (per D-01). Singapore region (+50-100ms vs Mumbai, acceptable for alpha). **Caveat:** free instances sleep after idle — server-side cron (8pm push, hard-delete, keep-alive ping) must run as **GitHub Actions scheduled workflows**, not in-process APScheduler, which will not fire while asleep (per D-03). |
 | **Supabase Postgres** | Postgres 15/16 | DB hosted in **Mumbai region** | Free tier: 500 MB DB, 1 GB storage, 50K MAU. **Only managed Postgres with India region** between Neon (no India) and Fly Postgres (works but expensive at $38/mo Basic). Supabase pauses inactive projects after 1 week — set up cron-ping or upgrade to $25 Pro before alpha launch. |
-| **Fly Postgres** (alternative) | Postgres 16 | DB co-located with API in `bom1` | Use IF API on Fly.io; co-location wins latency but Basic plan = $38/mo (over budget pre-Phase-3). Supabase Mumbai is cheaper. |
 
-**Decision rule:** Start on **Railway + Supabase Mumbai Postgres** for Phase 0-1 if founder values DX over latency; migrate to **Fly.io Mumbai + Supabase Mumbai** at Phase 2 (100 users) when 80ms vs 20ms matters. Founder's choice; document the decision and don't re-litigate.
+**Alternatives considered (rejected):**
+- **Fly.io Mumbai (bom1)** — Shared-CPU 256MB VM ≈ $1.94/mo; production (2 API instances + Postgres) ≈ $13-20/mo; sub-20ms latency to Mumbai/Bangalore/Delhi (vs 80-150ms from Singapore). **Rejected: requires a credit card on file in 2026 — fails the zero-CC constraint (D-01).** The Mumbai latency advantage is retained only as a deferred Phase-4 migration trigger.
+- **Railway Singapore** — $5 Hobby + usage; better one-click DX. **Rejected: also requires a credit card in 2026 — fails the zero-CC constraint (D-01).**
+- **Fly Postgres (co-located in `bom1`)** — co-location wins latency but Basic plan = $38/mo (over budget pre-Phase-3); moot now that compute is on Render, not Fly. Supabase Mumbai remains the DB.
 
 **Anti-pattern:** AWS Mumbai region. Solo founder cannot afford the operational overhead of EC2/RDS/IAM/VPC. Stay on PaaS until paid users justify devops time.
 
@@ -238,8 +241,8 @@ The design doc names `ai_provider.py` as a Week 0d locked deliverable. Research-
 | Mobile framework | Expo (managed) | Bare React Native | First-time RN shipper risk; Expo handles Gradle/Xcode config; EAS Build is essentially free for solo dev |
 | Mobile framework | Expo | Flutter | Founder has not stated Dart experience; React mental model + JS ecosystem broader; design doc locks RN at Week 0d |
 | Backend lang | FastAPI (Python) | Node/Express, Hono | AI ecosystem is Python-native; pydantic+SQLAlchemy mature; founder's prior Python familiarity assumed |
-| Hosting | Fly.io Mumbai / Railway Singapore | Render | Render has no Mumbai/Singapore proximity; latency worse than Railway |
-| Hosting | Fly.io / Railway | Self-hosted VPS (Hetzner) | Operational overhead unjustified at this scale; revisit at Phase 3+ if margin pressure demands |
+| Hosting | Render free (Singapore, D-01) | Fly.io Mumbai / Railway Singapore | Fly.io + Railway both require a credit card in 2026 (fails zero-CC); Render free accepted, Mumbai-latency migration deferred to Phase 4 |
+| Hosting | Render free (Singapore, D-01) | Self-hosted VPS (Hetzner) | Operational overhead unjustified at this scale; revisit at Phase 3+ if margin pressure demands |
 | DB | Supabase Postgres (Mumbai) | Neon | Neon has no India region; Supabase is the only managed Postgres in Mumbai in price band |
 | DB | Supabase | RDS Mumbai | AWS operational overhead too high for solo founder |
 | Object storage | Cloudflare R2 (india jurisdiction) | S3 Mumbai (ap-south-1) | R2: zero egress, true jurisdictional guarantee; S3 charges egress per GB which compounds fast |
@@ -423,7 +426,7 @@ This stack supports the design doc's 14-week plan unchanged, with three correcti
 
 1. **Gemini 2.5 Flash** (not 2.0) — update `ai_provider.py` defaults
 2. **R2 bucket jurisdiction = india** (not Mumbai-edge) — update infra setup in Week 1
-3. **Choose Railway-SG vs Fly-Mumbai explicitly** before Week 1 — document and don't revisit
+3. **Compute hosting locked to Render free (Singapore) per D-01** — Fly.io/Railway rejected (both require a credit card in 2026); Mumbai-latency migration deferred to Phase 4
 
 **Phase ordering remains:** Gates 0a-0d (Week 0) → Backend + Vision (Weeks 1-2) → Advice engine (Week 3) → RN scaffold (Weeks 4-7) → Polish + alpha (Weeks 8-12) → Public + Razorpay (Weeks 13+).
 

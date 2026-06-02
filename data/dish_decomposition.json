@@ -649,9 +649,8 @@
         {"ifct_id": "potato", "g": 60},
         {"ifct_id": "brinjal_baingan", "g": 30},
         {"ifct_id": "tomato_red", "g": 30},
-        {"ifct_id": "mustard_oil", "g": 5}
-      ],
-      "_note_to_founder": "ifct_id 'mustard_oil' should be 'oil_mustard' — fix on verify"
+        {"ifct_id": "oil_mustard", "g": 5}
+      ]
     },
     "fish_curry_bengali": {
       "name_en": "Bengali fish curry (1 katori)",

@@ -2,7 +2,7 @@
 
 > ⚠️ **PARTIALLY SUPERSEDED — read `.planning/phases/01-validation-gates-stack-lock/01-CONTEXT.md` (D-01..D-19 + D-CEO-01..03) and `CLAUDE.md` FIRST.**
 > This is a point-in-time research artifact (2026-05-27). The following items are STALE and overridden by later locked decisions — do NOT plan against them:
-> - **Compute:** "Railway / railway.toml" → **Render free (Singapore)** per D-01. Railway eliminated (CC required 2026).
+> - **Compute:** "FastAPI on Railway / Railway Postgres / railway.toml" → **Render free tier, Singapore region** per D-01. Both Railway AND Fly.io eliminated — each requires a credit card in 2026, failing the zero-CC bootstrap constraint. Render free has no CC requirement. The Mumbai-compute latency win (sub-20ms) is a **deferred Phase-4 migration trigger only**, never the V1 plan. **Every "Railway" / "Mumbai-edge compute" / "Fly.io" mention in the diagram, component table, scaling table, anti-patterns, and India-specific table below is STALE — read it as "Render free, Singapore."**
 > - **Vision model:** "Gemini 2.0 Flash (15 RPM / 1500 RPD)" → **Gemini 2.5 Flash** (10 RPM / 250K TPM / 500 RPD) per CLAUDE.md + D-stack. 2.0 retires 2026-03-03.
 > - **Cron:** "in-process APScheduler" for hard-delete / keep-alive / push → **GitHub Actions scheduled workflows** per D-03 (Render free sleeps; in-process cron will NOT fire). APScheduler only valid once on always-on paid compute.
 > - **Auth wire:** "HTTPS (JWT)" / app-minted JWT → **Firebase ID token used directly as Bearer**, verified per-request via `firebase-admin.verify_id_token` per D-05 (no separate app JWT).
@@ -420,7 +420,7 @@ async def decompose(dish_name: str, portion_g: int) -> list[Ingredient]:
 [User taps "Delete my data" in settings]
     │
     ▼
-[Mobile → Backend]  POST /compliance/delete  (requires fresh OTP re-auth)
+[Mobile → Backend]  DELETE /me  (soft-delete; any valid Firebase Bearer token — G6 / D-05)
     │
     ▼
 [Backend]  ├─ users.soft_delete_at = now()
@@ -453,8 +453,8 @@ async def decompose(dish_name: str, portion_g: int) -> list[Ingredient]:
 
 | Scale | Architecture Adjustments |
 |-------|--------------------------|
-| 0-20 users (alpha, weeks 8-12) | Railway $5/mo single dyno, in-process APScheduler, free AI tiers entirely. No queue. |
-| 20-100 users (Phase 2, public) | Railway $20/mo Pro. Move push scheduler to dedicated worker process. Add Redis for rate-limit cache (free providers). Keep single Postgres. |
+| 0-20 users (alpha, weeks 8-12) | **Render free web service (Singapore), per D-01** [~~Railway $5/mo~~ superseded]; cron via **GitHub Actions scheduled workflows** (D-03), NOT in-process APScheduler — free instance sleeps when idle; free AI tiers entirely. No queue. |
+| 20-100 users (Phase 2, public) | Stay on Render free or step to a paid always-on instance if sleep latency bites [~~Railway $20/mo Pro~~ superseded]. Move push scheduler to dedicated worker (or keep on GitHub Actions). Add Redis for rate-limit cache (free providers). Keep single Postgres. |
 | 100-1000 users | Split vision pipeline to ARQ/Celery worker (async meal processing). Add CDN for R2 GET. AI cost becomes top-line — tune routing weights. |
 | 1000-10k users | Read replica Postgres. Per-region FCM batch sender. Consider self-hosted Qwen 2.5 VL on GPU to flatten vision cost curve. |
 | 10k+ | Out of scope; revisit at PMF. |
@@ -549,7 +549,7 @@ async def decompose(dish_name: str, portion_g: int) -> list[Ingredient]:
 
 | Concern | Design Decision | Rationale |
 |---------|----------------|-----------|
-| **Data localization (DPDP Act 2023)** | Cloudflare R2 with Mumbai jurisdiction tag; Railway Postgres region = closest to India (Singapore acceptable, Mumbai if available). | Photos + PII stay in Asia region. Document jurisdiction in privacy policy. |
+| **Data localization (DPDP Act 2023)** | Cloudflare R2 with `india` jurisdiction (PII + photos); **Postgres = Supabase Mumbai region** (DB stays in India). Compute = **Render free, Singapore** (D-01) — compute in Singapore is acceptable because PII at rest (DB + R2) is India-resident; only transient request processing transits Singapore. | Photos + PII stay in India region (R2 india + Supabase Mumbai). Document jurisdiction in privacy policy. ~~Railway Postgres region = closest to India~~ superseded — see D-01. |
 | **Latency on Indian 4G** | Presigned PUT direct to R2 Mumbai (one hop, not two). Compress to 200KB max. Parallel vision + advice on backend. 6s hard timeout. | First-meal experience target: <8s shutter-to-macros. |
 | **Free-tier rate limits** | Provider abstraction with 429 fallback; per-provider RPM tracked in Redis (Phase 2). | Gemini free 15 RPM caps ~50 simultaneous users at lunch peak; fallback chain prevents user-facing failure. |
 | **DPDP consent ledger** | `consent_log` append-only table; consent screens version-stamped; PII-stripped audit kept post-delete. | Survives "delete my data" but proves consent existed — regulatory requirement. |

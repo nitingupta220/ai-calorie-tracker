@@ -81,7 +81,7 @@ A user can photograph their Indian meal and immediately get accurate macros + on
 ## Constraints
 
 - **Tech stack**: React Native + Expo + EAS Build (V1); FastAPI on Render free (Singapore) + Supabase Mumbai Postgres; Cloudflare R2 with `jurisdiction=india` for photo storage; Firebase phone OTP — Reason: Render is the only no-CC FastAPI host in 2026 (Fly removed free, Railway requires CC). Supabase Mumbai + R2 india jurisdiction satisfy DPDP residency for PII + photos. Singapore compute disclosed in privacy policy. Re-evaluate Mumbai compute (Fly bom1 or Render India) at Phase 4-5 trigger
-- **AI models**: Multi-provider abstraction via `ai_provider.py`; Phase 0 testing = 100% free tiers (Google AI Studio Gemini 2.0 Flash + Groq Llama 3.3 70B); Phase 1 alpha = free-first then paid; Phase 2+ = paid Gemini Flash primary, OpenRouter fallback — Reason: bootstrap budget, vendor-risk mitigation
+- **AI models**: Multi-provider abstraction via `ai_provider.py`; Phase 0 testing = 100% free tiers (Google AI Studio Gemini 2.5 Flash + Groq Llama 3.3 70B); Phase 1 alpha = free-first then paid; Phase 2+ = paid Gemini Flash primary, OpenRouter fallback — Reason: bootstrap budget, vendor-risk mitigation
 - **Budget**: ~₹0 in Phase 0, ~₹0-200 across Phase 1 alpha (4 weeks), ~₹1,700/mo ceiling at 100 free users — Reason: solo bootstrap founder, no external funding
 - **Timeline**: 14-week target to public launch; 10-12 weeks if founder has shipped React Native before, 14-20 weeks if first-time RN shipper — Reason: founder native-app fluency unknown
 - **Compliance**: DPDP Act 2023 + CDSCO/ASCI advertising disclaimers — Reason: Indian regulatory obligations; medical-device territory must be avoided

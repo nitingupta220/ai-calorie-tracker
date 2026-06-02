@@ -269,7 +269,7 @@ Phase-3 emailed variant: upload to a short-TTL (15-min) presigned R2 GET URL und
     "budget_bucket": "150-250"
   },
   "consents": [
-    { "consent_type": "photo_upload", "action": "grant", "granted": true,
+    { "consent_type": "photo", "action": "grant", "granted": true,
       "purpose_text_hash": "sha256:...", "created_at": "..." }
   ],
   "meals": [
@@ -377,11 +377,11 @@ A Phase-2 **GitHub Actions workflow step** (shell owned by INFRA-OPS-SPEC.md) �
 - [ ] `BANNED_WORDS` module shared by build lint + runtime G6; `BANNED_RE` compiled once.
 - [ ] `consent_log` write path live; `consent_type` enum matches MODEL-SPEC exactly; `purpose_text_hash` populated (COMP-03/09).
 - [ ] `ai_training` default OFF — no grant row until Settings toggle (COMP-09).
-- [ ] `POST /compliance/delete` soft-delete + 403 lockout + `delete_requested` ledger row (COMP-04/AUTH-05).
+- [ ] `DELETE /me` soft-delete + 403 lockout + `delete_requested` `consent_audit` event (NOT a `consent_log` row, per G1/G6) (COMP-04/AUTH-05).
 - [ ] `/internal/compliance/purge` endpoint: token-gated, idempotent, executes §4.3 ordered cascade + PII-strip + audit_event.
 - [ ] `.github/workflows/dpdp-purge.yml` scheduled (22:00 UTC) + `workflow_dispatch`; hits purge endpoint (INFRA-OPS shell).
 - [ ] `test_hard_delete.py` fixture test green: 31-day back-date → R2+PG purge, stripped consent_log retained, audit row written, idempotent (COMP-04).
-- [ ] `POST /compliance/export` → §5.2 JSON shape → email link (transport OPEN); `data_exported` ledger row (COMP-05).
+- [ ] `GET /me/export` → §5.2 JSON shape → email link (transport OPEN); `export_generated` `consent_audit` event (there is no `data_exported` enum value; NOT a `consent_log` row, per G1/G6) (COMP-05).
 - [ ] `assert_region_pin()` in lifespan startup; fails closed on R2/Supabase mismatch (COMP-01).
 - [ ] COMP-08 banned-words string lint step in CI; greps scoped paths; exits 1 on hit.
 - [ ] `whatsapp_session` table stubbed (MODEL-SPEC DDL); STOP-keyword + 24h-TTL purge logic specced for Phase-4 wire (D-CEO-01).
@@ -394,4 +394,4 @@ A Phase-2 **GitHub Actions workflow step** (shell owned by INFRA-OPS-SPEC.md) �
 1. **Email transport for COMP-05 export + hard-delete confirmation (§5.3).** Recommend Resend (3K/mo free, no CC). Needs founder to confirm + verify a sending domain. Endpoint codes against `EmailTransport` Protocol so swap is one file.
 2. **WhatsApp consent posture (§2.1).** This spec RECOMMENDS explicit YES-gate on first inbound (one extra turn) over D-CEO-01's footer-only legitimate-use basis. Founder confirms whether to accept the one-turn UX cost for a harder lawful basis, or stay footer-only.
 3. **Disclaimer constant sync mobile↔backend (§0.1).** Single generated `constants.ts` from Python vs hand-synced byte-equal pair. Trivial; founder/dev preference — defaulting to hand-synced + lint-asserted until a codegen step is wanted.
-4. **Fresh-OTP re-auth on `POST /compliance/delete` (§4.1).** Recommended (prevents hijacked-session deletion) but adds a re-auth flow. Founder confirms whether Phase-2 delete requires re-OTP or accepts the standard Bearer token.
+4. **Fresh-OTP re-auth on `DELETE /me` (§4.1).** Recommended (prevents hijacked-session deletion) but adds a re-auth flow. Founder confirms whether Phase-2 delete requires re-OTP or accepts the standard Bearer token.

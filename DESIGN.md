@@ -1,7 +1,8 @@
 # Bhog · Design System Tokens
 
 Design contract for the Bhog AI Personal Coach app. Locked 2026-05-28 from
-`.planning/specs/bhog-v1-design-spec.html` and `designs/003-meal-detail-20260528/finalized.html`.
+`.planning/specs/bhog-v1-design-spec.html` and the sketch winners at
+`.planning/sketches/00X-*/index.html` (001=A, 002=A, 003=B, 004=C).
 
 All Pretext-native HTML, React Native (Expo), and future variants MUST consume these tokens.
 
@@ -245,7 +246,7 @@ Format: mono 10px, muted color, top-border separator inside advice block.
 
 Hanuman langur (Semnopithecus). Silver-grey fur, distinctive black face, copper-amber chest band.
 
-V1 ships as SVG placeholder (see `designs/003-meal-detail-20260528/finalized.html`).
+V1 ships as SVG placeholder (see `.planning/sketches/003-meal-detail/index.html` — winner B).
 
 V1.1 swap: Ideogram-rendered PNG asset, 6-expression set (default, thinking, celebrating, concerned, sleepy, pointing).
 
@@ -284,4 +285,4 @@ Pretext bundle vendored at `~/.claude/skills/gstack/design-html/vendor/pretext.j
 - `.planning/research/VISUAL-IDENTITY.md` — research basis (Whoop/CRED/Linear)
 - `.planning/research/TYPOGRAPHY.md` — Inter + Plex Mono rationale
 - `.planning/research/MASCOT.md` — Bali persona research
-- `designs/003-meal-detail-20260528/finalized.html` — first locked screen, canonical token usage
+- `.planning/sketches/003-meal-detail/index.html` — sketch winner B for the meal-detail screen, reference for token usage (production-finalized HTML pending /design-html)

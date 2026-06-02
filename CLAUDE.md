@@ -9,8 +9,8 @@ An AI-powered nutrition + advice app for urban Indian youth (18-30) that uses fo
 
 ### Constraints
 
-- **Tech stack**: React Native + Expo + EAS Build (V1); FastAPI + Postgres on Railway; Cloudflare R2 Mumbai for photo storage; Firebase phone OTP — Reason: Expo minimizes native-config complexity for first-time RN shipper; Indian-region storage required by DPDP Act
-- **AI models**: Multi-provider abstraction via `ai_provider.py`; Phase 0 testing = 100% free tiers (Google AI Studio Gemini 2.0 Flash + Groq Llama 3.3 70B); Phase 1 alpha = free-first then paid; Phase 2+ = paid Gemini Flash primary, OpenRouter fallback — Reason: bootstrap budget, vendor-risk mitigation
+- **Tech stack**: React Native + Expo + EAS Build (V1); FastAPI on Render free (Singapore, per D-01) + Supabase Mumbai Postgres; Cloudflare R2 with `jurisdiction=india` for photo storage; Firebase phone OTP — Reason: Render is the only no-credit-card FastAPI host in 2026 (Fly.io removed free, Railway requires CC); Supabase Mumbai + R2 india jurisdiction satisfy DPDP residency; Singapore compute disclosed in privacy policy; re-evaluate Mumbai compute at Phase 4-5 trigger
+- **AI models**: Multi-provider abstraction via `ai_provider.py`; Phase 0 testing = 100% free tiers (Google AI Studio Gemini 2.5 Flash + Groq Llama 3.3 70B); Phase 1 alpha = free-first then paid; Phase 2+ = paid Gemini Flash primary, OpenRouter fallback — Reason: bootstrap budget, vendor-risk mitigation
 - **Budget**: ~₹0 in Phase 0, ~₹0-200 across Phase 1 alpha (4 weeks), ~₹1,700/mo ceiling at 100 free users — Reason: solo bootstrap founder, no external funding
 - **Timeline**: 14-week target to public launch; 10-12 weeks if founder has shipped React Native before, 14-20 weeks if first-time RN shipper — Reason: founder native-app fluency unknown
 - **Compliance**: DPDP Act 2023 + CDSCO/ASCI advertising disclaimers — Reason: Indian regulatory obligations; medical-device territory must be avoided
@@ -25,7 +25,7 @@ An AI-powered nutrition + advice app for urban Indian youth (18-30) that uses fo
 | Design doc said | Research says | Action |
 |---|---|---|
 | Gemini **2.0** Flash primary | Gemini 2.0 Flash **retires 2026-03-03** | Use **Gemini 2.5 Flash** as primary vision (same free tier, better quality) |
-| **Railway** $5/mo backend | Railway has no India region; Singapore = +50-100ms | Consider **Fly.io Mumbai (bom1)** for sub-20ms; Railway acceptable if founder prefers DX |
+| **Railway** $5/mo backend | Railway and Fly.io both require a credit card in 2026 (fails zero-CC) | Locked **Render free tier (Singapore)** per D-01; Fly.io Mumbai = deferred Phase-4 migration target only |
 | **Cloudflare R2 Mumbai edge** for DPDP | Mumbai is a *network PoP*, not a storage *jurisdiction* | Use R2 **`india` jurisdictional bucket** (explicit DPDP guarantee), accessed via `https://<acct>.in.r2.cloudflarestorage.com` |
 ## Recommended Stack
 ### Mobile (Android V1, iOS V2)
@@ -62,10 +62,10 @@ An AI-powered nutrition + advice app for urban Indian youth (18-30) that uses fo
 ### Hosting / PaaS
 | Technology | Version | Purpose | Why |
 |---|---|---|---|
-| **Fly.io** (recommended) | current | FastAPI deploy in **Mumbai (bom1)** region | **Only PaaS with native India region** in the founder's price band. Shared-CPU 256MB VM ≈ $1.94/mo; production setup (2 API instances + Postgres) ≈ $13-20/mo. Sub-20ms latency to Mumbai/Bangalore/Delhi users (vs 80-150ms from Singapore). |
-| **Railway** (acceptable alternative) | current | FastAPI deploy in Singapore | Nearest region is Singapore (+50-100ms vs Mumbai). $5 Hobby + usage; better DX (one-click deploy, simpler env management) for first-time deployer. **Use only if Fly.io's CLI/multi-region setup is too steep for V1 launch.** |
+| **Render** (V1 choice — decision D-01) | current | FastAPI deploy on free tier, **Singapore** region | **Zero-credit-card free tier** — the binding V1 constraint. Singapore is +50-100ms vs Mumbai, accepted for alpha. Free instances sleep after inactivity; warm via cron-ping before alpha sessions. Mumbai-compute migration is a **deferred Phase-4 trigger** (fires on latency complaints at scale), never the V1 plan. |
+| ~~Fly.io / Railway~~ (rejected, D-01) | — | — | **Rejected:** both require a credit card on file in 2026, which fails the zero-CC bootstrap constraint. Fly.io Mumbai (bom1) sub-20ms latency stays attractive only as a Phase-4 migration target, not V1. |
 | **Supabase Postgres** | Postgres 15/16 | DB hosted in **Mumbai region** | Free tier: 500 MB DB, 1 GB storage, 50K MAU. **Only managed Postgres with India region** between Neon (no India) and Fly Postgres (works but expensive at $38/mo Basic). Supabase pauses inactive projects after 1 week — set up cron-ping or upgrade to $25 Pro before alpha launch. |
-| **Fly Postgres** (alternative) | Postgres 16 | DB co-located with API in `bom1` | Use IF API on Fly.io; co-location wins latency but Basic plan = $38/mo (over budget pre-Phase-3). Supabase Mumbai is cheaper. |
+| ~~Fly Postgres~~ (rejected, D-01) | Postgres 16 | DB co-located with API in `bom1` | **Rejected for V1:** presumed API on Fly.io, which D-01 eliminated (credit-card required). Co-location latency only relevant if a Phase-4 Mumbai-compute migration ever happens; Supabase Mumbai is the V1 DB regardless. |
 ### Object Storage
 | Technology | Version | Purpose | Why |
 |---|---|---|---|
@@ -150,8 +150,8 @@ An AI-powered nutrition + advice app for urban Indian youth (18-30) that uses fo
 | Mobile framework | Expo (managed) | Bare React Native | First-time RN shipper risk; Expo handles Gradle/Xcode config; EAS Build is essentially free for solo dev |
 | Mobile framework | Expo | Flutter | Founder has not stated Dart experience; React mental model + JS ecosystem broader; design doc locks RN at Week 0d |
 | Backend lang | FastAPI (Python) | Node/Express, Hono | AI ecosystem is Python-native; pydantic+SQLAlchemy mature; founder's prior Python familiarity assumed |
-| Hosting | Fly.io Mumbai / Railway Singapore | Render | Render has no Mumbai/Singapore proximity; latency worse than Railway |
-| Hosting | Fly.io / Railway | Self-hosted VPS (Hetzner) | Operational overhead unjustified at this scale; revisit at Phase 3+ if margin pressure demands |
+| Hosting | Render free tier (Singapore) | Fly.io Mumbai / Railway Singapore | Both require a credit card on file in 2026 — fails the zero-CC bootstrap constraint (D-01). Fly.io Mumbai sub-20ms latency stays a deferred Phase-4 migration target only. |
+| Hosting | Render | Self-hosted VPS (Hetzner) | Operational overhead unjustified at this scale; revisit at Phase 3+ if margin pressure demands |
 | DB | Supabase Postgres (Mumbai) | Neon | Neon has no India region; Supabase is the only managed Postgres in Mumbai in price band |
 | DB | Supabase | RDS Mumbai | AWS operational overhead too high for solo founder |
 | Object storage | Cloudflare R2 (india jurisdiction) | S3 Mumbai (ap-south-1) | R2: zero egress, true jurisdictional guarantee; S3 charges egress per GB which compounds fast |

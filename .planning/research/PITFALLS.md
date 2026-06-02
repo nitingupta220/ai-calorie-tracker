@@ -4,6 +4,8 @@
 **Researched:** 2026-05-27
 **Overall confidence:** HIGH (most pitfalls drawn from the project's adversarial-reviewed design doc + 2024-2025 literature on food-vision accuracy + Indian regulatory primary sources)
 
+> **SUPERSEDED NOTE (2026-06-02):** Vision model is locked to **Gemini 2.5 Flash** (free tier 10 RPM / 250K TPM / 500 RPD), not the retired Gemini 2.0 Flash. Any "Gemini 2.0 Flash" or "15 RPM / 1500 RPD" figure below is a stale 2026-05-27 research note — read it as Gemini 2.5 Flash per the locked stack.
+
 Pitfalls are organized by severity: Critical (causes rewrite, ship-blocker, legal exposure), Moderate (degrades retention or unit economics), Minor (recoverable in-flight). Each carries a phase pointer so the roadmap can route mitigation.
 
 Source map for confidence calls:

@@ -16,7 +16,7 @@ Founder design doc has already done feature scoping (50-dish whitelist, muscle-g
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Photo-to-macros (single meal) | HealthifyMe Auto Snap, Cal AI, NutriScan all ship this; Cal AI hit $300M ARR on this hook | MEDIUM | Already V1 scope. Gemini 2.0 Flash + 50-dish whitelist. Gate 0a validates. |
+| Photo-to-macros (single meal) | HealthifyMe Auto Snap, Cal AI, NutriScan all ship this; Cal AI hit $300M ARR on this hook | MEDIUM | Already V1 scope. Gemini 2.5 Flash + 50-dish whitelist. Gate 0a validates. |
 | Daily calorie + macro target with progress bar | Every tracker since MyFitnessPal 2005 has this; users will not log without seeing "X / Y kcal today" | LOW | Already V1 scope (home screen totals). |
 | Manual food entry fallback ("dish not supported") | 50-dish whitelist will fail on 30%+ of real meals; users abandon if there's no escape hatch | LOW | Already V1 scope (free-text macros entry on whitelist miss). |
 | Edit / correct macros after AI guess | Photo accuracy is ±25-35%; users see wrong portion → must be able to fix or trust collapses | LOW-MEDIUM | Already V1 scope (Week 3 deliverable, doubles as training signal). |
@@ -116,7 +116,7 @@ Minimum viable product per design doc + this research's gap additions:
 
 - [x] Phone OTP signup (Firebase)
 - [x] Onboarding: goal (muscle-gain only), height/weight/age, activity, veg-or-non-veg, budget bucket
-- [x] Photo-to-macros (50-dish whitelist, Gemini 2.0 Flash)
+- [x] Photo-to-macros (50-dish whitelist, Gemini 2.5 Flash)
 - [x] Daily home screen: calorie + protein/carbs/fat progress vs target
 - [x] **Inline advice on every macros card (THE MOAT)** — 1-2 sentences, specific food + quantity + ₹ cost + last-3-day log reference
 - [x] Last 3 days meal history

@@ -1,3 +1,7 @@
+> **SUPERSEDED 2026-06-02 — FINAL V1 APP NAME = Bhog (founder decision). The analysis below is retained for history only.**
+
+---
+
 # NAME-V2: Sound-Catchy Brainstorm
 
 **Brief.** Founder rejected V1 finalists (Niwala / Khurak / Saath) on the grounds that they don't *land* when spoken aloud. V2 re-runs the brainstorm with a single overriding constraint: **sound-catchiness when said out loud.** Reads, scans, hashtags, voice notes — all need to "stick" after one hearing. Reference patterns: Cred, Cult, Slice (1 syl, hard ending), Nykaa, Swiggy (2 syl, vowel ending), Ola (2 syl, vowel ending), Paytm (1 syl, hard ending). Mascot is a Langur named **Bali**, so the name must either pair with "Bali" naturally or stand cleanly alone.

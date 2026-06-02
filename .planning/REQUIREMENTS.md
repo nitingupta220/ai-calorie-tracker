@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **GATE-01**: Founder captures 30-photo benchmark stratified across 10 single-dish / 10 mixed / 10 thali; Gemini 2.5 Flash recognition ≥70% dish-name match, ≥60% macros within ±35% of IFCT-derived ground truth (per-bucket pass bar)
 - [ ] **GATE-02**: Founder logs 14 days of own meals through validated vision pipeline + advice engine; ≥70% of advice replies score 4/4 on rubric (specific food + specific quantity + ₹ cost or pantry mention + reference to recent log)
 - [ ] **GATE-03**: Founder identifies 20 named Trial Users with WhatsApp contact; ≥10 verbal commitments; ≥3 verbatim price-WTP quotes ("I'd pay ₹299/mo for...")
-- [ ] **GATE-04**: Tech stack locked (Expo + RN + FastAPI + Supabase Mumbai + R2 india-jurisdiction + Firebase OTP + ai_provider.py abstraction); Fly.io Mumbai vs Railway Singapore decision documented; Play Developer account purchased ($25) + identity verification submitted
+- [ ] **GATE-04**: Tech stack locked (Expo + RN + FastAPI + Supabase Mumbai + R2 india-jurisdiction + Firebase OTP + ai_provider.py abstraction); compute hosting locked to Render free Singapore per D-01 (Fly.io/Railway rejected — credit-card required); Play Developer account purchased ($25) + identity verification submitted
 
 ### Infrastructure & AI Provider Abstraction (INFRA)
 
@@ -23,7 +23,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **INFRA-05**: FastAPI 0.128 + Pydantic v2 + SQLAlchemy 2.0 async + asyncpg + Alembic backend skeleton with `/healthz` and structured logging
 - [ ] **INFRA-06**: Supabase Mumbai Postgres connected; Alembic baseline migration with `users`, `meal_photo`, `daily_summary`, `streak`, `push_event`, `consent_log`, `correction_event` tables
 - [ ] **INFRA-07**: Cloudflare R2 bucket created with `jurisdiction=india` endpoint (`<acct>.in.r2.cloudflarestorage.com`); presigned PUT URL endpoint working from mobile client
-- [ ] **INFRA-08**: Hosting deployed (Fly.io Mumbai bom1 OR Railway Singapore — founder pick); `/healthz` reachable from EAS dev client
+- [ ] **INFRA-08**: Hosting deployed (Render free tier, Singapore — per D-01); `/healthz` reachable from EAS dev client
 
 ### Authentication (AUTH)
 
@@ -112,6 +112,12 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **LAUNCH-02**: ASO listing live (icon, screenshots, description, keywords); ASCI-compliant marketing copy in listing
 - [ ] **LAUNCH-03**: Public launch on Production track Week 14+ only after Gate 7 + ASCI/CDSCO review passes
 - [ ] **LAUNCH-04**: Post-launch monitoring — vision accuracy on real-user photos sustained ≥75%, advice 4/4-rubric rate ≥75% on samples, AI cost per active user ≤₹15/mo
+
+### CEO Scope Expansions (CEO — locked /plan-ceo-review 2026-05-28)
+
+- [ ] **REQ-CEO-01**: WhatsApp share-photo install hook via Meta WhatsApp Cloud API direct (1K free conversations/mo, no CC — Aadhaar/PAN/GSTIN verification) — new `POST /whatsapp/webhook` route reusing `ai_provider.py` + advice engine; response footer = install CTA; `whatsapp_session` table with 24h TTL (DPDP §5 legitimate-use, pre-install lawful basis via inline consent footer); Indian BSP fallback (Interakt / AiSensy) pre-onboarded before public launch (D-CEO-01)
+- [ ] **REQ-CEO-02**: Own-rank social streak pill ("47th in Mumbai · 7-day streak") — `streak_event` table + nightly cron at 22:00 UTC (03:30 IST) computes city-month-cohort percentiles; opt-in via Settings (default OFF for DPDP minimization); pill hides if cohort < 5 opt-ins; server-computed (mobile renders rank, never computes); top-N cohort leaderboard deferred to V1.1 (D-CEO-02)
+- [ ] **REQ-CEO-03**: ₹/protein budget optimizer screen in Tools tab — lookup-only V1: SQL aggregation over `veg_protein_prices` table, filter veg/non-veg/vegan + ₹ budget typed input, top-3 results highlighted with "BEST VALUE" pill; no new ML or data; V1.5 deferred: spend aggregation + grocery-list export to BigBasket/Zepto/Blinkit (D-CEO-03)
 
 ## v2 Requirements
 
@@ -245,21 +251,26 @@ Which phases cover which requirements. Updated during roadmap creation. Mapped a
 | LAUNCH-02 | Phase 4 | Pending |
 | LAUNCH-03 | Phase 5 | Pending |
 | LAUNCH-04 | Phase 5 | Pending |
+| REQ-CEO-01 | Phase 2 (table+stub) | Pending |
+| REQ-CEO-01 | Phase 4 (wire) | Pending |
+| REQ-CEO-02 | Phase 2 (cron) | Pending |
+| REQ-CEO-02 | Phase 3 (mobile) | Pending |
+| REQ-CEO-03 | Phase 3 | Pending |
 | V1.1-02 (trigger) | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 67 total (4 gates + 8 infra + 5 auth + 5 onboard + 10 track + 6 advice + 6 history + 5 retain + 9 comp + 3 woz + 5 alpha + 4 launch + 1 V1.1 trigger / V1.1-02 trigger evaluated in Phase 5; V1.1-01 deferred-but-tracked)
-- Mapped to phases: 67 / 67
+- v1 requirements: 70 total (4 gates + 8 infra + 5 auth + 5 onboard + 10 track + 6 advice + 6 history + 5 retain + 9 comp + 3 woz + 5 alpha + 4 launch + 3 CEO + 1 V1.1 trigger / V1.1-02 trigger evaluated in Phase 5; V1.1-01 deferred-but-tracked)
+- Mapped to phases: 70 / 70 (REQ-CEO-01 spans Phase 2 table+stub + Phase 4 wire; REQ-CEO-02 spans Phase 2 cron + Phase 3 mobile)
 - Unmapped: 0
 
 **Per-phase counts:**
 - Phase 1 (Validation Gates + Stack Lock): 4 (GATE-01..04)
-- Phase 2 (Photo → Macros End-to-End): 31 (INFRA-01..08 + AUTH-01,02,04,05 + TRACK-04..10 + ADVICE-01..06 + HISTORY-03,04 + COMP-01,03,04,05,08,09)
-- Phase 3 (Mobile App + Inline Advice + Retention): 22 (AUTH-03 + ONBOARD-01..05 + TRACK-01,02,03 + HISTORY-01,02,05,06 + RETAIN-01..05 + WOZ-01..03 + COMP-02,06)
-- Phase 4 (Alpha Hardening + Launch Submission): 8 (ALPHA-01..05 + COMP-07 + LAUNCH-01,02)
+- Phase 2 (Photo → Macros End-to-End): 33 (INFRA-01..08 + AUTH-01,02,04,05 + TRACK-04..10 + ADVICE-01..06 + HISTORY-03,04 + COMP-01,03,04,05,08,09 + REQ-CEO-01 table+stub + REQ-CEO-02 cron)
+- Phase 3 (Mobile App + Inline Advice + Retention): 24 (AUTH-03 + ONBOARD-01..05 + TRACK-01,02,03 + HISTORY-01,02,05,06 + RETAIN-01..05 + WOZ-01..03 + COMP-02,06 + REQ-CEO-02 mobile + REQ-CEO-03)
+- Phase 4 (Alpha Hardening + Launch Submission): 9 (ALPHA-01..05 + COMP-07 + LAUNCH-01,02 + REQ-CEO-01 wire)
 - Phase 5 (Public Launch + Paid Tier + V1.1): 3 (LAUNCH-03,04 + V1.1-02 trigger)
 
-**Sum check:** 4 + 31 + 22 + 8 + 3 = 68 (= 67 v1 + V1.1-02 trigger evaluated as gate, not deferred)
+**Sum check:** 4 + 33 + 24 + 9 + 3 = 73 (= 70 v1 + REQ-CEO-01 counted in both Phase 2 and Phase 4 + REQ-CEO-02 counted in both Phase 2 and Phase 3 + V1.1-02 trigger evaluated as a Phase-5 gate)
 
 ---
 *Requirements defined: 2026-05-27 (YOLO mode + auto-synthesis from PROJECT.md + research/SUMMARY.md + design doc iteration 4)*

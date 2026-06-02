@@ -246,9 +246,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-DietPreference = Literal["veg", "non_veg", "vegan", "egg_veg", "lactose_intolerant"]
-Goal = Literal["muscle_gain"]                 # V1 only; weight_loss is V1.1 (out of scope)
-BudgetBucket = Literal["100_150", "150_250", "250_plus"]   # ONBOARD-01 buckets
+# ── Enum SOURCE OF TRUTH: MODEL-SPEC.md §4 Postgres DB enums are canonical. ──
+# These Literals MUST match the DB enum string values verbatim. Keep in sync.
+DietPreference = Literal["veg", "egg", "non_veg", "vegan", "lacto_veg_no_egg", "lactose_intolerant"]  # = diet_t
+Goal = Literal["muscle_gain", "weight_loss"]  # = goal_t. DO NOT drop weight_loss (V1.1 forward-compat).
+                                              # V1 is MUSCLE-GAIN-ONLY: the advice builder MUST reject/clamp
+                                              # goal=="weight_loss" behind a feature flag (see clamp note below) —
+                                              # the TYPE keeps both so the DB enum and schema stay aligned.
+BudgetBucket = Literal["b100_150", "b150_250", "b250_plus"]   # = budget_t (b-prefix, verbatim); ONBOARD-01 buckets
 
 @dataclass(frozen=True)
 class MealLogRow:
@@ -274,7 +279,11 @@ class AdvicePromptContext:
     # ── identity: DE-IDENTIFIED ONLY ──
     de_identified_user_id: str          # opaque user_id; never the phone-derived id
     # ── goal + targets (ONBOARD-02) ──
-    goal: Goal
+    goal: Goal                          # V1 = muscle_gain only. weight_loss stays in the type
+                                        # (= goal_t) for V1.1 forward-compat, BUT build_advice_prompt
+                                        # MUST clamp/reject goal=="weight_loss" when the weight_loss
+                                        # feature flag is OFF — raise/clamp to muscle_gain rather than
+                                        # emitting weight-loss advice (G9 goal-directional guardrail).
     target_kcal: int
     target_protein_g: int               # ISSN 1.8 g/kg default
     diet_preference: DietPreference

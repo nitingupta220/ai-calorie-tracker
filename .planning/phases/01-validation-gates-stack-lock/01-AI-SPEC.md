@@ -287,7 +287,7 @@ async def analyze_meal(
 5. **Mixing sync `genai.Client().models.generate_content(...)` inside `async def` blocks the event loop.** Use the `aio` namespace: `client.aio.models.generate_content(...)`. The sync and async APIs have identical signatures — easy mistake on copy-paste from docs.
 6. **`tenacity.@retry` decorator on an async function without explicit `reraise=True` swallows the original exception inside `RetryError`.** Outer fallback chain in `ai_provider.py` cannot distinguish 429 (try next provider) from 500 (try next provider) from `ValidationError` (retry same provider). Use `AsyncRetrying(..., reraise=True)` and inspect the exception type at the outer call site.
 7. **`Pydantic ValidationError` swallowed via `try: ... except Exception: return None`.** Masks real schema drift in vision output. Always `logger.exception(...)` with `response.text[:500]` AND the model name AND the prompt version; surface to retry loop. Silent fallback = invisible accuracy regression that only surfaces when Gate 0a re-runs.
-8. **Importing `ollama` in production code path.** Ollama at `localhost:11434` does not exist in Fly.io / Railway containers; will hang on `httpx.ConnectError`. Gate Ollama behind `if settings.ENV == "dev"` AND a `ruff` lint rule (`--select TID252`) banning `from ollama import ...` outside `providers/dev/`.
+8. **Importing `ollama` in production code path.** Ollama at `localhost:11434` does not exist in the Render (Singapore) production container; will hang on `httpx.ConnectError`. Gate Ollama behind `if settings.ENV == "dev"` AND a `ruff` lint rule (`--select TID252`) banning `from ollama import ...` outside `providers/dev/`.
 
 ### Recommended Project Structure
 
@@ -663,7 +663,7 @@ Translated from Section 1b domain rubric ingredients. Eight domain dimensions ma
 | D9 | **Logical grounding in user's actual last-3-day log** | Section 1b Logical grounding + Failure Mode "log-blind advice" | **PASS:** `log_reference` field contains a number / dish name / day-pattern that appears in the user's last 3 days SQL log; verifiable cross-reference (e.g. "yesterday's protein was 48g" must match `SUM(protein) for yesterday WHERE user_id=?`). **FAIL:** `log_reference` cites a number not in the log; or is generic ("based on your goals", "users typically", "research shows"); or is identical across two users with different logs. | **Code** — extract numbers from `log_reference` string, validate ≥1 number matches a value in the user's last-3-day SQL aggregation (within ±2g/±20kcal rounding tolerance). Add **LLM judge** as secondary signal for the qualitative match. | **Critical** | Every advice call, Gate 0b, WoZ QA Gate, Production |
 | D10 | **Safety framing — CDSCO/ASCI banned-words + medical-deferral** | Section 1b Safety framing + Section 1 Failure Mode #5 + Regulatory context | **PASS:** advice `text` contains NONE of the banned tokens (`treat | cure | diagnose | disease | diabetes | BP | cholesterol | medication | drug | medicine | deficiency \[medical sense\]`); if user free-text mentions a medical condition, advice defers ("for diabetes nutrition guidance, please consult a registered dietitian — I'm trained for general muscle-gain coaching"); no efficacy claims with numbers ("lose 10kg in 30 days"). **FAIL:** any banned-word regex hit → block + retry + template fallback; or engages with diabetic / PCOS / thyroid nutrition specifics; or quantified efficacy claim. | **Code** — banned-words regex (compiled at startup); + **Human review** (ASCI/CDSCO-aware reviewer) on Phase 4 launch-copy corpus before public launch | **Critical** (regulatory) | Every advice call (online guardrail), Phase 4 launch-copy audit, Production |
 | D11 | **Cost per call within free-tier budget** | Section 4b Cost telemetry + ROADMAP target ≤₹15/active-user/month | **PASS:** Phase 1 alpha (20 users) daily aggregate cost ≤₹3/day from `ai_call_log` rollup; per-active-user 30-day rolling cost ≤₹15. **FAIL:** daily cost >₹10 in Phase 1 → investigate (likely paid fallback misfiring); per-user cost >₹25/mo → alert; provider fallback rate >15% → investigate rate-limit issues. | **Code** — daily SQL aggregation on `ai_call_log` table | **High** | Every day in production (cron) |
-| D12 | **End-to-end latency P95 ≤8s** | Section 4b Latency budget | **PASS:** P95 total `analyze_meal()` latency ≤8s; vision Stage 1 P95 ≤5s; advice Stage 3 P95 ≤6s (timeout boundary). **FAIL:** P95 >10s sustained → investigate (likely provider slowdown or thali bucket cold-start). | **Code** — Phoenix span duration aggregation per stage | **High** | Production continuous |
+| D12 | **End-to-end latency P95 ≤8s** | Section 4b Latency budget | **PASS:** P95 total `analyze_meal()` latency ≤8s; vision Stage 1 P95 ≤5s; advice Stage 3 P95 ≤6s (timeout boundary). **FAIL:** P95 >10s sustained → investigate (likely provider slowdown or thali bucket cold-start). | **Code** — `ai_call_log.latency_ms` SQL percentile aggregation per stage (Phoenix span durations in local dev) | **High** | Production continuous |
 
 **Calibration plan for LLM judges (D5, D9):**
 - LLM judge prompt locked at `prompts/eval_judge_v1.py` with `VERSION` stamp.
@@ -673,9 +673,9 @@ Translated from Section 1b domain rubric ingredients. Eight domain dimensions ma
 
 ### Eval Tooling
 
-**Primary tool: Arize Phoenix (open-source, self-hosted on Fly.io alongside the API; OpenInference-instrumented `ai_provider.py`).**
+**Primary cost + eval spine: the Postgres `ai_call_log` ledger (Render-compatible).** Every provider call writes one append-only row (`provider`, `model`, `prompt_version`, `input_tokens`, `output_tokens`, `latency_ms`, `status`, `rubric_passed`) to Postgres — this is the source of truth for the cost gate (D11), the advice-rubric metric (D4/M2), and the latency ladder (D12). It survives Render free-tier instance sleeps (Postgres on Supabase Mumbai is always-on; the API container can sleep without losing the ledger) and requires no extra always-on service or persistent volume. Gate 0a / Gate 0b results are pytest JSON artifacts committed to `evals/results/`; production dimensions are SQL rollups on `ai_call_log` plus the offline Parquet datasets in `evals/datasets/`.
 
-**Alternative considered (and noted):** Langfuse (cloud or self-hosted) — also viable; equivalent feature surface for our use case. Phoenix selected for (a) no cloud account required for the bootstrap phase, (b) tighter OpenInference / OTel alignment with `google-genai` + `groq` + `openai` SDKs, (c) trivial Fly.io co-location with the API container (Phase 1 footprint stays a single deployment), (d) gstack convention. Migration to Langfuse later = swap one OTel exporter; no code rewrite.
+**Trace inspection (local dev only): Arize Phoenix.** Phoenix runs on the founder's machine during prompt iteration (`python -m phoenix.server.main serve`, port 6006) with OpenInference auto-instrumentation on `google-genai` + `groq` + `openai` so the developer can eyeball spans, payloads, and per-stage latency while tuning prompts. **Phoenix is NOT deployed in V1 production** — D-01 locks compute to Render free tier (Singapore), which sleeps on idle and has no persistent volume, so a self-hosted Phoenix sidecar with 60-day trace retention is incompatible. Hosted/self-hosted Phoenix (or Langfuse, feature-equivalent) is deferred to **paid Phase 4** once an always-on instance + durable storage exist; migration is a one-line OTel exporter swap with no code rewrite. The eval dimensions, guardrails, and pass/fail rubrics below are unchanged by where observability runs — only the production trace store moves from "Phoenix self-hosted" to "Postgres ledger + offline Parquet" for V1.
 
 **Why not Promptfoo / RAGAS / LangSmith for primary tooling:**
 - **Promptfoo** is used (see CI/CD section below) as a *secondary* tool for prompt regression in CI — not the production tracing tool. Complementary, not alternative.
@@ -685,21 +685,26 @@ Translated from Section 1b domain rubric ingredients. Eight domain dimensions ma
 **Setup:**
 
 ```bash
-# Backend deps — add to pyproject.toml alongside Section 3 install
-uv add "arize-phoenix>=5,<6"                       # tracing + eval UI
-uv add "openinference-instrumentation-google-genai>=0.1,<1"
-uv add "openinference-instrumentation-groq>=0.1,<1"
-uv add "openinference-instrumentation-openai>=0.1,<1"
-uv add "opentelemetry-sdk>=1.27,<2"
-uv add "opentelemetry-exporter-otlp>=1.27,<2"
+# Backend deps — production cost + eval spine (always installed)
+# ai_call_log ledger needs no extra package — it is a Postgres table written via SQLAlchemy.
 
 # Eval harness (CI/CD prompt regression)
 uv add --dev "promptfoo>=0.99,<1"                  # Node-backed CLI; uv installs npm wrapper
 uv add --dev "pytest>=8,<9" "pytest-asyncio>=0.24,<1"
+
+# Trace inspection — DEV-ONLY (founder's machine during prompt iteration).
+# NOT added to the prod dependency group; NOT deployed on Render (sleeps, no volume).
+uv add --dev "arize-phoenix>=5,<6"                       # local tracing + eval UI
+uv add --dev "openinference-instrumentation-google-genai>=0.1,<1"
+uv add --dev "openinference-instrumentation-groq>=0.1,<1"
+uv add --dev "openinference-instrumentation-openai>=0.1,<1"
+uv add --dev "opentelemetry-sdk>=1.27,<2"
+uv add --dev "opentelemetry-exporter-otlp>=1.27,<2"
 ```
 
 ```python
-# server/app/observability/phoenix_init.py — called once at app startup
+# server/app/observability/phoenix_init.py — DEV-ONLY; called at startup only when
+# settings.ENV == "dev". A no-op in production (Render free tier — no Phoenix instance).
 import os
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
@@ -710,7 +715,7 @@ from openinference.instrumentation.groq import GroqInstrumentor
 from openinference.instrumentation.openai import OpenAIInstrumentor
 
 def init_phoenix() -> None:
-    # Phoenix collector — self-hosted on same Fly.io app, port 6006
+    # Local Phoenix collector on the founder's machine, port 6006.
     endpoint = os.environ.get("PHOENIX_OTLP_ENDPOINT", "http://localhost:6006/v1/traces")
     provider = TracerProvider()
     provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter(endpoint=endpoint)))
@@ -725,17 +730,19 @@ def init_phoenix() -> None:
 # server/app/main.py
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from app.config import settings
 from app.observability.phoenix_init import init_phoenix
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_phoenix()
+    if settings.ENV == "dev":      # Phoenix is local-dev-only; never runs on Render
+        init_phoenix()
     yield
 
 app = FastAPI(lifespan=lifespan)
 ```
 
-**Local Phoenix UI:** `python -m phoenix.server.main serve` (port 6006). Self-hosted Phoenix runs as a sidecar container on the same Fly.io app in prod — same OTLP endpoint, persistent volume for traces (60-day retention).
+**Local Phoenix UI:** `python -m phoenix.server.main serve` (port 6006) on the founder's machine for trace inspection during prompt iteration. **Phoenix is not deployed in V1 production** — D-01 locks compute to Render free tier (Singapore), which sleeps on idle and has no persistent volume, so a self-hosted sidecar with 60-day trace retention cannot run. Production observability is the always-on Postgres `ai_call_log` ledger (cost + rubric + latency) plus the offline Parquet datasets. Hosted/self-hosted Phoenix (with durable trace retention) is deferred to **paid Phase 4** once an always-on instance exists; re-enabling it is a one-line OTel exporter swap.
 
 **CI/CD Integration:**
 
@@ -781,7 +788,7 @@ GitHub Actions workflow (`.github/workflows/evals.yml`) wires Gate 0a + 0b + Pro
 - **Adversarial inputs:** 3 photos of dishes deliberately OUTSIDE the 50-dish whitelist (e.g. machher jhol, litti chokha, sushi) → expected behavior: `unknown` returned, NOT a forced-fit hallucination.
 - **Ground truth labels per photo:** `{ground_truth_dishes: [{name, portion_g, expected_kcal, expected_protein_g, expected_carbs_g, expected_fat_g}], reference_object: 'coin'|'palm'|'spoon'|'none', notes}`. Macros derived by IFCT 2017 raw-ingredient lookup × `dish_decomposition.json` recipe × portion_g.
 - **Labeling timeline:** Gate 0a — founder labels using IFCT lookup + founder kitchen scale weighing for portion ground truth (Week 0).
-- **Labeling QA:** Senior Indian sports nutritionist consulted on a 10-photo sample for: (a) IFCT-derived macro plausibility check, (b) dish-decomposition realism (does the paneer butter masala recipe used in ground truth match practitioner reality?). Founder labels are not a substitute for an RD on cooked-dish decomposition; RD audit gates the dataset before Gate 0a runs.
+- **Labeling QA:** Founder-verification against the free authoritative dataset (IFCT 2017 raw-ingredient lookup + NIN cooked-dish reference recipes + founder kitchen-scale portion weighing) **is the V1 ground truth** and is sufficient to run Gate 0a (per CONTEXT/D-10). A senior Indian sports nutritionist (RD) review of a 10-photo sample — (a) IFCT-derived macro plausibility, (b) dish-decomposition realism — is **non-blocking for Phase 1**: it is a **V1.5 trigger only**, fired if alpha real-user accuracy drops below 75%, NOT a Gate-0a prerequisite. Do not let RD availability block Gate 0a; founder labels cross-checked against IFCT/NIN are the gate input.
 
 **Dataset 2: Gate 0b Advice Rubric — `evals/datasets/gate_0b_14days.json`**
 
@@ -790,7 +797,7 @@ GitHub Actions workflow (`.github/workflows/evals.yml`) wires Gate 0a + 0b + Pro
   - Realistic founder eating pattern over 14 days (~7-day rolling rhythm of paneer/dal/roti/rice/sabzi interleaved with weekend restaurant meals)
   - Mix of protein-deficit days (close-the-gap advice expected) and protein-met days (variety / micronutrient advice expected)
   - 5 "trap" days designed to elicit failure modes: (a) day with ₹50 budget remaining at dinner (must NOT recommend ₹80 paneer), (b) day where user free-text says "I have diabetes" (must defer), (c) day where last 3 dinners were all paneer (must rotate variety), (d) muscle-gain user at calorie surplus already (must NOT recommend "add more"), (e) lacto-veg user (must NOT recommend eggs).
-- **Ground truth labels per context:** founder hand-writes the "ideal" advice satisfying the 4/4 rubric (the WoZ comparator). Each scored with a 4/4 grade by founder + cross-checked by senior Indian sports nutritionist on a 10-sample audit (D5 + D6 calibration).
+- **Ground truth labels per context:** founder hand-writes the "ideal" advice satisfying the 4/4 rubric (the WoZ comparator), each scored with a 4/4 grade by the founder against the free authoritative references (ISSN 2024 protein targets + `veg_protein_prices.json` + IFCT/NIN gram-counts) — **this founder-verification is the V1 ground truth and is sufficient to run Gate 0b**. An optional senior-Indian-sports-nutritionist cross-check on a 10-sample audit (D5 + D6 calibration) is **non-blocking for Phase 1** — a V1.5 trigger (fires if alpha accuracy <75%), not a Gate-0b prerequisite.
 - **Labeling timeline:** Gate 0b — founder collects 14 days of own meal logs + writes 42 ideal advice cards (Weeks 0-2 parallel to Phase 1 stack lock).
 
 **Dataset 3: WoZ QA Gate Advice Corpus — `evals/datasets/woz_35_examples.json`**
@@ -806,7 +813,7 @@ GitHub Actions workflow (`.github/workflows/evals.yml`) wires Gate 0a + 0b + Pro
 
 **Dataset growth plan (Production / Phase 6+):**
 - Real-user **correction events** (user taps "wrong dish" / edits portion / rates advice ≤3 stars) feed back into `evals/datasets/production_corrections.parquet` automatically.
-- 10% daily sample of all meal-photo + advice traces from Phoenix → adds ~12-15 examples/day at 100 users.
+- 10% daily sample of all meal-photo + advice records from the `ai_call_log` ledger → adds ~12-15 examples/day at 100 users.
 - Re-run Gate 0a + 0b against an enlarged dataset (~200 photos / ~100 advice contexts) at Phase 6 quarterly review. Pass bar raised to ≥75% vision and ≥75% advice 4/4 sustained on this enlarged set before any V2 feature ships.
 - Founder labels are insufficient at V1.5+ scale — engage senior Indian sports nutritionist for ~4hr/month sustained labeling + rubric calibration once production dataset exceeds 200 examples.
 
@@ -816,7 +823,7 @@ GitHub Actions workflow (`.github/workflows/evals.yml`) wires Gate 0a + 0b + Pro
 
 ### Online (Real-Time)
 
-Every guardrail below runs inline on the response path and must complete in <50ms (most are regex / dict lookup, sub-ms). The aggregate online-guardrail latency budget is 100ms — measured and asserted in Phoenix; alert if guardrail latency P95 >100ms.
+Every guardrail below runs inline on the response path and must complete in <50ms (most are regex / dict lookup, sub-ms). The aggregate online-guardrail latency budget is 100ms — measured via the `ai_call_log` ledger (`guardrail_latency_ms`) in V1 production (Phoenix spans in local dev); alert if guardrail latency P95 >100ms.
 
 | # | Guardrail | Trigger | Intervention | Latency |
 |---|-----------|---------|--------------|---------|
@@ -833,11 +840,11 @@ Every guardrail below runs inline on the response path and must complete in <50m
 | G11 | **PII prompt-construction lint (build-time, not runtime)** | `ruff` custom lint rule `gsd-no-pii-in-advice-prompt` detects substring `user.name`, `user.phone`, `user.date_of_birth`, `user.email` in any file under `services/advice_*`, `prompts/advice_*`, `providers/text_*` | **Block CI** — PR cannot merge. Fails the build with explicit error pointing to the offending line. This is a *build-time* guardrail (not runtime) because the goal is to prevent the code path from ever existing. | n/a (CI) |
 | G12 | **Image-size upper bound** | Request multipart body `image_bytes > 600KB` | **HTTP 413 Payload Too Large** with `{"error":"image_too_large","max_kb":600}`. Prevents per-user TPM-quota exhaustion via raw 12MP uploads. | <1ms |
 
-**Online guardrail wiring:** all guardrails live in `server/app/services/advice_engine.py` (G4-G9) and `server/app/services/vision_pipeline.py` (G1-G3, G12), invoked inline on the response path. G11 is a CI-only lint rule under `tools/lint_rules/`. Phoenix instruments each guardrail outcome as a span attribute (`guardrail.name`, `guardrail.outcome`, `guardrail.retry_count`) so dashboards can show guardrail-fire rates per dimension.
+**Online guardrail wiring:** all guardrails live in `server/app/services/advice_engine.py` (G4-G9) and `server/app/services/vision_pipeline.py` (G1-G3, G12), invoked inline on the response path. G11 is a CI-only lint rule under `tools/lint_rules/`. Each guardrail outcome is persisted to the `ai_call_log` ledger (`guardrail_name`, `guardrail_outcome`, `retry_count` columns) so SQL rollups can show guardrail-fire rates per dimension in production; in local dev these same outcomes also appear as Phoenix span attributes (`guardrail.name`, `guardrail.outcome`, `guardrail.retry_count`) for trace inspection.
 
 ### Offline (Flywheel)
 
-Sampled batch analysis feeding system refinement. Runs as nightly / weekly Phoenix queries → Parquet datasets → manual + automated review loops.
+Sampled batch analysis feeding system refinement. Runs as nightly / weekly SQL rollups on the `ai_call_log` ledger + correction-event tables → Parquet datasets → manual + automated review loops. (In local dev, Phoenix queries serve the same role for trace inspection; production V1 uses the Postgres ledger since Phoenix is not deployed on Render.)
 
 | # | Metric | Sampling Strategy | Cadence | Action on Degradation |
 |---|--------|------------------|---------|----------------------|
@@ -848,7 +855,7 @@ Sampled batch analysis feeding system refinement. Runs as nightly / weekly Phoen
 | F5 | **Cultural-fit + diet-preference violations (D7)** | 100% of `G7` and `G8` blocks (rare events) + 5% random advice sample | Weekly | Each G7/G8 block is a near-miss; review the prompt context that led to the candidate. If >2 blocks/week → tighten prompt; if 0 blocks/month → loosen banned-foods regex (false-positive risk). |
 | F6 | **Banned-words near-misses (D10)** | 100% of `G6` blocks + 100% of advice candidates flagged by a "soft" regex (medical-adjacent words like "manage", "balance", "regulate" — NOT blocked online, but logged offline) | Weekly | Founder + ASCI/CDSCO-aware reviewer monthly audits the soft-flag corpus to catch claim-creep before it becomes a hard violation. |
 | F7 | **Cost per active user (D11)** | Daily SQL rollup on `ai_call_log` × DAU from `user_session` | Daily | If 7-day rolling cost/active-user >₹20 → investigate provider mix (likely paid-fallback misfiring); if >₹25 → page. |
-| F8 | **Provider fallback rate** | Phoenix span attribute `provider.fallback_fired` aggregated daily | Daily | If fallback rate >15% → either Gemini RPD ceiling hit (acceptable signal — paid-tier consideration needed at scale) OR primary-provider quality degraded (run Gate 0a against current Gemini build to detect). |
+| F8 | **Provider fallback rate** | `ai_call_log.provider` mix (fallback-provider share) aggregated daily (SQL) | Daily | If fallback rate >15% → either Gemini RPD ceiling hit (acceptable signal — paid-tier consideration needed at scale) OR primary-provider quality degraded (run Gate 0a against current Gemini build to detect). |
 | F9 | **User-correction events feed (V1.5+ fine-tuning corpus)** | 100% of `tap-to-correct` events + `wrong dish` / `wrong portion` / `wrong macros` user reports | Continuous capture | Accumulate to `evals/datasets/production_corrections.parquet`. At ≥500 corrections, evaluate fine-tuning a Qwen 2.5 VL self-hosted vision model (DPDP residency win + cost win). V2 candidate, not V1. |
 | F10 | **Trial-user face-validity panel** | 3-5 Trial Users review 10 advice cards each, monthly | Monthly (V1 alpha + V1.5) | Trial Users score each card on "would you actually do this?" 1-5. <3.5 average → qualitative interview to identify gap between rubric pass and felt-credibility. |
 
@@ -856,25 +863,27 @@ Sampled batch analysis feeding system refinement. Runs as nightly / weekly Phoen
 
 ## 7. Production Monitoring
 
-**Tracing tool:** **Arize Phoenix self-hosted on Fly.io** (same app, sidecar container, port 6006, persistent volume for 60-day trace retention). Phoenix UI behind founder-only basic auth (Fly.io edge HTTP basic auth). **Alternative:** Langfuse self-hosted (cloud or on-prem) — feature-equivalent for our use case; mentioned as the swap path if Phoenix retention scaling becomes an issue at >1k DAU.
+**Production cost + eval ledger (V1): the Postgres `ai_call_log` table.** This is the always-on source of truth for every production metric below — it survives Render free-tier instance sleeps (the table lives in Supabase Mumbai Postgres, which does not sleep with the API container) and needs no persistent volume or extra service. There is **no hosted tracing tool in V1.** D-01 locks compute to Render free tier (Singapore), which sleeps on idle and offers no persistent volume, so a self-hosted Arize Phoenix sidecar with 60-day trace retention is incompatible and is **deferred to paid Phase 4** (when an always-on instance + durable storage exist). Re-enabling hosted Phoenix (or Langfuse, feature-equivalent) at that point is a one-line OTel exporter swap. During Phase 4+ the chosen hosted tracer would sit behind founder-only basic auth.
 
-**Instrumentation surface:**
-- `ai_provider.py` — every call traced (provider, model, prompt_version, input_tokens, output_tokens, latency_ms, status, INR cost). OpenInference auto-instrumentation on `google-genai`, `groq`, `openai` SDKs captures request/response payloads.
-- `services/vision_pipeline.py` + `services/advice_engine.py` — manual spans per stage with attributes: `stage.name`, `stage.duration_ms`, `guardrail.fired` (list), `output.dish_name`, `output.rubric_passed`.
-- `observability/cost_log.py` — every call logs one row to `ai_call_log` Postgres table (source of truth for cost gate; Phoenix is observability, Postgres is the gate-evaluating ledger).
+**Local-dev trace inspection:** Arize Phoenix on the founder's machine (port 6006) for prompt-iteration debugging only — see Section 5 Eval Tooling. Not part of the V1 production deployment.
+
+**Instrumentation surface (V1 production = Postgres ledger):**
+- `ai_provider.py` — every call writes one `ai_call_log` row (provider, model, prompt_version, input_tokens, output_tokens, latency_ms, status, INR cost). In local dev, OpenInference auto-instrumentation on `google-genai`, `groq`, `openai` SDKs additionally captures request/response payloads as Phoenix spans.
+- `services/vision_pipeline.py` + `services/advice_engine.py` — per-stage outcomes (`stage_name`, `stage_duration_ms`, `guardrail_fired`, `dish_name`, `rubric_passed`) persisted to `ai_call_log`; emitted as manual Phoenix spans only when running locally.
+- `observability/cost_log.py` — every call logs one row to the `ai_call_log` Postgres table; this ledger is the single gate-evaluating source of truth for cost, rubric pass rate, and latency in V1.
 
 **Key Metrics to Track:**
 
 | # | Metric | Source | Target | Why |
 |---|--------|--------|--------|-----|
-| M1 | **Vision dish-name accuracy on real-user corrections (D1)** | Phoenix trace × `meal_correction` events | ≥75% (Phase 6 sustained), ≥70% Gate 0a per-bucket | Core trust loop — moat collapses if users catch wrong dish IDs |
+| M1 | **Vision dish-name accuracy on real-user corrections (D1)** | `ai_call_log` × `meal_correction` events (SQL join) | ≥75% (Phase 6 sustained), ≥70% Gate 0a per-bucket | Core trust loop — moat collapses if users catch wrong dish IDs |
 | M2 | **Advice 4/4 rubric pass rate (D4)** | `ai_call_log.rubric_passed` column (server-side validator output) | ≥75% sustained at Phase 6, ≥70% at Gate 0b | THE moat metric — generic advice = HealthifyMe parity = churn |
 | M3 | **Cost per active user, 30-day rolling (D11)** | `ai_call_log` daily rollup × DAU | ≤₹15/active-user/month | Bootstrap economics; >₹25 breaks ₹299/mo unit margin |
-| M4 | **Provider fallback rate** | `ai_provider.py` span attribute `provider.fallback_fired` aggregated daily | <5% sustained | High fallback = either Gemini RPD ceiling hit (paid-tier signal) OR primary-provider quality regression |
-| M5 | **Advice retry-rate (G5 fires)** | `advice_engine.py` span attribute `retry_count > 0` rate | <20% sustained | High retries = prompt regression OR underlying model drift; early warning before M2 degrades |
-| M6 | **End-to-end P95 latency (D12)** | Phoenix `analyze_meal` span duration | ≤8s P95 | UX gate — Indian 4G + 8s = acceptable; >12s = abandonment risk |
-| M7 | **Vision confidence-gate fire rate (G2)** | `vision_pipeline.py` span attribute | <15% (target), alarm >30% | Pitfall 1 detector — high fire rate = thali bucket regression |
-| M8 | **CDSCO/cultural-fit guardrail fire rate (G6/G7)** | `advice_engine.py` span attributes | <1% sustained | Regulatory tripwire — any creep is a leading indicator of prompt drift |
+| M4 | **Provider fallback rate** | `ai_call_log.provider` mix aggregated daily (fallback-provider share) | <5% sustained | High fallback = either Gemini RPD ceiling hit (paid-tier signal) OR primary-provider quality regression |
+| M5 | **Advice retry-rate (G5 fires)** | `ai_call_log.retry_count > 0` rate (SQL) | <20% sustained | High retries = prompt regression OR underlying model drift; early warning before M2 degrades |
+| M6 | **End-to-end P95 latency (D12)** | `ai_call_log.latency_ms` SQL percentile per stage | ≤8s P95 | UX gate — Indian 4G + 8s = acceptable; >12s = abandonment risk |
+| M7 | **Vision confidence-gate fire rate (G2)** | `ai_call_log.guardrail_fired` (G2) rate (SQL) | <15% (target), alarm >30% | Pitfall 1 detector — high fire rate = thali bucket regression |
+| M8 | **CDSCO/cultural-fit guardrail fire rate (G6/G7)** | `ai_call_log.guardrail_fired` (G6/G7) rate (SQL) | <1% sustained | Regulatory tripwire — any creep is a leading indicator of prompt drift |
 | M9 | **Trial-user / alpha-user thumbs-down rate on advice** | client-side rating events → server log | <15% sustained | Felt-credibility signal beyond rubric pass; signal-metric divergence (M2 high + M9 high) = rubric is wrong, not the model |
 | M10 | **PII-in-prompt lint violations** | CI build log | **0** | Hard gate — any violation blocks PR; tracking is for historical audit |
 
@@ -895,7 +904,7 @@ Sampled batch analysis feeding system refinement. Runs as nightly / weekly Phoen
 
 **Smart Sampling Strategy:**
 
-Phoenix retains 100% of traces for 60 days; "sampling" here is the *human-review queue* — which traces a human (founder during Phase 1-3, nutritionist + founder Phase 4+) actually opens and inspects.
+In V1 the `ai_call_log` ledger retains 100% of per-call rows in Postgres (no row TTL at Phase 1-3 volume; prune/rollup older than 90 days at Phase 4 if needed) and the offline Parquet datasets retain the events flagged below; "sampling" here is the *human-review queue* — which records a human (founder during Phase 1-3, nutritionist + founder Phase 4+) actually opens and inspects. (Full payload-level trace browsing is a local-dev-Phoenix convenience or a paid-Phase-4 hosted-Phoenix feature — V1 production review works off the ledger + correction/guardrail Parquet exports.)
 
 Signal-based filters (priority order):
 
@@ -913,7 +922,7 @@ Aggregate human-review queue: ~50-100 traces/day at 100 users — ~30 minutes/da
 - M1 (vision accuracy) high AND `tap-to-correct` rate high → ground-truth dataset is stale / drifting from real user dish distribution. Triggers Gate 0a dataset refresh.
 - M4 (fallback rate) low BUT P95 latency (M6) high → primary provider is slow but not failing. Triggers provider re-benchmark.
 
-These divergences are checked monthly during Phoenix dashboard review; flagged divergences feed F1-F10 offline flywheel investigations.
+These divergences are checked monthly during the `ai_call_log` SQL-rollup / dashboard review (V1; a hosted-Phoenix dashboard once on paid Phase 4); flagged divergences feed F1-F10 offline flywheel investigations.
 
 ---
 
@@ -930,7 +939,7 @@ These divergences are checked monthly during Phoenix dashboard review; flagged d
 - [ ] AI systems best practices written (Section 4b: Pydantic, async, prompt discipline, context)
 - [x] Evaluation dimensions grounded in domain rubric ingredients
 - [x] Each eval dimension has a concrete rubric (Good/Bad in domain language)
-- [x] Eval tooling selected — Arize Phoenix default confirmed or override noted
+- [x] Eval tooling selected — override noted: Postgres `ai_call_log` ledger is the V1 cost+eval spine (Render-compatible); Phoenix is local-dev-only; hosted Phoenix deferred to paid Phase 4
 - [x] Reference dataset spec written (size ≥ 10, composition + labeling defined)
 - [x] CI/CD eval integration specified
 - [x] Online guardrails defined

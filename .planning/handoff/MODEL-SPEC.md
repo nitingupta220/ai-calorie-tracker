@@ -42,8 +42,9 @@
 | 11 | `push_event` | **YES** | **P3** (deferred) | INFRA-06 (table named), RETAIN-01/02/04 | FCM token + per-push send/open log |
 | 12 | `streak_event` | **YES** | **P3** (deferred) | D-CEO-02, RETAIN-03 | own-rank cohort pill; nightly cron writes |
 | 13 | `whatsapp_session` | no (24h TTL evict) | **P2 baseline** (stub) / **P4** (wire) | D-CEO-01 | E.164-keyed pre-install session; link not rewrite |
+| 14 | `ai_provider_pricing` | no (versioned by effective_from) | **P2 baseline** | AP-08, AI-SPEC §4b, D11/M3 | per-(provider,model,modality) INR price; read-time cost-ledger join with `ai_call_log` |
 
-**Phase-2 baseline = create in the Alembic baseline + early P2 migrations** (tables 1-10, 13). Tables 11-12 are **deferred to Phase 3** per REQUIREMENTS traceability (RETAIN-* and D-CEO-02 are Phase 3). `whatsapp_session` table+stub lands in Phase 2 per D-CEO-01 ("Phase 2 (table + stub)"), wiring in Phase 4.
+**Phase-2 baseline = create in the Alembic baseline + early P2 migrations** (tables 1-10, 13, 14). Tables 11-12 are **deferred to Phase 3** per REQUIREMENTS traceability (RETAIN-* and D-CEO-02 are Phase 3). `whatsapp_session` table+stub lands in Phase 2 per D-CEO-01 ("Phase 2 (table + stub)"), wiring in Phase 4. `ai_provider_pricing` (table 14) is the read-time pricing source AP-08 requires for the `ai_call_log` cost-ledger join (D11/M3 ≤₹15/user/mo gate); it ships in the baseline so cost can be computed from row 1.
 
 > **INFRA-06 reconciliation:** REQUIREMENTS INFRA-06 lists 7 tables `{users, meal_photo, daily_summary, streak, push_event, consent_log, correction_event}`. This spec **renames `streak` → `streak_event`** (D-CEO-02 locked the append-only event-log shape; the bare `streak` counter is derived, not stored) and **defers `push_event` + `streak_event` to Phase 3** to match the RETAIN-*/D-CEO-02 phase mapping. The Phase-2 Alembic baseline therefore creates `{users, meal_photo, consent_log, correction_event, daily_summary}` + the AI tables + `veg_protein_prices` + `consent_audit` + `whatsapp_session` stub. This is a deliberate, traced deviation, not a contradiction.
 
@@ -105,7 +106,7 @@ REQ: AUTH-01..05, ONBOARD-01/02, INFRA-06. City is the single source of truth sh
 | `goal` | `ENUM goal_t` | no | `'muscle_gain'` | `goal_t = {muscle_gain, weight_loss}`. **Declare both now** (weight_loss is V1.1, ONBOARD-01 V1=muscle_gain only; PostHog dark-launch per CLAUDE.md). |
 | `diet_preference` | `ENUM diet_t` | no | — | `diet_t = {veg, egg, non_veg, vegan, lacto_veg_no_egg, lactose_intolerant}`. **Declare full set now** — advice guardrails G8 + eval D7 branch on every value (eggs-to-lacto-veg, dairy-to-vegan/lactose). Maps to `veg_protein_prices.diet_compatible` codes VG/EG/NV/VN. |
 | `height_cm` | `NUMERIC(5,1)` | no | — | ONBOARD-01. |
-| `weight_kg` | `NUMERIC(5,1)` | no | — | onboarding seed weight; ongoing weights in `OPEN` weight_log (§3.14). |
+| `weight_kg` | `NUMERIC(5,1)` | no | — | onboarding seed weight; ongoing weights in `OPEN` weight_log (§3.15). |
 | `date_of_birth` | `DATE` | no | — | PII. 18+ age gate (AUTH-04) computed at signup; **never** sent to LLM (AI-SPEC FM#3 / G11). |
 | `is_adult` | `BOOLEAN` | no | — | **stored age-gate verdict** computed from `date_of_birth` at signup (AUTH-04). The `current_user` dependency (API-SPEC §1 step 5) reads this flag per-request to reject non-adult tokens — it does NOT recompute from DOB each call. Reconciliation: API-SPEC enforces a *stored* verdict; this column is that store. (Added 2026-05-29 cross-spec reconciliation G5.) |
 | `activity_level` | `ENUM activity_t` | no | — | `activity_t = {sedentary, light, moderate, active, very_active}` (Mifflin-St-Jeor multiplier, ONBOARD-02). |
@@ -348,7 +349,39 @@ REQ: D-CEO-01. **Normalized E.164 phone is the PK** (not a surrogate). `linked_u
 Index: `INDEX(expires_at)` (TTL evict), `INDEX(linked_user_id)`.
 **Phase-2 deliverable = table + a no-op stub route registration** (D-CEO-01 "table + stub"). No message handling until Phase 4 (post Meta Business Verification).
 
-### 3.14 `weight_log` — OPEN
+### 3.14 `ai_provider_pricing` — per-(provider,model,modality) INR price  (mutable: versioned by effective_from)
+
+REQ: AP-08, AI-SPEC §4b cost table, D11/M3. **MODEL-SPEC owns this DDL; AI-PROVIDER-SPEC §8 owns the read-time cost contract.** Cost is **never stored on `ai_call_log`** — it is computed at READ-TIME by joining `ai_call_log` to the pricing row whose `effective_from` is the latest `<= ai_call_log.ts` for that `(provider, model)` (AP-08), so a later price correction re-prices history correctly. Prices are stored **in INR already-converted** at the LOCKED FX **₹85/$1** (May 2026 reference, AP-08); when FX moves >10%, INSERT a NEW row with a new `effective_from` — never mutate an existing row (history integrity). `is_free=TRUE` rows carry 0 cost (the V1 routine free-tier path) and are complete on day 1; paid per-Mtok INR for Gemini/Groq is OPEN (fill at first paid burst, AP-08) and does NOT block the baseline.
+
+| Column | Type | Null | Default | Notes |
+|---|---|:---:|---|---|
+| `id` | `BIGSERIAL` | no | — | PK. |
+| `provider` | `TEXT` | no | — | provider routing key — MUST match `ai_call_log.provider` verbatim (e.g. `gemini_2_5_flash_free`, `groq_llama_3_3_70b_free`, `gpt_4o_mini_paid`). The read-time join is on `(provider, model)`. |
+| `model_name` | `TEXT` | no | — | model id — matches `ai_call_log.model` (e.g. `gemini-2.5-flash`, `llama-3.3-70b-versatile`, `gpt-4o-mini`). |
+| `modality` | `TEXT` | no | — | `CHECK (modality IN ('vision','text'))`. A vision-capable model used for both vision and text gets one row per modality (mirrors `ai_stage_t`). |
+| `input_cost_per_mtok` | `NUMERIC(10,4)` | yes | NULL | **INR per 1M input tokens**, already converted at ₹85/$1 (AP-08 `price_in_per_mtok_inr`). NULL = OPEN (paid tier not yet priced). 0 for free tiers. |
+| `output_cost_per_mtok` | `NUMERIC(10,4)` | yes | NULL | **INR per 1M output tokens** (AP-08 `price_out_per_mtok_inr`). NULL = OPEN. 0 for free tiers. |
+| `currency` | `CHAR(3)` | no | `'INR'` | LOCKED `INR` — prices are stored already-converted (AP-08 ₹85/$1). Column documents the unit; do not store USD. |
+| `is_free` | `BOOLEAN` | no | `FALSE` | TRUE for the `:free` / free-tier provider rows (cost columns = 0); the V1 routine path. |
+| `effective_from` | `DATE` | no | — | price-validity start; read-time join picks the latest `effective_from <= ai_call_log.ts`. |
+| `created_at` | `TIMESTAMPTZ` | no | `now()` | |
+
+Constraint: **`UNIQUE(provider, model_name, modality, effective_from)`** (one price per provider/model/modality per validity date; new prices INSERT a new `effective_from`). Index: `INDEX(provider, model_name, modality, effective_from DESC)` (read-time latest-price lookup). Reference/config data — **no FK to users, NOT in the DPDP hard-delete cascade** (mirrors `veg_protein_prices`/`provider_quota`).
+
+**Seed rows** (from AI-SPEC §4b cost table / AP-08; free tiers = 0, INR at ₹85/$1; `effective_from='2026-05-01'`):
+
+| provider | model_name | modality | input ₹/Mtok | output ₹/Mtok | is_free | note |
+|---|---|---|---|---|:---:|---|
+| `gemini_2_5_flash_free` | `gemini-2.5-flash` | `vision` | 0 | 0 | TRUE | primary vision, free tier |
+| `gemini_2_5_flash_free` | `gemini-2.5-flash` | `text` | 0 | 0 | TRUE | paid-fallback text (free row covers free-tier text use) |
+| `groq_llama_3_3_70b_free` | `llama-3.3-70b-versatile` | `text` | 0 | 0 | TRUE | primary text (advice), free tier |
+| `openrouter_qwen_vl_free` | `qwen/qwen2.5-vl-32b-instruct:free` | `vision` | 0 | 0 | TRUE | vision fallback 1, free |
+| `openrouter_llama_free` | `meta-llama/llama-3.3-70b-instruct:free` | `text` | 0 | 0 | TRUE | text fallback 1, free |
+| `gpt_4o_mini_paid` | `gpt-4o-mini` | `vision` | ≈12.75 (=$0.15×85) | ≈51.0 (=$0.60×85) | FALSE | last-resort paid vision fallback |
+
+> Paid Gemini/Groq exact per-Mtok INR rows are **OPEN** — insert at first paid burst from providers' 2026 price pages × ₹85, with a fresh `effective_from` (AP-08). The free rows above are the complete V1 routine path; the cost-ledger join (AP-08 / §8 below) works from day 1.
+
+### 3.15 `weight_log` — OPEN
 
 REQ: HISTORY-05 (manual weight log, Phase 3). Not yet schema-locked in any source. Minimal proposed shape: `{id BIGSERIAL, user_id UUID FK CASCADE, weight_kg NUMERIC(5,1), logged_on DATE, created_at}` with `UNIQUE(user_id, logged_on)` (daily granularity per HISTORY-05). **OPEN — needs founder** to confirm whether weight history is its own table (proposed) vs appended to `daily_summary`. Phase 3, not Phase 2 — does not block the baseline migration. Defaulting to standalone `weight_log` table unless founder objects.
 
@@ -374,7 +407,7 @@ REQ: HISTORY-05 (manual weight log, Phase 3). Not yet schema-locked in any sourc
 | `audit_event_t` | `delete_requested, hard_deleted, export_generated` | — | `consent_audit.event_type` |
 | `push_kind_t` | `dinner_reminder_8pm, streak_milestone, protein_gap` | — | `push_event.push_kind` (P3) |
 
-Note: `veg_protein_prices` uses **CHECK constraints** (not native enums) for `source_platform`/`category` per its committed SQL — keep as-is, do not convert.
+Note: `veg_protein_prices` uses **CHECK constraints** (not native enums) for `source_platform`/`category` per its committed SQL — keep as-is, do not convert. `ai_provider_pricing.modality` likewise uses a **CHECK** (`IN ('vision','text')`) not a native enum (§3.14) — the value set is closed and shared informally with `ai_stage_t`, but kept as a CHECK so adding a future modality is a trivial constraint edit, not an enum migration.
 
 ---
 
@@ -390,9 +423,10 @@ Topological by FK dependency. One logical migration per group; group 1 is the ba
 6. **`0006_consent_audit`** — `consent_audit` (no FK; survives delete).
 7. **`0007_whatsapp_session_stub`** — `whatsapp_session` (FK→users nullable). Phase-2 stub.
 8. **`0008_push_streak`** — `push_event`, `streak_event` (FK→users + meal_photo). **Phase 3** — do not run in the P2 baseline.
-9. **`0009_weight_log`** — **Phase 3, OPEN** (pending founder confirm §3.14).
+9. **`0009_weight_log`** — **Phase 3, OPEN** (pending founder confirm §3.15).
+10. **`0010_ai_provider_pricing`** — `ai_provider_pricing` (table + `UNIQUE(provider, model_name, modality, effective_from)` + lookup index + seed rows, §3.14). No user FK; order-independent. **Phase-2 baseline** (despite the high number — it is sequenced after the P3 migrations only by authoring order; run it in the P2 baseline because AP-08's read-time cost-ledger join against `ai_call_log` (0003) needs it). Depends on no other table; safe to apply any time after enums (0001).
 
-Append-only-trigger migration (§7) runs **after** the tables it guards exist; fold into each table's creating migration or a single `0003b_append_only_triggers` after group 3 (and re-applied for `push_event`/`streak_event` in 0008).
+Append-only-trigger migration (§7) runs **after** the tables it guards exist; fold into each table's creating migration or a single `0003b_append_only_triggers` after group 3 (and re-applied for `push_event`/`streak_event` in 0008). `ai_provider_pricing` is **mutable** (versioned by `effective_from`) — no append-only guard.
 
 ---
 
@@ -458,7 +492,7 @@ CREATE TRIGGER guard_consent_log
 -- repeat for correction_event, ai_call_log, consent_audit, streak_event
 ```
 
-`provider_quota`, `vision_cache`, `daily_summary`, `users`, `meal_photo`, `veg_protein_prices`, `whatsapp_session` are **mutable** — no guard trigger; they keep `updated_at` auto-touch triggers instead.
+`provider_quota`, `vision_cache`, `daily_summary`, `users`, `meal_photo`, `veg_protein_prices`, `whatsapp_session`, `ai_provider_pricing` are **mutable** — no guard trigger. `ai_provider_pricing` has no `updated_at` (prices are versioned by `effective_from` INSERTs, not in-place edits); the rest keep `updated_at` auto-touch triggers where they carry that column.
 
 ---
 
@@ -470,4 +504,4 @@ CREATE TRIGGER guard_consent_log
 - **`food_id` vocabulary unified:** `veg_protein_prices.food_id` = `ifct_lookup.json` ingredient key = `dish_decomposition.json` `ifct_id`. Single namespace; seed-time validation required.
 - **`diet_preference` (users) ↔ `diet_compatible` (prices):** `diet_t` enum maps to `{VG,EG,NV,VN}` codes for optimizer + G8.
 - **R2 provenance** (`r2_jurisdiction='india'`, `r2_region='mumbai'`) on `meal_photo` operationalizes COMP-01 boot check + AP#2/#5.
-- **Cost gate** (AI-SPEC M3, ≤₹15/user/mo) reads `ai_call_log` (price computed at read-time from a pricing table — that pricing table is config, not a DB table here).
+- **Cost gate** (AI-SPEC M3, ≤₹15/user/mo) reads `ai_call_log` with price computed at **read-time** by joining `ai_provider_pricing` (§3.14) on `(provider, model)` for the latest `effective_from <= ai_call_log.ts`. AP-08 promotes pricing to a **DB table** (table #14) — superseding the earlier "config, not a DB table" note: storing prices as rows lets a later FX/price correction re-price history correctly without mutating the call log. Cost is never frozen onto `ai_call_log`.
