@@ -31,7 +31,16 @@ All v1 code is deferred until Phase 1 gates pass; design-doc artifacts (`.planni
   3. Founder has ≥10 verbal commitments + ≥3 verbatim price-WTP quotes from 20 named Trial Users on WhatsApp (Gate 0c)
   4. Stack is locked in `.planning/decisions/` — Expo + RN + FastAPI + Supabase Mumbai + R2 `jurisdiction=india` + Firebase OTP + `ai_provider.py` abstraction + Gemini 2.5 Flash (not 2.0) + compute hosting = Render free Singapore per D-01 (Gate 0d)
   5. Google Play Developer account purchased ($25), identity verification submitted, 3-7 day clock started before Phase 2 begins
-**Plans**: TBD
+**Plans:** 7 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — INDB integration + dish_decomposition.json (Gate 0a prerequisite, Wave 1)
+- [ ] 01-02-PLAN.md — IFCT/INDB license emails (Gate 0d / launch gate, Wave 1)
+- [ ] 01-03-PLAN.md — veg_protein_prices seed CSV collection (Gate 0b enabler, Wave 1)
+- [ ] 01-04-PLAN.md — Gate 0a photos: 30 weighed photos + Opus labeling (Wave 2, depends 01-01)
+- [ ] 01-05-PLAN.md — Gate 0b: 14-day WoZ meal log + advice rubric scoring (Wave 1)
+- [ ] 01-06-PLAN.md — Gate 0c: WhatsApp outreach + WTP quotes (Wave 1)
+- [ ] 01-07-PLAN.md — Gate 0d: stack lock summary + Play Console (Wave 2, depends all)
 
 ### Phase 2: Photo → Macros End-to-End (Backend Spine)
 **Goal**: Stand up the full server-side vertical slice — a user photo posted to the API returns dish name, macros, inline advice, and persists a correction-ready record — with DPDP plumbing baked in from day one.
