@@ -476,6 +476,7 @@
       <div class="nav-label">Execute</div>
       <button class="nav-item" data-target="roadmap"><span class="nav-num">10</span>Roadmap<span class="nav-meta">5</span></button>
       <button class="nav-item" data-target="decisions"><span class="nav-num">11</span>Phase 1 Decisions<span class="nav-meta">19</span></button>
+      <button class="nav-item" data-target="decisions-0602"><span class="nav-num">11b</span>Decisions · 2026-06-02<span class="nav-meta">14</span></button>
       <button class="nav-item" data-target="checklist"><span class="nav-num">12</span>Week-1 Checklist<span class="nav-meta">23</span></button>
       <button class="nav-item" data-target="risks"><span class="nav-num">13</span>Open Risks<span class="nav-meta">8</span></button>
       <button class="nav-item" data-target="refs"><span class="nav-num">14</span>References</button>
@@ -841,7 +842,7 @@ saffron-orange, religious iconography, weapons, aggressive face.</code></pre>
           <tr><td><strong>HTTP</strong></td><td>httpx</td><td class="num">0.27+</td><td>Async provider calls.</td></tr>
           <tr><td><strong>Retry</strong></td><td>tenacity</td><td class="num">8.x</td><td>429-fallback chain in ai_provider.py.</td></tr>
           <tr><td><strong>Scheduler</strong></td><td>APScheduler</td><td class="num">3.x</td><td>8pm IST push. Split to ARQ/Celery at ~100 DAU.</td></tr>
-          <tr><td><strong>Tracing</strong></td><td>Arize Phoenix + OpenInference</td><td class="num">latest</td><td>Self-hosted; auto-instruments LLM SDKs.</td></tr>
+          <tr><td><strong>Cost/eval ledger</strong></td><td>Postgres <code>ai_call_log</code> table</td><td class="num">V1</td><td>Cost + eval spine (Render-compatible, survives sleep). Phoenix = local-dev trace inspection only; hosted Phoenix deferred to paid Phase 4.</td></tr>
         </tbody>
       </table></div>
       <h3>Data + storage</h3>
@@ -879,6 +880,7 @@ Dev:
         <div class="card"><h4 style="margin-top:0">Postgres · Supabase Mumbai free</h4><p>500MB, 50K MAU, India region. Auto-pauses 1wk idle → defeated by GitHub Actions cron-ping every 6hr.</p></div>
         <div class="card"><h4 style="margin-top:0">Photo · R2 jurisdiction=india</h4><p>Endpoint <code>&lt;acct&gt;.in.r2.cloudflarestorage.com</code>. Mumbai PoP alone ≠ residency. Free 10GB.</p></div>
         <div class="card"><h4 style="margin-top:0">Auth · Firebase Phone OTP</h4><p>50K MAU free. No DLT vs MSG91 SMS. Server verifies tokens via firebase-admin.</p></div>
+        <div class="card"><h4 style="margin-top:0">Backups · pg_dump → R2 (DR)</h4><p>Supabase free has no automated backups / PITR. Nightly GitHub Actions <code>pg_dump</code> → R2 india (7 daily + 4 weekly) closes the total-loss risk for ₹0.</p></div>
       </div>
       <h3>Phase 1 alpha keep-warm</h3>
       <p>GitHub Actions cron every <span class="num">10 min</span> hits Render <code>/healthz</code> during 14-day alpha. Disable after to conserve Actions minutes.</p>
@@ -1032,6 +1034,28 @@ Dev:
       </div>
       <h3>Process</h3>
       <div class="callout"><div class="lbl">D-19 · Decisions ledger</div><div class="body">Each D-01..D-18 seeds 1-paragraph ADR-lite at <code>.planning/decisions/YYYY-MM-DD-slug.md</code> with status / context / decision / consequences.</div></div>
+    </section>
+
+    <!-- 11b DECISIONS · 2026-06-02 -->
+    <section class="block" id="decisions-0602">
+      <div class="section-head"><span class="section-num">11b</span><h2>Decisions Locked · 2026-06-02</h2><span class="badge locked">Founder ruling</span></div>
+      <p>Founder rulings + cross-spec reconciliations from the pre-build audit. These supersede any conflicting earlier text and are mirrored across <code>CLAUDE.md</code>, the <code>.planning/</code> specs, and the handoff set.</p>
+      <div class="card-grid cols-2">
+        <div class="card"><h4 style="margin-top:0">F-01 · App name</h4><p><strong>Bhog</strong> is final for V1. <code>Niwala</code> (NAME.md) and Sahi/Tejo (NAME-V2.md) superseded.</p></div>
+        <div class="card"><h4 style="margin-top:0">F-02 · Vision model</h4><p>Gemini <strong>2.5 Flash</strong> (not 2.0 — retired 2026-03-03). Reaffirmed across all docs.</p></div>
+        <div class="card"><h4 style="margin-top:0">F-03 · Ground truth</h4><p>Founder-verification against a free authoritative dataset = V1 ground truth. <strong>RD audit = non-blocking V1.5 trigger</strong> (fires if alpha accuracy &lt;75%); does NOT gate Gate 0a.</p></div>
+        <div class="card"><h4 style="margin-top:0">F-04 · Observability</h4><p>Cost + eval spine = Postgres <code>ai_call_log</code> ledger (Render-compatible). Phoenix = local-dev trace inspection only; hosted Phoenix deferred to paid Phase 4.</p></div>
+        <div class="card"><h4 style="margin-top:0">F-05 · Enum source of truth</h4><p>MODEL-SPEC Postgres enums are canonical; advice Pydantic Literals aligned (diet / budget / goal). <code>weight_loss</code> kept in type, clamped behind a V1 flag (muscle-gain-only).</p></div>
+        <div class="card"><h4 style="margin-top:0">F-06 · Provider pricing table</h4><p>New <code>ai_provider_pricing</code> table (MODEL-SPEC #14, migration 0010) powers the read-time cost-ledger join (AP-08).</p></div>
+        <div class="card"><h4 style="margin-top:0">F-07 · DSR routes</h4><p><code>DELETE /me</code> (soft-delete) + <code>GET /me/export</code>. Events logged as <code>consent_audit</code>; consent_type value = <code>photo</code>. No <code>POST /compliance/*</code>.</p></div>
+        <div class="card"><h4 style="margin-top:0">F-08 · DSR auth defaults</h4><p>Delete / export accept any valid Firebase Bearer token (no fresh-OTP re-auth). Soft-deleted user can still export within the 30-day window.</p></div>
+        <div class="card"><h4 style="margin-top:0">F-09 · DB backups</h4><p>Supabase free has no PITR / backups. Nightly GitHub Actions <code>pg_dump</code> → R2 india (7 daily + 4 weekly) closes the total-loss risk for ₹0.</p></div>
+        <div class="card"><h4 style="margin-top:0">F-10 · Timeline</h4><p>Founder has ample React Native experience → <strong>10–12 week</strong> path locked (dropped the 14–20wk first-timer swing + RN-spike pivot trigger).</p></div>
+        <div class="card"><h4 style="margin-top:0">F-11 · Local dev loop</h4><p>Gemini key added soon. <code>seed_dev</code> fixtures + mocked-provider cassette (<code>MOCK_AI=1</code>) run analyze→advice locally with no live key / Firebase token.</p></div>
+        <div class="card"><h4 style="margin-top:0">F-12 · CEO scope mapping</h4><p>REQ-CEO-01 → Phase 2 stub + Phase 4 wire · REQ-CEO-02 → Phase 2 cron + Phase 3 mobile · REQ-CEO-03 → Phase 3. Per the locked D-CEO file.</p></div>
+        <div class="card"><h4 style="margin-top:0">F-13 · Data fix</h4><p><code>dish_decomposition.json</code> litti_chokha <code>ifct_id</code> → <code>oil_mustard</code> (was dangling <code>mustard_oil</code> — KeyError in <code>derive_macros()</code>).</p></div>
+        <div class="card"><h4 style="margin-top:0">F-14 · Pile-1 pending</h4><p>The free authoritative dataset (name / license TBD by founder) feeds ground truth + the 50-dish whitelist. Last unblock before Phase-1 planning.</p></div>
+      </div>
     </section>
 
     <!-- 12 CHECKLIST -->
