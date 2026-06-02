@@ -469,6 +469,7 @@
       <button class="nav-item" data-target="stack"><span class="nav-num">06</span>Tech Stack</button>
       <button class="nav-item" data-target="deploy"><span class="nav-num">07</span>Deployment</button>
       <button class="nav-item" data-target="ai"><span class="nav-num">08</span>AI Decisions</button>
+      <button class="nav-item" data-target="vision-accuracy"><span class="nav-num">08b</span>Vision Accuracy<span class="nav-meta">6</span></button>
       <button class="nav-item" data-target="competitors"><span class="nav-num">09</span>Competitors</button>
     </div>
     <div class="nav-divider"></div>
@@ -948,6 +949,22 @@ Dev:
           <tr><td class="num">D12</td><td>Latency</td><td>Telemetry</td><td class="num">P95 &lt;8s</td></tr>
         </tbody>
       </table></div>
+    </section>
+
+    <!-- 08b VISION ACCURACY -->
+    <section class="block" id="vision-accuracy">
+      <div class="section-head"><span class="section-num">08b</span><h2>Vision Accuracy · Reality Check</h2><span class="badge risk">External-review-verified</span></div>
+      <p>Fact-checked against primary sources (Nutrition5k CVPR 2021 · GPT-4V Nutrients 2025 · Martin 2018). Recognition is the easy ~20%; the binding error is portion + hidden fat. Full detail in <code>PITFALLS.md</code> V-01..V-06. One reviewer claim ("68%→21% churn / AI churns 30% faster") FAILED verification and is omitted as unsourced.</p>
+      <div class="card-grid cols-2">
+        <div class="card"><h4 style="margin-top:0">V-01 · Recognition ≠ calorie accuracy</h4><p>Dish-ID is solved: ~87–93% (MobileNetV3), GPT-4V 93% precision. But the <em>same</em> GPT-4V study: 11/16 nutrients significantly wrong. Naming "paneer butter masala" says nothing about 280 vs 450 kcal. → score dish-ID + macros <strong>separately</strong> (Gate-0a F-15).</p></div>
+        <div class="card"><h4 style="margin-top:0">V-02 · Portion-from-2D is ill-posed</h4><p>Monocular scale ambiguity — geometry, not model quality. Verified floor: image-only calorie error <strong>~26.1%</strong>; depth halves it to ~16.5% (Nutrition5k, Table 3). We have no depth → reference object (coin/palm) is the scale prior. ±35% ok on the mean, fails on the tail.</p></div>
+        <div class="card"><h4 style="margin-top:0">V-03 · Hidden oil/ghee is invisible</h4><p><strong>1 tbsp oil = 120 kcal</strong>, no pixels. "Dal" spans ~100–400 kcal by tadka. A second error source stacked on portion. → dal_plain / dal_tadka / dal_restaurant variants + one-tap selector; market "estimate/range".</p></div>
+        <div class="card"><h4 style="margin-top:0">V-04 · Human accuracy ceiling</h4><p>People get only <strong>5/20</strong> photos within ±20% (Martin 2018, n=2,028). So "not perfect" is the defensible target — and user corrections are a noisy signal, founder eyeball portions too (→ weigh the truth).</p></div>
+        <div class="card"><h4 style="margin-top:0">V-05 · Indian cuisine stacks everything</h4><p>Thali = multi-item segmentation × portion ambiguity × hidden fat × regional variance → 40–60% total error, outside any published result. → thali reported-only (F-15), "snap each item" UX, V1.5 re-intro.</p></div>
+        <div class="card"><h4 style="margin-top:0">V-06 · Ground-truth bottleneck</h4><p>Every free Indian dataset = recognition labels only, NOT weighed grams. → weigh the 30 benchmark plates + ingest <strong>INDB</strong> (recipe grams). Until then a Gate-0a pass ≠ field accuracy.</p></div>
+      </div>
+      <div class="callout"><div class="lbl">Dataset verdict</div><div class="body">No free <em>Indian</em> dataset can serve as macro ground truth — all (Indian Food Images 4k/80-class, IndianFoodNet-30, etc.) are recognition labels only. Weighed-gram truth exists only Western (Nutrition5k CC BY 4.0, SimpleFood45) — calibrates methodology, not Indian macros. Indian macro layer = IFCT 2017 + <strong>INDB (Indian Nutrient Databank)</strong>: ~1,014 recipes with per-ingredient grams + per-serving macros, open-access, IFCT-derived → ingest alongside IFCT (D-21 / TODOS-9). Gate-0a truth must be <strong>weighed</strong> by the founder.</div></div>
+      <div class="callout"><div class="lbl">Competitive reality</div><div class="body">HealthifyMe "Snap" (Sept 2023) already ships this: 150k items, GPT-4 Turbo Vision + fine-tuned ensemble + humans-in-loop, ~75% accuracy, 40M+ users (OpenAI case study). Even the incumbent caps ~75% with far more — so the moat is NOT photo accuracy; it's budget-aware veg-protein-gap advice grounded in the user's own log. Strategic pivot (diaspora / GLP-1) logged OPEN in D-29, not decided.</div></div>
     </section>
 
     <!-- 09 COMPETITORS -->
